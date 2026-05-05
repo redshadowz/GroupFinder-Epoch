@@ -1805,9 +1805,10 @@ function GF_GetWhoData(arg2,arg12,groupfound)
 	end
 end
 function GF_UpdateWhoDataViaFriendsList()
+	if FriendsFrame:IsVisible() then return end
 	GF_UpdateWhoDataViaFriendsListTimer = GF_UpdateWhoDataViaFriendsListTimer - 1
 	if GF_UpdateWhoDataViaFriendsListTimer < 0 then
-		GF_UpdateWhoDataViaFriendsListTimer = 0
+		GF_UpdateWhoDataViaFriendsListTimer = 3
 		local highestPriorityName
 		local highestPriorityTime = time() + 999999
 		for name,data in pairs(GF_SavedVariables.friendsToRemove) do if data > time() then if data < highestPriorityTime and (not GF_FriendUnknown[highestPriorityName] or GF_FriendUnknown[highestPriorityName] < time()) then highestPriorityTime = data highestPriorityName = name end end end
@@ -1820,11 +1821,13 @@ end
 function GF_UpdateFriendsList()
 	GF_CurrentNumFriends = GetNumFriends()
 	GF_Friends = {}
+	local counter = 0
 	for i=1,GetNumFriends() do
 		local name,level,class,_,online = GetFriendInfo(i)
 		if name then
 			if name == UNKNOWN then
 				RemoveFriend(i)
+				counter = counter + 1
 			elseif GF_ClassColors[GF_Classes[class]] and level and level ~= 0 then
 				GF_WhoTable[GF_RealmName][name] = { level, GF_Classes[class], "", time()}
 				if online and not GF_SavedVariables.friendsToRemove[name] then GF_Friends[name] = true end
@@ -1832,11 +1835,13 @@ function GF_UpdateFriendsList()
 				if GF_SavedVariables.friendsToRemove[name] then GF_FriendUnknown[name] = time() + 900 end
 			end
 		end
-		if GF_SavedVariables.friendsToRemove[name] then RemoveFriend(i) end
+		if GF_SavedVariables.friendsToRemove[name] then RemoveFriend(i) counter = counter + 1 end
+		if counter >= 3 then break end
 	end
 	for name,_ in pairs(GF_SavedVariables.friendsToRemove) do
 		if not GF_Friends[name] and GF_SavedVariables.friendsToRemove[name] + 30 < time() then GF_SavedVariables.friendsToRemove[name] = nil end
 	end
+	GF_UpdateWhoDataViaFriendsListTimer = 0
 end
 function GF_CheckForAnnounce()
 	GF_AutoAnnounceTimer = GF_AutoAnnounceTimer + 1
@@ -3757,8 +3762,8 @@ function GF_SearchMessageForTextString(msg,textstring,entry)
 		end
 	end
 end
-function GF_GroupHistoryZoneUpdate() -- GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { zonename,createtime,playerlist,itemlist,lastupdatetime,alreadydisplayed }
-	if GF_CurrentZone ~= GetRealZoneText() then
+function GF_GroupHistoryZoneUpdate(fromGroupUpdate) -- GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { zonename,createtime,playerlist,itemlist,lastupdatetime,alreadydisplayed }
+	if GF_PerCharVariables.CurrentGroup["TempData"][1] ~= GetRealZoneText() then
 -- This function saves TempData when changing zone
 		GF_PerCharVariables.CurrentGroup["TempData"][5] = time() -- Save the time I left the zone.
 		if not GF_PerCharVariables.groupfinishtimer then -- Save tempdata to currentgroup if there is no timer for the currentzone
@@ -3787,7 +3792,7 @@ function GF_GroupHistoryZoneUpdate() -- GF_PerCharVariables.CurrentGroup[GF_Curr
 			for name,data in pairs(GF_PerCharVariables.CurrentGroup["TempData"][3]) do if GF_PlayersCurrentlyInGroup[name] and not GF_PerCharVariables.CurrentGroup[GF_CurrentZone][3][name] then GF_PerCharVariables.CurrentGroup[GF_CurrentZone][3][name] = {data[1],data[2],0,0,0} end end
 			for pos,data in pairs(GF_PerCharVariables.CurrentGroup[GF_CurrentZone]) do if type(data) == "table" then for tpos,tdata in pairs(data) do GF_PerCharVariables.CurrentGroup["TempData"][pos][tpos] = tdata end else GF_PerCharVariables.CurrentGroup["TempData"][pos] = data end end
 		end
-		GF_UpdateGroup()
+		if not fromGroupUpdate then GF_UpdateGroup() end
 	end
 	if not GF_PerCharVariables.CurrentGroup["TempData"][6] then GF_GroupHistoryDisplayLogCurrent("TempData",true) end
 end
@@ -3944,6 +3949,7 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 	GF_NumPartyMembersOnline = 0
 	GF_PlayersCurrentlyInGroup = {[UnitName("player")] = "player"}
 	GF_PetCurrentlyInGroup = {}
+	if GF_PerCharVariables.CurrentGroup["TempData"][1] ~= GF_CurrentZone then GF_GroupHistoryZoneUpdate(true) end
 	if not GF_PerCharVariables.CurrentGroup[GF_CurrentZone] then table.insert(GF_PerCharVariables.CurrentGroup,GF_CurrentZone) GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() } end
 	if UnitExists("pet") then GF_PetCurrentlyInGroup[UnitName("pet")] = {UnitName("player"),"pet"} end
 	if GetNumRaidMembers() > 1 then
@@ -4454,7 +4460,7 @@ function GF_LFMWhisperRequestInviteButton(frame,id)
 	if GF_PerCharVariables.lfgheal then specString = specString..GF_HEALER.."/" end
 	if GF_PerCharVariables.lfgdps then specString = specString..GF_DPS.."/" end
 	specString = strsub(specString,1,-2)..gsub(strsub(specString,-1,-1),"[/ ]","").." "..UnitClass("player").."] "
-	SendChatMessage(specString..GF_INVITE_PLEASE,"WHISPER",nil,GF_FilteredResultsList[GF_ResultsListOffset+id].op)
+	SendChatMessage(specString..GF_INVITE_FOR..GF_FilteredResultsList[GF_ResultsListOffset+id].message.."\"","WHISPER",nil,GF_FilteredResultsList[GF_ResultsListOffset+id].op)
 	GF_RequestInviteTime[GF_FilteredResultsList[GF_ResultsListOffset+id].op] = time() + 120
 	getglobal(frame:GetName().."LFMWhisperRequestInviteButton"):Hide()
 end
