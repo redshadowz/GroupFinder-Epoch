@@ -1143,7 +1143,7 @@ GF_WORD_FIX_SINGLE_WORD = { -- Single word changes. Mostly typos and simple word
 ["ferlas"] = "feralas",["fearalas"] = "feralas",["ferelas"] = "feralas",["feralass"] = "feralas",["fairalas"] = "feralas",["feralass"] = "feralas",["feraless"] = "feralas",["fairalass"] = "feralas",["feralis"] = "feralas",
 ["feralus"] = "feralas",["fearlas"] = "feralas",["feralash"] = "feralas",["feeralas"] = "feralas",["fearlass"] = "feralas",["ferales"] = "feralas",["farelsa"] = "feralas",
 ["goldhire"] = "goldshire",
-["hinter"] = "hinterlands",
+["hinter"] = "hinterlands",["hinterlade"] = "hinterlands",
 ["stonrad"] = "stonard",["thersmore"] = "theramore",["theramor"] = "theramore",["theraore"] = "theramore",["thera"] = "theramore",["thermore"] = "theramore",["teramore"] = "theramore",
 ["thereamore"] = "theramore",["theramroe"] = "theramore",["treomore"] = "theramore",["thalamore"] = "theramore",["theramoore"] = "theramore",
 ["gultch"] = "gulch",["avs"] = "av",
@@ -1201,7 +1201,7 @@ GF_WORD_FIX_SINGLE_WORD = { -- Single word changes. Mostly typos and simple word
 
 -- Dungeons
 ["rf"] = "rfc",["rsc"] = "rfc",["rcf"] = "rfc",["rgc"] = "rfc",["rfv"] = "rfc",["rffc"] = "rfc",["rfg"] = "rfc",["chasam"] = "chasm",["casm"] = "chasm",
-["dms"] = "dm",["vc"] = "deadmines",["dmines"] = "deadmines",["dmine"] = "deadmines",
+["dms"] = "dm",["vc"] = "deadmines",["dmines"] = "deadmines",["dmine"] = "deadmines",["deadines"] = "deadmines",
 ["twc"] = "wc",["wcr"] = "wc",["waling"] = "wailing",["vailing"] = "wailing",["wailling"] = "wailing",["waililing"] = "wailing",["wailign"] = "wailing",["waialing"] = "wailing",["wailirn"] = "wailing",
 ["cavs"] = "caverns",["caverne"] = "caverns",["carverns"] = "caverns",["cavernes"] = "caverns",["canverns"] = "caverns",["caveras"] = "caverns",
 ["stocls"] = "stock",["stonks"] = "stock",["stockk"] = "stock",["stk"] = "stock",["stck"] = "stock",["stcks"] = "stocks",
@@ -3133,6 +3133,7 @@ GF_LFM_AFTER = { -- Up to two words after
 ["speedrun"] = 1,["speedrungoing"] = 1,
 ["stealthrun"] = 1,
 ["stillgoing"] = 1,
+["thengo"] = .5,
 ["upboys"] = 1,
 ["wme"] = 1,
 ["whisper"] = 1,
@@ -3295,7 +3296,7 @@ GF_LFM_CONNECT_WORDS_BEFORE = { -- Connecting words before Groupname(needhealer(
 ["cloth"] = .25,["leather"] = .25,["mail"] = .25,["plate"] = .25,
 ["reserved"] = .5,["binding"] = .5,["mat"] = .5,["recipe"] = .5,["boe"] = .5,["mount"] = .5,["legendary"] = .5,
 ["tier"] = 0,["tierone"] = 0,["tiertwo"] = 0,["tierthree"] = 0,
-["yelo"] = .5,["yelos"] = .5,["yala"] = .5,["yalla"] = .5,["yolo"] = .5,["dualspec"] = .25,["finish"] = .25,["finishing"] = .25,
+["yelo"] = .5,["yelos"] = .5,["yala"] = .5,["yalla"] = .5,["yolo"] = .5,["dualspec"] = .25,["finish"] = .25,["finishing"] = .25,["then"] = 0,
 
 ["b"] = 0,["c"] = 0,["d"] = 0,["e"] = 0,["f"] = 0,["g"] = 0,["h"] = 0,["i"] = 0,["j"] = 0,["k"] = 0,["l"] = 0,["m"] = 0,["n"] = 0,["o"] = 0,["p"] = 0,["q"] = 0,["r"] = 0,["s"] = 0,["t"] = 0,["u"] = 0,["v"] = 0,["w"] = 0,["y"] = 0,["z"] = 0,["da"] = 0,["ms"] = 0,
 
@@ -3341,7 +3342,7 @@ GF_LFM_CONNECT_WORDS_AFTER = { -- Connecting words after Groupname(dm(need)heale
 ["cloth"] = .25,["leather"] = .25,["mail"] = .25,["plate"] = .25,
 ["reserved"] = .5,["binding"] = .5,["mat"] = .5,["recipe"] = .5,["boe"] = .5,["mount"] = .5,["legendary"] = .5,
 ["tier"] = 0,["tierone"] = 0,["tiertwo"] = 0,["tierthree"] = 0,
-["yelo"] = .5,["yelos"] = .5,["yala"] = .5,["yalla"] = .5,["yolo"] = .5,["dualspec"] = .25,["finish"] = .25,["finishing"] = .25,
+["yelo"] = .5,["yelos"] = .5,["yala"] = .5,["yalla"] = .5,["yolo"] = .5,["dualspec"] = .25,["finish"] = .25,["finishing"] = .25,["then"] = 0,
 
 ["b"] = 0,["c"] = 0,["d"] = 0,["e"] = 0,["f"] = 0,["g"] = 0,["h"] = 0,["i"] = 0,["j"] = 0,["k"] = 0,["l"] = 0,["m"] = 0,["n"] = 0,["o"] = 0,["p"] = 0,["q"] = 0,["r"] = 0,["s"] = 0,["t"] = 0,["u"] = 0,["v"] = 0,["w"] = 0,["y"] = 0,["z"] = 0,["da"] = 0,["ms"] = 0,
 
