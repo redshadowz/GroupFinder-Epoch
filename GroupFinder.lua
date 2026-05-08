@@ -326,8 +326,8 @@ function GF_LoadVariables()
 		GF_PerCharVariables.CurrentGroup = {}
 		table.insert(GF_PerCharVariables.CurrentGroup,GF_CurrentZone)
 		GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() }
-		GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() }
 	end
+	if not GF_PerCharVariables.CurrentGroup["TempData"] then GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() } end
 	if GetPlayerInfoByGUID then -- Added to block stuff in WOTLK
 		GF_SavedVariables.usefriendslist = true
 		GF_UseFriendsListCheckButton:Hide()
@@ -888,10 +888,11 @@ function GF_OnLoad() -- Onload, Tooltips, and Frame/Minimap Functions
 		elseif strfind(name,"^n\-\"?(%a+)\"?$") or strfind(name,"^(%a+)$") then -- /who is on cooldown, name is a player, but name is not in displayWhoMessageName... add to GF_WhoQueue(this should only ever be called by another addon)
 			_,_,name = strfind(name,"^n\-\"?(%a+)\"?$") if not name then _,_,name = strfind(name,"^(%a+)$") end
 			if name then
-				for i=1, getn(GF_WhoQueue) do if GF_WhoQueue[i] == name then table.remove(GF_WhoQueue, i) break end end
+				for i=1, getn(GF_UrgentWhoRequest) do if GF_UrgentWhoRequest[i] == name then table.remove(GF_UrgentWhoRequest, i) break end end
 				DEFAULT_CHAT_FRAME:AddMessage(GF_SENDING_WHO_FOR..name.." - "..ceil(GF_NextAvailableWhoTime - time() + getn(GF_UrgentWhoRequest) * GF_WhoCooldownTime)..GF_SECONDS,1,1,0.5)
-				table.insert(GF_WhoQueue,1,name)
-				GF_WhoQueue[name] = true
+				table.insert(GF_UrgentWhoRequest,1,name)
+				GF_UrgentWhoRequest[name] = time()
+				displayWhoMessageName["n-"..name] = {name,time()}
 			end
 		else
 			DEFAULT_CHAT_FRAME:AddMessage(GF_WHO_ON_COOLDOWN..ceil(GF_NextAvailableWhoTime - time() + getn(GF_UrgentWhoRequest) * GF_WhoCooldownTime)..GF_SECONDS,1,1,0.5)
@@ -1810,10 +1811,10 @@ function GF_AddNameToWhoQueue(name,addToTopOfList)
 		end
 	elseif addToTopOfList then
 		table.insert(GF_WhoQueue,1,name)
-		GF_WhoQueue[name] = true
+		GF_WhoQueue[name] = time()
 	else
 		table.insert(GF_WhoQueue, name)
-		GF_WhoQueue[name] = true
+		GF_WhoQueue[name] = time()
 	end
 	if GF_UpdateAndRequestTimer > 4 then GF_UpdateAndRequestTimer = GF_NextAvailableWhoTime - time() end
 end
@@ -1861,7 +1862,7 @@ function GF_UpdateFriendsList()
 	for name,_ in pairs(GF_SavedVariables.friendsToRemove) do
 		if not GF_Friends[name] and GF_SavedVariables.friendsToRemove[name] + 30 < time() then GF_SavedVariables.friendsToRemove[name] = nil end
 	end
-	GF_UpdateWhoDataViaFriendsListTimer = 0
+	GF_UpdateWhoDataViaFriendsListTimer = 1
 	GF_OnUpdateFunctions["UpdateFriends"] = nil
 end
 function GF_CheckForAnnounce()
@@ -2237,7 +2238,20 @@ function GF_Frame:GUILD_ROSTER_UPDATE()
 	if GetNumGuildMembers() ~= GF_CurrentNumGuildies then GF_UpdateGuildiesList() end
 end
 function GF_Frame:PARTY_INVITE_REQUEST(self,event,...)
-	if GF_RequestInviteTime[arg1] and GF_RequestInviteTime[arg1] > time() then AcceptGroupInvite() end
+	if GF_RequestInviteTime[arg1] and GF_RequestInviteTime[arg1] > time() then
+		AcceptGroup()
+		for i=1, STATICPOPUP_NUMDIALOGS do
+			if getglobal("StaticPopup"..i).which == "PARTY_INVITE" then
+				getglobal("StaticPopup"..i).inviteAccepted = 1
+				StaticPopup_Hide("PARTY_INVITE")
+				break
+			elseif getglobal("StaticPopup"..i).which == "PARTY_INVITE_XREALM" then
+				getglobal("StaticPopup"..i).inviteAccepted = 1
+				StaticPopup_Hide("PARTY_INVITE_XREALM")
+				break
+			end
+		end
+	end
 end
 function GF_Frame:PARTY_MEMBERS_CHANGED()
 	GF_OnUpdateFunctions["UpdateGroup"] = GF_UpdateGroup
@@ -3759,7 +3773,7 @@ end
 function GF_GetRolesFromLFGText(arg1)
 	local lfs,lfe,prefix,dungeonName,numTank,numHeal,numDPS = strfind(arg1,"([LFGM]+):(%w+):(%w+):?(%d?%d?):?(%d?%d?)")
 	if prefix == "LFM" and dungeonName and numTank and numHeal and numDPS then
-		return gsub(prefix.." "..dungeonName.." have "..(tonumber(numTank) > 0 and (numTank.."tank ") or "")..(tonumber(numHeal) > 0 and (numHeal.."heal ") or "")..(tonumber(numDPS) > 0 and (numDPS.."dps ") or ""),":"," ").."(LFG addon)"
+		return gsub(prefix.." "..dungeonName.." have "..(tonumber(numTank) and tonumber(numTank) > 0 and (numTank.."tank ") or "")..(tonumber(numHeal) and tonumber(numHeal) > 0 and (numHeal.."heal ") or "")..(tonumber(numDPS) and tonumber(numDPS) > 0 and (numDPS.."dps ") or ""),":"," ").."(LFG addon)"
 	elseif numTank then
 		prefix = numTank.." "..prefix.." "..dungeonName
 		lfs = lfe+1
@@ -3793,7 +3807,7 @@ function GF_SearchMessageForTextString(msg,textstring,entry)
 	end
 end
 function GF_GroupHistoryZoneUpdate(fromGroupUpdate) -- GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { zonename,createtime,playerlist,itemlist,lastupdatetime,alreadydisplayed }
-	if GF_PerCharVariables.CurrentGroup["TempData"][1] ~= GetRealZoneText() then
+	if GF_PerCharVariables.CurrentGroup["TempData"][1] ~= GetRealZoneText() and GetRealZoneText() ~= "" then
 -- This function saves TempData when changing zone
 		GF_PerCharVariables.CurrentGroup["TempData"][5] = time() -- Save the time I left the zone.
 		if not GF_PerCharVariables.groupfinishtimer then -- Save tempdata to currentgroup if there is no timer for the currentzone
@@ -3979,7 +3993,7 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 	GF_NumPartyMembersOnline = 0
 	GF_PlayersCurrentlyInGroup = {[UnitName("player")] = "player"}
 	GF_PetCurrentlyInGroup = {}
-	if GF_PerCharVariables.CurrentGroup["TempData"][1] ~= GF_CurrentZone then GF_GroupHistoryZoneUpdate(true) end
+	if GF_PerCharVariables.CurrentGroup["TempData"][1] ~= GetRealZoneText() and GetRealZoneText() ~= "" then GF_GroupHistoryZoneUpdate(true) end
 	if not GF_PerCharVariables.CurrentGroup[GF_CurrentZone] then table.insert(GF_PerCharVariables.CurrentGroup,GF_CurrentZone) GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() } end
 	if UnitExists("pet") then GF_PetCurrentlyInGroup[UnitName("pet")] = {UnitName("player"),"pet"} end
 	if GetNumRaidMembers() > 1 then
@@ -5535,7 +5549,7 @@ function GF_UpdateQueueLFTButton() -- Updates(gets dungeon list) on login and wh
 				else
 					GF_GenTooltips["GF_QueuetoLFTButton"].tooltip1 = GF_SELECT_ROLES_QUEUE
 				end
-				GF_GenTooltips["GF_QueuetoLFTButton"].tooltip2 = strsub(wordString,1,-3)
+				GF_GenTooltips["GF_QueuetoLFTButton"].tooltip2 = wordString
 			end
 		end
 	elseif LFGMain and leaveQueueButton and findGroupButton and findMoreButton then

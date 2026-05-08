@@ -526,7 +526,7 @@ GF_WORD_BYPASS_TRIGGER = { -- Words to not include in the WordTable. lf/lfg/lfm/
 }
 GF_WORD_GROUP_BYPASS = { -- If lf/lfg/lfm/queue then check for next word for matching dungeon
 ["lf"] = "lf",["lfg"] = "lfg",["lfm"] = "lfm",["queue"] = "queue",["join"] = "join",["doing"] = "doing",["run"] = "run",["heal"] = "heal",["heals"] = "heal",["healer"] = "healer",["dps"] = "dps",["tank"] = "tank",["lk"] = "lf",["lfc"] = "lf",["lm"] = "lfm",
-["arm"] = "smarm",["bl"] = "bwl",["bmw"] = "bm",["ch"] = "cg",["counterattack"] = "counterattackexclamation",["dw"] = "dm",["gnome"] = "gnomer",["gy"] = "smgy",["hateful"] = "hfq",["kc"] = "karazhancrypt",["ws"] = "wsg",["hquest"] = "hquest",
+["arm"] = "smarm",["bl"] = "bwl",["bmw"] = "bm",["ch"] = "cg",["counterattack"] = "counterattackexclamation",["dw"] = "dm",["gnome"] = "gnomer",["gy"] = "smgy",["hateful"] = "hfq",["kc"] = "karazhancrypt",["ws"] = "wsg",["hquest"] = "hquest",["wb"] = "boss",
 ["lords"] = "silithuslords",["hfm"] = "hfq",["monastery"] = "scarletmonastery",["nac"] = "naxxramas",["rc"] = "rfc",["ruins"] = "stormwroughtruins",["sc"] = "stormwroughtcastle",["school"] = "scholomance",["th"] = "tmh",["gm"] = "gmm",["svt"] = "stv",
 ["sd"] = "stormwroughtdescent",["sf"] = "sfk",["stwv"] = "swv",["start"] = "stratholme",["strat"] = "stratholme",["stra"] = "stratholme",["temple"] = "sunkentemple",["tribute"] = "dmt",["ud"] = "udstrat",["gulch"] = "wsg",["canyon"] = "windhorncanyon",
 ["wailing"] = "wc",["wg"] = "wsg",["dr"] = "dragonmaw",["ra"] = "rfc",["rg"] = "rfc",["counterstrike"] = "counterattackexclamation",["wv"] = "swv",["bf"] = "bfd",["drm"] = "dm",["prison"] = "stockade",["kt"] = "naxxramas",["tan"] = "tank",["tl"] = "tailor",
@@ -1026,7 +1026,7 @@ GF_WORD_FIX_SINGLE_WORD = { -- Single word changes. Mostly typos and simple word
 ["neva"] = "never",["onl"] = "only",["onlinee"] = "online",["oout"] = "out",["orges"] = "ogres",["others"] = "other",["oyu"] = "you",["norht"] = "north",["boi"] = "boy",["harcore"] = "hardcore",["wherer"] = "where",["chiken"] = "chicken",
 ["pleaasee"] = "please",["pleassee"] = "please",["pwease"] = "please",["plzz"] = "please",["pelase"] = "please",["pleaze"] = "please",["pleeaasee"] = "please",["pleease"] = "please",["plez"] = "please",["plkease"] = "please",
 ["plix"] = "please",["pliz"] = "please",["plox"] = "please",["pls"] = "please",["plss"] = "please",["pleaase"] = "please",["pleaae"] = "please",["plizz"] = "please",["plzt"] = "please",["plis"] = "please",["ppls"] = "please",
-["plx"] = "please",["plxx"] = "please",["plz"] = "please",["pleas"] = "please",["plaease"] = "please",["multiboxxing"] = "multiboxing",["brachet"] = "bracket",["dockmastter"] = "dockmaster",["mastter"] = "master",
+["plx"] = "please",["plxx"] = "please",["plz"] = "please",["pleas"] = "please",["plaease"] = "please",["multiboxxing"] = "multiboxing",["brachet"] = "bracket",["dockmastter"] = "dockmaster",["mastter"] = "master",["quic"] = "quick",["quickk"] = "quick",
 ["ppl"] = "people",["promie"] = "promise",["quequito"] = "queue",["randos"] = "random",["rdy"] = "ready",["macth"] = "match",["havea"] = "have",["wich"] = "which",["luv"] = "love",["takebn"] = "taken",["stratigically"] = "strategically",
 ["rememberer"] = "remember",["reservd"] = "reserved",["resrved"] = "reserved",["rhey"] = "they",["rper"] = "rp",["rpers"] = "rp",["rserved"] = "reserved",["sayin"] = "saying",["seperate"] = "separate",["posibility"] = "possibility",
 ["serber"] = "server",["shpeed"] = "speed",["siign"] = "sign",["skullz"] = "skull",["skulz"] = "skull",["socila"] = "social",["sory"] = "sorry",["sosial"] = "social",["souther"] = "southern",["alrdy"] = "already",["apparell"] = "apparel",["greve"] = "grave",
@@ -1139,7 +1139,7 @@ GF_WORD_FIX_SINGLE_WORD = { -- Single word changes. Mostly typos and simple word
 ["arati"] = "arathi",["alteriv"] = "alterac",["atlerac"] = "alterac",["altarac"] = "alterac",["alterak"] = "alterac",["altrac"] = "alterac",["alterec"] = "alterac",
 ["azhara"] = "azshara",["ashara"] = "azshara",["azshare"] = "azshara",["azshera"] = "azshara",["azashara"] = "azshara",
 ["silithis"] = "silithus",["sithilus"] = "silithus",["silitshus"] = "silithus",["silthius"] = "silithus",["silith"] = "silithus",["ailithus"] = "silithus",["shilithus"] = "silithus",
-["silithid"] = "silithus",["silithius"] = "silithus",["sillithus"] = "silithus",["slithus"] = "silithus",["siltihus"] = "silithus",["silithgus"] = "silithus",
+["silithid"] = "silithus",["silithius"] = "silithus",["sillithus"] = "silithus",["slithus"] = "silithus",["siltihus"] = "silithus",["silithgus"] = "silithus",["silitus"] = "silithus",
 ["ferlas"] = "feralas",["fearalas"] = "feralas",["ferelas"] = "feralas",["feralass"] = "feralas",["fairalas"] = "feralas",["feralass"] = "feralas",["feraless"] = "feralas",["fairalass"] = "feralas",["feralis"] = "feralas",
 ["feralus"] = "feralas",["fearlas"] = "feralas",["feralash"] = "feralas",["feeralas"] = "feralas",["fearlass"] = "feralas",["ferales"] = "feralas",["farelsa"] = "feralas",
 ["goldhire"] = "goldshire",
@@ -1192,12 +1192,12 @@ GF_WORD_FIX_SINGLE_WORD = { -- Single word changes. Mostly typos and simple word
 ["hydraxxian"] = "hydraxian",["hydrazian"] = "hydraxian",["hydraixan"] = "hydraxian",["hydaxian"] = "hydraxian",["hydraxi"] = "hydraxian",["hydraxin"] = "hydraxian",["hydriaxian"] = "hydraxian",
 ["smonus"] = "somnus",["duks"] = "dukes",["tiwlligt"] = "twilight",["abbssal"] = "abyssal",["abssal"] = "abyssal",["abbyssal"] = "abyssal",
 ["abyssl"] = "abyssal",["abysal"] = "abyssal",["noz"] = "nozdormu",["obsidon"] = "obsidion",["obsidon"] = "obsidion",["tf"] = "thunderfury",["aquamentas"] = "aquementas",["aquamentos"] = "aquementas",
-["rougug"] = "roogug",["rugug"] = "roogug",["rougog"] = "roogug",["cobrarian"] = "cobrahn",["borerlgore"] = "borelgore",["tusks"] = "tusk",["thunderan"] = "thunderaan",
+["rougug"] = "roogug",["rugug"] = "roogug",["rougog"] = "roogug",["cobrarian"] = "cobrahn",["borerlgore"] = "borelgore",["tusks"] = "tusk",["thunderan"] = "thunderaan",["monogramed"] = "monogrammed",
 
 ["mission"] = "quest",["klavens"] = "klaven",["krastinovs"] = "krastinov",["scuthe"] = "scythe",["bangladash"] = "bangalash",
 ["courrier"] = "courier",["scyth"] = "scythe",["liutenant"] = "lieutenant",["alvaroid"] = "alverold",["cinders"] = "cinder",["dynders"] = "cynders",["cyndes"] = "cynders",["captaions"] = "captain",["capitain"] = "captain",["captains"] = "captain",
 ["scort"] = "escort",["baronv"] = "barov",["marshall"] = "marshal",["cylonian"] = "cyclonian",["cylone"] = "cyclonian",
-["dailys"] = "dailies",["dillies"] = "dailies",["daylies"] = "dailies",["dayles"] = "dailies",["dalyes"] = "dailies",["dailie"] = "daily",["dailes"] = "dailies",["daili"] = "daily",
+["dailys"] = "dailies",["dillies"] = "dailies",["daylies"] = "dailies",["dayles"] = "dailies",["dalyes"] = "dailies",["dailie"] = "daily",["dailes"] = "dailies",["daylis"] = "dailies",["daili"] = "daily",
 
 -- Dungeons
 ["rf"] = "rfc",["rsc"] = "rfc",["rcf"] = "rfc",["rgc"] = "rfc",["rfv"] = "rfc",["rffc"] = "rfc",["rfg"] = "rfc",["chasam"] = "chasm",["casm"] = "chasm",
@@ -1461,7 +1461,7 @@ GF_WORD_FIX_BEFORE_QUEST = { -- Word changes processed before quests.
 ["hitnerlands"] = "hinterlands",["hitnerland"] = "hinterlands",["hitterlands"] = "hinterlands",["hitterland"] = "hinterlands",["hinterladns"] = "hinterlands",["hinterladn"] = "hinterlands",["hitherland"] = "hinterlands",
 ["hinterland"] = "hinterlands",["hunterlands"] = "hinterlands",["hiunterlands"] = "hinterlands",
 ["fellwood"] = "felwood",
-
+["bastedlands"] = "blastedlands",["blastadlands"] = "blastedlands",["bastadlands"] = "blastedlands",
 ["redrige"] = "redridge",["redrodge"] = "redridge",["reddrige"] = "redridge",["redredge"] = "redridge",["rr"] = "redridge",["redridhe"] = "redridge",["redrigde"] = "redridge",["redridg"] = "redridge",
 ["strangethorn"] = "stranglethorn",["stranglthorn"] = "stranglethorn",["stranglethrn"] = "stranglethorn",["strangthorn"] = "stranglethorn",["strangethrn"] = "stranglethorn",["vele"] = "vale",
 ["theramoreisland"] = "theramore",
@@ -1590,7 +1590,7 @@ GF_WORD_FIX_BEFORE_QUEST = { -- Word changes processed before quests.
 
 ["shadomwang"] = "sfk",["sfkeep"] = "sfk",["shawdowfang"] = "sfk",["shadowfeng"] = "sfk",["shadowfernkeep"] = "sfk",["shadowfkeep"] = "sfk",["sfkk"] = "sfk",["sfks"] = "sfk",["shadwofang"] = "sfk",
 ["razorfren"] = "razorfen",["razofern"] = "razorfen",["razorfer"] = "razorfen",["razorder"] = "razorfen",["razerfen"] = "razorfen",["razonfen"] = "razorfen",["razoerfen"] = "razorfen",["rpk"] = "rfk",["rfkk"] = "rfk",["rdk"] = "rfk",
-["razorfrn"] = "razorfen",["wzorfen"] = "razorfen",["wazorfen"] = "razorfen",["razorfenk"] = "razorfenkraul",
+["razorfrn"] = "razorfen",["wzorfen"] = "razorfen",["wazorfen"] = "razorfen",["wazorfen"] = "razorfen",["razorfern"] = "razorfenkraul",
 ["libraryu"] = "library",["cathedrale"] = "cathedral",
 ["downsynd"] = "downs",["razorfend"] = "razorfendowns",["razorfendown"] = "razorfendowns",["rfdowns"] = "razorfendowns",
 
@@ -1666,7 +1666,7 @@ GF_WORD_FIX_BEFORE_QUEST = { -- Word changes processed before quests.
 
 ["glimmermrk"] = "glittermurk",["glimmermek"] = "glittermurk",["glimmermerc"] = "glittermurk",["glimmermrc"] = "glittermurk",["glimermrk"] = "glittermurk",["glimmermruk"] = "glittermurk",["glimermruk"] = "glittermurk",["glimmrmruk"] = "glittermurk",
 ["glimermek"] = "glittermurk",["glimermerc"] = "glittermurk",["glimermrc"] = "glittermurk",["glimermurk"] = "glittermurk",["glimmermuk"] = "glittermurk",["glimmermurk"] = "glittermurk",
-["glittermine"] = "glittermurkmine",["glittermurkmines"] = "glittermurkmine",
+["glittermine"] = "glittermurkmine",["glittermurkmines"] = "glittermurkmine",["glimmermine"] = "glittermurk",["glimmermines"] = "glittermurk",
 
 ["bhold"] = "baradinhold",["baradinhld"] = "baradinhold",["baradenhld"] = "baradinhold",["baradenhold"] = "baradinhold",["bardinhold"] = "baradinhold",["bardinhld"] = "baradinhold",
 ["bardenhld"] = "baradinhold",["bardenhold"] = "baradinhold",
@@ -1759,7 +1759,7 @@ GF_WORD_FIX_BEFORE_QUEST = { -- Word changes processed before quests.
 }
 GF_WORD_FIX_BEFORE_QUEST_SECOND = {
 -- Groups
-["lovepotion"] = {"azshara","quest"},["farmtimbermawrep"] = {"timbermaw","repfarm"},["anygr"] = {"any","group"},["giantsws"] = {"frostmaul","winterspring"},["needto"] = {"need","to"},
+["lovepotion"] = {"azshara","quest"},["farmtimbermawrep"] = {"timbermaw","repfarm"},["anygr"] = {"any","group"},["giantsws"] = {"frostmaul","winterspring"},["needto"] = {"need","to"},["wnado"] = {"need","do"},
 ["lokmodan"] = {"loch","modan"},["silithusraidgroup"] = {"silithus","repfarm"},["sillydailies"] = {"silithus","dailies"},["sillydaily"] = {"silithus","daily"},
 ["slidailies"] = {"silithus","dailies"},["slidaily"] = {"silithus","daily"},["sildailies"] = {"silithus","dailies"},["sildaily"] = {"silithus","daily"},
 
@@ -2179,7 +2179,7 @@ GF_WORD_FIX_ITEM_NAME = { -- Converts "[Crimson Pantaloons]" into "[legs]" for d
 ["blacksmithing"] = "blacksmithin",
 ["lock"] = "lock",["key"] = "key",["grail"] = "trinket",["stormwind"] = "trinket",["ironforge"] = "trinket",
 ["thunderfury"] = "thunderfury",
-["grimoire"] = "grimoire",["mechanical"] = "mechanical",
+["grimoire"] = "grimoire",["mechanical"] = "mechanical",["food"] = "meat",
 }
 GF_WORD_FIX_TIME = { -- Converts "20:00 ST" into "20:00 servertime" to stop detecting Sunken Temple mostly
 ["st"] = "servertime",["utc"] = "utc",
@@ -3070,7 +3070,7 @@ GF_LFM_BEFORE = { -- Up to three words before
 ["damage"] = .75,["dps"] = 1,["heal"] = .75,["healer"] = .75,["tank"] = .75,
 ["group"] = .75,["p"] = 1,["pop"] = .5,["queue"] = 1,["qing"] = 1,["raid"] = .75,["running"] = 1,
 ["anyone"] = 1,["duo"] = 1,["together"] = .75,
-["finishing"] = 1,["form"] = 1,["fresh"] = 1,["host"] = 1,["join"] = 1,["make"] = .75,["setup"] = 1,["start"] = .5,["starting"] = 1,
+["finishing"] = 1,["form"] = 1,["fresh"] = 1,["host"] = 1,["join"] = 1,["make"] = .75,["setup"] = 1,["start"] = .5,["starting"] = 1,["search"] = 1,
 ["gtg"] = 1,["yelo"] = .75,["yelos"] = .75,["yala"] = .75,["yalla"] = .75,["yolo"] = .75,
 ["help"] = 1,["kill"] = 1,["please"] = 1,
 ["reg"] = .5,["normal"] = .5,
@@ -3147,7 +3147,7 @@ GF_LFM_AFTER = { -- Up to two words after
 ["damage"] = .75,["dps"] = 1,["heal"] = .75,["healer"] = .75,["tank"] = .75,
 ["group"] = .75,["p"] = 1,["pop"] = .5,["popped"] = 1,["popping"] = 1,["queue"] = 1,["raid"] = .75,["spam"] = 1,["sr"] = 1,["softreserve"] = 1,
 ["anyone"] = 1,["duo"] = 1,["open"] = 1,["opened"] = 1,["seek"] = 1,["together"] = .75,
-["form"] = 1,["fresh"] = 1,["host"] = 1,["join"] = 1,["rerun"] = 1,["run"] = .75,["running"] = 1,["start"] = .75,["starting"] = 1,
+["form"] = 1,["fresh"] = 1,["host"] = 1,["join"] = 1,["rerun"] = 1,["run"] = .75,["running"] = 1,["start"] = .75,["starting"] = 1,["search"] = 1,
 ["gtg"] = 1,["id"] = 1,
 ["help"] = 1,["kill"] = 1,["please"] = 1,
 ["reg"] = .5,["normal"] = .5,
@@ -3296,7 +3296,7 @@ GF_LFM_CONNECT_WORDS_BEFORE = { -- Connecting words before Groupname(needhealer(
 ["cloth"] = .25,["leather"] = .25,["mail"] = .25,["plate"] = .25,
 ["reserved"] = .5,["binding"] = .5,["mat"] = .5,["recipe"] = .5,["boe"] = .5,["mount"] = .5,["legendary"] = .5,
 ["tier"] = 0,["tierone"] = 0,["tiertwo"] = 0,["tierthree"] = 0,
-["yelo"] = .5,["yelos"] = .5,["yala"] = .5,["yalla"] = .5,["yolo"] = .5,["dualspec"] = .25,["finish"] = .25,["finishing"] = .25,["then"] = 0,
+["yelo"] = .5,["yelos"] = .5,["yala"] = .5,["yalla"] = .5,["yolo"] = .5,["dualspec"] = .25,["finish"] = .25,["finishing"] = .25,["then"] = 0,["silly"] = 0,["semi"] = 0,["super"] = 0,
 
 ["b"] = 0,["c"] = 0,["d"] = 0,["e"] = 0,["f"] = 0,["g"] = 0,["h"] = 0,["i"] = 0,["j"] = 0,["k"] = 0,["l"] = 0,["m"] = 0,["n"] = 0,["o"] = 0,["p"] = 0,["q"] = 0,["r"] = 0,["s"] = 0,["t"] = 0,["u"] = 0,["v"] = 0,["w"] = 0,["y"] = 0,["z"] = 0,["da"] = 0,["ms"] = 0,
 
@@ -3342,7 +3342,7 @@ GF_LFM_CONNECT_WORDS_AFTER = { -- Connecting words after Groupname(dm(need)heale
 ["cloth"] = .25,["leather"] = .25,["mail"] = .25,["plate"] = .25,
 ["reserved"] = .5,["binding"] = .5,["mat"] = .5,["recipe"] = .5,["boe"] = .5,["mount"] = .5,["legendary"] = .5,
 ["tier"] = 0,["tierone"] = 0,["tiertwo"] = 0,["tierthree"] = 0,
-["yelo"] = .5,["yelos"] = .5,["yala"] = .5,["yalla"] = .5,["yolo"] = .5,["dualspec"] = .25,["finish"] = .25,["finishing"] = .25,["then"] = 0,
+["yelo"] = .5,["yelos"] = .5,["yala"] = .5,["yalla"] = .5,["yolo"] = .5,["dualspec"] = .25,["finish"] = .25,["finishing"] = .25,["then"] = 0,["semi"] = 0,["super"] = 0,
 
 ["b"] = 0,["c"] = 0,["d"] = 0,["e"] = 0,["f"] = 0,["g"] = 0,["h"] = 0,["i"] = 0,["j"] = 0,["k"] = 0,["l"] = 0,["m"] = 0,["n"] = 0,["o"] = 0,["p"] = 0,["q"] = 0,["r"] = 0,["s"] = 0,["t"] = 0,["u"] = 0,["v"] = 0,["w"] = 0,["y"] = 0,["z"] = 0,["da"] = 0,["ms"] = 0,
 
@@ -3502,7 +3502,7 @@ GF_WORD_LEVEL_ZONE = { -- Single Word only
 ["grimreaches"] = 36,["lapidisisle"] = 52,["gillijimisle"] = 52,["thalassianhighlands"] = 7,["blackstoneisland"] = 7,["moonwhispercoast"] = 57,
 
 -- Epoch Zones
-["fortairheart"] = 42,["felstonefort"] = 0,["felstonefortress"] = 0,["zulumar"] = 0,
+["airheart"] = 42,["fortairheart"] = 42,["felstonefort"] = 0,["felstonefortress"] = 0,["zulumar"] = 0,
 
 -- Other for detection
 ["barov"] = 60,--["grimbatol"] = 30,
@@ -3563,6 +3563,7 @@ GF_WORD_QUEST = {
 
 ["emeraldsanctumattunement"]={0,60,0},["timbermawrepfarm"]={0,60,0},["timbermaw"]={0,60,0},["timbermawholdrep"]={0,55,0},["timbermawholdrepfarm"]={0,60,0},["jujufarm"]={0,60,0},["duskwing"]={0,60,0},
 ["bearinlochmodan"]={0,20,0},["dwarvesinwetlands"]={0,31,0},["drakeswampofsorrows"]={0,60,0},["twistingriftcrystal"]={0,60,0},["minesofhillsbrad"]={0,30,0},["upperkarazhanattunement"]={0,60,0},
+["bearquest"] = {0,12,0},
 
 ["taurenstartingarea"]={0,5,0},["humanstartingarea"]={0,5,0},["undeadstartingarea"]={0,5,0},["dwarfstartingarea"]={0,5,0},["gnomestartingarea"]={0,5,0},["nightelfstartingarea"]={0,5,0},["orcstartingarea"]={0,5,0},["trollstartingarea"]={0,5,0},["highelfstartingarea"] = "highelf",["goblinstartingarea"]={0,5,0},
 
@@ -4046,7 +4047,7 @@ GF_TRADE_COMMON_WORDS = {
 ["head"] = "I",["legs"] = "I",["neck"] = "I",["ring"] = "I",["cloak"] = "I",["shoulder"] = "I",["shirt"] = "I",["back"] = "I",["chest"] = "I",["wrist"] = "I",["gloves"] = "I",["hand"] = "I",["shield"] = "I",["boots"] = "I",["weapon"] = "I",["belt"] = "I",["beltbuckle"] = "I",["gem"] = "I",["gemstone"] = "I",["jewel"] = "I",["handsword"] = "I",["handaxe"] = "I",["handmace"] = "I",["handstaff"] = "I",["handdagger"] = "I",["arcanum"] = "I",["libram"] = "I",["grimoire"] = "I",["axe"] = "I",["bow"] = "I",["dagger"] = "I",["greater"] = "I",["gun"] = "I",["lesser"] = "I",["mace"] = "I",["mighty"] = "I",["minor"] = "I",["polearm"] = "I",["staff"] = "I",["sword"] = "I",["throwing"] = "I",["trinket"] = "I",["wand"] = "I",["blueitem"] = "I",["epicitem"] = "I",["greenitem"] = "I",["bag"] = "I",["cluster"] = "I",["elixir"] = "I",["feather"] = "I",["fish"] = "I",["flask"] = "I",["food"] = "I",["formula"] = "I",["goggles"] = "I",["meat"] = "I",["mechanical"] = "G",["pattern"] = "I",["plans"] = "I",["pot"] = "G",["potion"] = "I",["pots"] = "G",["recipe"] = "I",["rocket"] = "I",["rod"] = "I",["schematic"] = "I",["scope"] = "I",["bar"] = "I",["cloth"] = "I",["leather"] = "I",["mail"] = "I",["ore"] = "I",["plate"] = "I",["stone"] = "I",["bolt"] = "G",["bomb"] = "G",["casing"] = "G",["eel"] = "G",["egg"] = "G",["fang"] = "G",["greenhills"] = "G",["mojo"] = "G",["mortar"] = "G",["oil"] = "G",["pearl"] = "G",["rune"] = "G",["runed"] = "G",["sagefish"] = "G",["scale"] = "G",["scroll"] = "G",["scrolls"] = "G",["soil"] = "G",["tenderloin"] = "G",["widget"] = "G",["arcanite"] = "H",["ruggedhide"] = "H",["hitem"] = "H",["mooncloth"] = "H",["oj"] = "H",["orange"] = "H",["water"] = "H",
 ["arcanecrystal"] = "H",["arthastears"] = "H",["blacklotus"] = "H",["blindweed"] = "H",["briarthorn"] = "H",["bruiseweed"] = "H",["dreamdust"] = "H",["dreamfoil"] = "H",["earthroot"] = "H",["fadeleaf"] = "H",["firebloom"] = "H",["firefinsnapper"] = "H",["flamesac"] = "H",["ghostmushroom"] = "H",["goldensansam"] = "H",["goldthorn"] = "H",["gravemoss"] = "H",["gromsblood"] = "H",["heartofwild"] = "H",["icecap"] = "H",["illusiondust"] = "H",["khadgarswhisker"] = "H",["khadgarwhisker"] = "H",["kingsblood"] = "H",["liferoot"] = "H",["mageroyal"] = "H",["mountainsilversage"] = "H",["oilyblackmouth"] = "H",["peacebloom"] = "H",["plaguebloom"] = "H",["purplelotus"] = "H",["silverleaf"] = "H",["souldust"] = "H",["stonescaleoil"] = "H",["strangedust"] = "H",["stranglekelp"] = "H",["sungrass"] = "H",["swiftthistle"] = "H",["swifttthistle"] = "H",["venomsac"] = "H",["visiondust"] = "H",["volatilerum"] = "H",["wildsteelbloom"] = "H",["wintersbite"] = "H",["blackguard"] = "H",["blackvitriol"] = "H",["blastingpowder"] = "H",["bloodvine"] = "H",["carapace"] = "H",["darkironbar"] = "H",["darkironore"] = "H",["darkrune"] = "H",["dragonsinew"] = "H",["delicatearcaniteconverter"] = "H",["dreamscale"] = "H",["expansivemind"] = "H",["eyeofshadow"] = "H",["felcloth"] = "H",["frozenrune"] = "H",["fusedwiring"] = "H",["ghostdye"] = "H",["giftofarthas"] = "H",["gyrochronatom"] = "H",["ironfeather"] = "H",["larvalacid"] = "H",["leyorb"] = "H",["livingessence"] = "H",["moonwell"] = "H",["morrowgrain"] = "H",["nightfinsnapper"] = "H",["onyxiacloak"] = "H",["overchargedleyenergy"] = "H",["poisonresist"] = "H",["rifttear"] = "H",["righteousorb"] = "H",["robeofarcana"] = "H",["rumseyrum"] = "H",["runntumtuber"] = "H",["sandworm"] = "H",["scaleofonyxia"] = "H",["shadowforgedeye"] = "H",["sigilofleeching"] = "H",["sigilofpenetration"] = "H",["sigilofquickness"] = "H",["sigilofresilience"] = "H",["snowball"] = "H",["souldarite"] = "H",["spidersilk"] = "H",["spiderssilk"] = "H",["stormwreaver"] = "H",["sulfuroningot"] = "H",["totemofselfpreservation"] = "H",["unstabletrigger"] = "H",["wickedclaw"] = "H",["wildvine"] = "H",["wintersquid"] = "H",["zulianmudskunk"] = "H",["greenhillsofstranglethorn"] = "H",["shredderoperatingmanual"] = "H",["fortitudeofscourge"] = "H",["mightofscourge"] = "H",["powerofscourge"] = "H",["resilienceofscourge"] = "H",["pvphead"] = "H",["pvpshoulder"] = "H",["pvpchest"] = "H",["pvpwrist"] = "H",["pvpgloves"] = "H",["pvphand"] = "H",["pvplegs"] = "H",["pvpbelt"] = "H",["pvpring"] = "H",["pvpboots"] = "H",["pvpneck"] = "H",["pvpback"] = "H",["pvpcloak"] = "H",["pvpweapon"] = "H",
 ["astral"] = "A",["brilliant"] = "A",["eternal"] = "A",["glimmering"] = "A",["glowing"] = "A",["magic"] = "A",["mystic"] = "A",["nether"] = "A",["nexus"] = "A",["radiant"] = "A",["essence"] = "G",["shard"] = "G",["bronze"] = "A",["copper"] = "A",["iron"] = "A",["mithril"] = "A",["ornate"] = "A",["reinforced"] = "A",["silver"] = "A",["steel"] = "A",["strong"] = "A",["sturdy"] = "A",["tin"] = "A",["truesilver"] = "A",["heavy"] = "A",["light"] = "A",["medium"] = "A",["thick"] = "A",["rugged"] = "A",["air"] = "N",["breath"] = "N",["core"] = "N",["coreof"] = "A",["earth"] = "N",["frozen"] = "N",["lava"] = "N",["wind"] = "N",["linen"] = "A",["mageweave"] = "A",["silk"] = "A",["thorium"] = "A",["wool"] = "A",["coarse"] = "A",["rough"] = "A",["solid"] = "A",["dense"] = "A",["shredder"] = "A",["page"] = "A",["pages"] = "A",["hide"] = "B",["mongoose"] = "A",["giants"] = "A",["resilience"] = "A",["chimaerok"] = "G",["chimera"] = "G",["devilsaur"] = "G",["dynamite"] = "G",["frostsaber"] = "G",["globe"] = "G",["heart"] = "G",["ichor"] = "G",["ironweb"] = "G",["lotus"] = "G",["obsidian"] = "G",["scorpid"] = "G",["star"] = "G",["titans"] = "G",["transformer"] = "G",["tube"] = "G",["warbear"] = "G",["beasts"] = "G",["chromatic"] = "G",["counterweight"] = "G",["constitution"] = "G",["dawnbringer"] = "G",["deviate"] = "G",["dreamshard"] = "G",["dreamsteel"] = "G",["dreamstone"] = "G",["dreamweave"] = "G",["elementium"] = "G",["ethereal"] = "G",["fortitude"] = "G",["grinding"] = "G",["hillmans"] = "G",["incendicite"] = "G",["invisibility"] = "G",["invocation"] = "G",["iridescent"] = "G",["lustrous"] = "G",["powerful"] = "G",["primal"] = "G",["pristine"] = "G",["protection"] = "G",["runeetched"] = "G",["sansam"] = "G",["spyglass"] = "G",["stronghold"] = "G",["supreme"] = "G",["swiftness"] = "G",["swimspeed"] = "G",["voracity"] = "G",["warlords"] = "G",["whitesoul"] = "G",["wildthorn"] = "G",["wisdom"] = "G",["circlet"] = "G",["vest"] = "G",
-["black"] = "N",["blessed"] = "N",["blue"] = "N",["blues"] = "N",["dark"] = "N",["flawless"] = "N",["golden"] = "N",["green"] = "N",["greens"] = "N",["huge"] = "N",["large"] = "N",["massive"] = "N",["perfect"] = "N",["purple"] = "N",["red"] = "N",["small"] = "N",["wizard"] = "N",["yellow"] = "N",["arthas"] = "G",["blackmouth"] = "G",["firefin"] = "G",["khadgar"] = "G",["khadgars"] = "G",["silversage"] = "G",["steelbloom"] = "G",["stonescale"] = "G",["undeath"] = "G",["cured"] = "A",["refined"] = "A",["deeprock"] = "I",["salt"] = "A",["azerothian"] = "G",["diamond"] = "G",["emerald"] = "G",["moonstone"] = "G",["opal"] = "G",["ruby"] = "G",["sapphire"] = "G",["tigerseye"] = "G",["aquamarine"] = "H",["bloodofmountain"] = "H",["citrine"] = "H",["jade"] = "H",["malachite"] = "H",["mossagate"] = "H",["shadowgem"] = "H",["gurubashi"] = "G",["vilebranch"] = "G",["witherbark"] = "G",["sandfury"] = "G",["skullsplitter"] = "G",["bloodscalp"] = "G",["zulian"] = "G",["razzashi"] = "G",["hakkari"] = "G",
+["black"] = "N",["blessed"] = "N",["blue"] = "N",["blues"] = "N",["dark"] = "N",["flawless"] = "N",["golden"] = "N",["green"] = "N",["greens"] = "N",["huge"] = "N",["large"] = "N",["massive"] = "N",["perfect"] = "N",["purple"] = "N",["rare"] = "N",["rares"] = "N",["red"] = "N",["small"] = "N",["wizard"] = "N",["yellow"] = "N",["arthas"] = "G",["blackmouth"] = "G",["firefin"] = "G",["khadgar"] = "G",["khadgars"] = "G",["silversage"] = "G",["steelbloom"] = "G",["stonescale"] = "G",["undeath"] = "G",["cured"] = "A",["refined"] = "A",["deeprock"] = "I",["salt"] = "A",["azerothian"] = "G",["diamond"] = "G",["emerald"] = "G",["moonstone"] = "G",["opal"] = "G",["ruby"] = "G",["sapphire"] = "G",["tigerseye"] = "G",["aquamarine"] = "H",["bloodofmountain"] = "H",["citrine"] = "H",["jade"] = "H",["malachite"] = "H",["mossagate"] = "H",["shadowgem"] = "H",["gurubashi"] = "G",["vilebranch"] = "G",["witherbark"] = "G",["sandfury"] = "G",["skullsplitter"] = "G",["bloodscalp"] = "G",["zulian"] = "G",["razzashi"] = "G",["hakkari"] = "G",
 }
 
 GF_GROUP_IDS = {
