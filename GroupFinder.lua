@@ -129,6 +129,7 @@ DAMAGESHIELDSELFOTHER, -- Self Reflect 31
 DAMAGESHIELDOTHERSELF,DAMAGESHIELDOTHEROTHER, } -- Other Reflect 32-33
 local factionRaces = { ["Alliance"] = { ["Human"]=true,["Dwarf"]=true,["Gnome"]=true,["NightElf"]=true, }, ["Horde"] = { ["Orc"]=true,["Troll"]=true,["Tauren"]=true,["Scourge"]=true, } }
 local minimapShapes = { ["ROUND"] = {true, true, true, true},["SQUARE"] = {false, false, false, false},["CORNER-TOPLEFT"] = {true, false, false, false},["CORNER-TOPRIGHT"] = {false, false, true, false},["CORNER-BOTTOMLEFT"] = {false, true, false, false},["CORNER-BOTTOMRIGHT"] = {false, false, false, true},["SIDE-LEFT"] = {true, true, false, false},["SIDE-RIGHT"] = {false, false, true, true},["SIDE-TOP"] = {true, false, true, false},["SIDE-BOTTOM"] = {false, true, false, true},["TRICORNER-TOPLEFT"] = {true, true, true, false},["TRICORNER-TOPRIGHT"] = {true, false, true, true},["TRICORNER-BOTTOMLEFT"] = {true, true, false, true},["TRICORNER-BOTTOMRIGHT"] = {false, true, true, true},}
+local triedToWhoName = nil
 
 local PlayersInCombat = {}
 local ShaguDPSLoaded = nil
@@ -876,14 +877,16 @@ function GF_OnLoad() -- Onload, Tooltips, and Frame/Minimap Functions
 			GF_NextAvailableWhoTime = time() + GF_WhoCooldownTime
 			if displayWhoMessageName[name] and displayWhoMessageName[name][2] + 900 > time() then DEFAULT_CHAT_FRAME:AddMessage(GF_SENDING_WHO_FOR..displayWhoMessageName[name][1],1,1,0.5) end
 			displayWhoMessageName[name] = nil
+			_,_,triedToWhoName = strfind(name,"^n%-\"?(%a+)\"?$") if not triedToWhoName then _,_,triedToWhoName = strfind(name,"^(%a+)$") end
+			GF_UpdateTicker = GetTime() + 1
 			return old_SendWho(name)
 		elseif displayWhoMessageName[name] then -- /who is on cooldown.. check if name in displayWhoMessageName... if so, add to GF_UrgentWhoRequest queue
 			for i=1, getn(GF_UrgentWhoRequest) do if GF_UrgentWhoRequest[i] == displayWhoMessageName[name][1] then table.remove(GF_UrgentWhoRequest, i) break end end
 			DEFAULT_CHAT_FRAME:AddMessage(GF_SENDING_WHO_FOR..displayWhoMessageName[name][1].." - "..ceil(GF_NextAvailableWhoTime - time() + getn(GF_UrgentWhoRequest) * GF_WhoCooldownTime)..GF_SECONDS,1,1,0.5)
 			table.insert(GF_UrgentWhoRequest,displayWhoMessageName[name][1])
 			GF_UrgentWhoRequest[displayWhoMessageName[name][1]] = true
-		elseif strfind(name,"^n\-\"?(%a+)\"?$") or strfind(name,"^(%a+)$") then -- /who is on cooldown, name is a player, but name is not in displayWhoMessageName... add to GF_WhoQueue(this should only ever be called by another addon)
-			_,_,name = strfind(name,"^n\-\"?(%a+)\"?$") if not name then _,_,name = strfind(name,"^(%a+)$") end
+		elseif strfind(name,"^n%-\"?(%a+)\"?$") or strfind(name,"^(%a+)$") then -- /who is on cooldown, name is a player, but name is not in displayWhoMessageName... add to GF_WhoQueue(this should only ever be called by another addon)
+			_,_,name = strfind(name,"^n%-\"?(%a+)\"?$") if not name then _,_,name = strfind(name,"^(%a+)$") end
 			if name then
 				for i=1, getn(GF_UrgentWhoRequest) do if GF_UrgentWhoRequest[i] == name then table.remove(GF_UrgentWhoRequest, i) break end end
 				DEFAULT_CHAT_FRAME:AddMessage(GF_SENDING_WHO_FOR..name.." - "..ceil(GF_NextAvailableWhoTime - time() + getn(GF_UrgentWhoRequest) * GF_WhoCooldownTime)..GF_SECONDS,1,1,0.5)
@@ -1685,6 +1688,7 @@ function GF_OnUpdate() -- OnUpdate, SendWho, WhoListUpdated, Announce, Broadcast
 		end
 		if GF_PerCharVariables.groupfinishtimer and GF_PerCharVariables.groupfinishtimer[1] < GetTime() then GF_GroupFinishedAddToGroupHistoryList() end
 		if SomeoneInCombat then if not UnitAffectingCombat("player") then UpdateOutOfCombat() elseif GF_PerCharVariables.dpsmetershown then GF_UpdateDPSMeterTimer = GF_UpdateDPSMeterTimer - 1 if GF_UpdateDPSMeterTimer < 0 then GF_UpdateDPSMeterTimer = 5 UpdateInCombat() GF_UpdateDPSMeter() end end end
+		if triedToWhoName and not GF_SavedVariables.friendsToRemove[triedToWhoName] then GF_SavedVariables.friendsToRemove[triedToWhoName] = time() + 99950 end
 	end
 end
 function GF_CheckForDelayedMessages()
@@ -1795,6 +1799,7 @@ function GF_WhoListUpdated()
 		end
 	end
 	GF_NextAvailableWhoTime = time() + GF_WhoCooldownTime
+	triedToWhoName = nil
 end
 function GF_AddNameToWhoQueue(name,addToTopOfList)
 	if string.len(name) < 2 or name == UnitName("player") then GF_PerCharVariables.friendUnknown[name] = time() + 999999 return end
@@ -1844,7 +1849,7 @@ function GF_UpdateFriendsList()
 	GF_Friends = {}
 	local counter = 0
 	for i=1,GetNumFriends() do
-		local name,level,class,_,online = GetFriendInfo(i)
+		local name,level,class,area,online = GetFriendInfo(i)
 		if name then
 			if name == UNKNOWN then
 				RemoveFriend(i)
@@ -1852,6 +1857,10 @@ function GF_UpdateFriendsList()
 			elseif GF_ClassColors[GF_Classes[class]] and level and level ~= 0 then
 				GF_WhoTable[GF_RealmName][name] = { level, GF_Classes[class], "", time()}
 				if online and not GF_SavedVariables.friendsToRemove[name] then GF_Friends[name] = true end
+			end
+			if name == triedToWhoName and GF_WhoTable[GF_RealmName][name] and GF_WhoTable[GF_RealmName][name][1] > 0 then
+				DEFAULT_CHAT_FRAME:AddMessage("|cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][name][2]] or "ffffff").."|Hplayer:"..name.."|h["..name.."]|h|r is Level "..GF_WhoTable[GF_RealmName][name][1].." in "..area,1,1,0.5)
+				triedToWhoName = nil
 			end
 			if GF_SavedVariables.friendsToRemove[name] then RemoveFriend(i) GF_PerCharVariables.friendUnknown[name] = time() + 900 counter = counter + 1 end
 			if counter >= 3 then break end
@@ -2769,6 +2778,7 @@ function GF_CheckForSystem(arg1)
 			GF_TimeTillNextBroadcast = 0
 		end
 		GF_NextAvailableWhoTime = time() + GF_WhoCooldownTime
+		triedToWhoName = nil
 		FriendsFrame_Update()
 	elseif GF_SavedVariables.showformattedchat and strfind(arg1,"|+Hplayer: ?(%w+)|+h%[[%w%s!=\,\-\+<>\":'\.]+%]|+h ") then
 		local lfs,lfe,wordString = strfind(arg1,"|+Hplayer: ?(%w+)|+h%[[%w%s!=\,\-\+<>\":'\.]+%]|+h ")
