@@ -6023,6 +6023,35 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								GF_ShowGroupLogEntryFrame:Hide()
 							</OnClick>
 						</Scripts>
+						<NormalFont style="GF_ButtonFont"/>
+						<HighlightFont style="GF_ButtonFontWhite"/>
+						<DisabledFont style="GF_ButtonFont"/>
+					</Button>
+					<Button name="GF_ShowGroupLogEntryFrameReportButton" inherits="GF_ButtonTemplate" text="GF_REPORT">
+						<Size>
+							<AbsDimension x="60" y="25"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="20" y="7"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnEnter>
+								GF_ShowTooltip(self)
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide()
+							</OnLeave>
+							<OnClick>
+								GF_ReportDamageMeter()
+							</OnClick>
+						</Scripts>
+						<NormalFont style="GF_ButtonFont"/>
+						<HighlightFont style="GF_ButtonFontWhite"/>
+						<DisabledFont style="GF_ButtonFont"/>
 					</Button>
 				</Frames>
 				<Scripts>

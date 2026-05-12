@@ -1032,9 +1032,9 @@ function GF_HandleItemRefLinks(link,text,button,chatFrame)
 					for entryname,wtable in pairs(GF_WORD_QUEST) do
 						if wtable[1] == questid then
 							if entryname == ({GF_GetQuestInfo(text)})[1][1] then
-								DEFAULT_CHAT_FRAME:AddMessage("GF: "..text..GF_QUEST_IS_LEVEL_TEXT..GF_WORD_QUEST[entryname][2].."("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[entryname][3]].."}",1,1,0.5)
+								DEFAULT_CHAT_FRAME:AddMessage("GF: "..text..GF_IS_LEVEL..GF_WORD_QUEST[entryname][2].."("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[entryname][3]].."}",1,1,0.5)
 							else
-								DEFAULT_CHAT_FRAME:AddMessage("GF: "..text.."("..entryname..")"..GF_QUEST_IS_LEVEL_TEXT..GF_WORD_QUEST[entryname][2].."("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[entryname][3]].."}",1,1,0.5)
+								DEFAULT_CHAT_FRAME:AddMessage("GF: "..text.."("..entryname..")"..GF_IS_LEVEL..GF_WORD_QUEST[entryname][2].."("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[entryname][3]].."}",1,1,0.5)
 							end
 							return true
 						end
@@ -1065,9 +1065,9 @@ function GF_GetQuestInfo(text,printinfo) -- TODO: Add full quest name with quest
 	if GF_WORD_QUEST[wordString] then
 		if printinfo and GF_QUEST_ZONE_ID[GF_WORD_QUEST[wordString][3]] then
 			if GF_QUEST_ZONE_ID[GF_WORD_QUEST[wordString][4]] and GF_WORD_QUEST[wordString][3] ~= GF_WORD_QUEST[wordString][4] then
-				DEFAULT_CHAT_FRAME:AddMessage("GF: "..text..GF_QUEST_IS_LEVEL_TEXT..GF_WORD_QUEST[wordString][2].."("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[wordString][3]].."), Objective("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[wordString][4]]..")",1,1,0.5)
+				DEFAULT_CHAT_FRAME:AddMessage("GF: "..text..GF_IS_LEVEL..GF_WORD_QUEST[wordString][2].."("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[wordString][3]].."), Objective("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[wordString][4]]..")",1,1,0.5)
 			else
-				DEFAULT_CHAT_FRAME:AddMessage("GF: "..text..GF_QUEST_IS_LEVEL_TEXT..GF_WORD_QUEST[wordString][2].."("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[wordString][3]]..")",1,1,0.5)
+				DEFAULT_CHAT_FRAME:AddMessage("GF: "..text..GF_IS_LEVEL..GF_WORD_QUEST[wordString][2].."("..GF_QUEST_ZONE_ID[GF_WORD_QUEST[wordString][3]]..")",1,1,0.5)
 			end
 		end
 		return GF_WORD_QUEST[wordString]
@@ -1438,16 +1438,18 @@ function GF_AddChannelMessage(arg1,arg2,arg8,arg9,delayed) -- Message Handlers
 	if GF_SavedVariables.friendsToRemove[arg2] and not delayed then table.insert(GF_LogHistory[GF_RealmName]["Delay"], {"Channel",time()+20,arg1,arg2,arg8,arg9}) return end
 	arg9 = string.gsub(arg9, " - .*", "")
 	arg1 = "["..arg8..". "..strupper(strsub(arg9,1,1))..strsub(arg9,2).."] "..GF_MakeBasicChatString(arg1,arg2,"CHANNEL")
+	local info = ChatTypeInfo["CHANNEL"..arg8]
 	for i=1,NUM_CHAT_WINDOWS do
 		channellist = { GetChatWindowChannels(i) }
 		for j=1, #channellist do
-			if channellist[j] == arg9 then getglobal("ChatFrame"..i):AddMessage(arg1, GF_TextColors["CHANNEL"][1], GF_TextColors["CHANNEL"][2], GF_TextColors["CHANNEL"][3]) break end
+			if channellist[j] == arg9 then getglobal("ChatFrame"..i):AddMessage(arg1, info.r, info.g, info.b, info.id) break end
 		end
 	end
 end
 function GF_AddChatMessage(arg1,arg2,event,delayed)
 	if arg2 ~= "SYSTEM" and GF_SavedVariables.friendsToRemove[arg2] and not delayed then table.insert(GF_LogHistory[GF_RealmName]["Delay"], {"Chat",time()+20,arg1,arg2,event}) return end
 	arg1 = (EventIDAlias[event] or "["..strsub(event,1,1).."] ")..GF_MakeBasicChatString(arg1,arg2,event)
+	local info = ChatTypeInfo[event]
 	if event == "HARDCORE" and TW_HARDCORE_CHAT1 then
 		for i=1,NUM_CHAT_WINDOWS do
 			if getglobal("TW_HARDCORE_CHAT"..i) == 1 then getglobal("ChatFrame"..i):AddMessage(arg1, GF_TextColors[event][1], GF_TextColors[event][2], GF_TextColors[event][3]) end
@@ -1456,7 +1458,7 @@ function GF_AddChatMessage(arg1,arg2,event,delayed)
 		for i=1,NUM_CHAT_WINDOWS do
 			channellist = { GetChatWindowMessages(i) }
 			for j=1, #channellist do
-				if channellist[j] == event or channellist[j] == GF_ChatNameAlias[event] then getglobal("ChatFrame"..i):AddMessage(arg1, GF_TextColors[event][1], GF_TextColors[event][2], GF_TextColors[event][3]) break end
+				if channellist[j] == event or channellist[j] == GF_ChatNameAlias[event] then getglobal("ChatFrame"..i):AddMessage(arg1, info.r, info.g, info.b, info.id) break end
 			end
 		end
 	end
@@ -1503,7 +1505,7 @@ function GF_ChatReplaceHplayer(arg1)
 	while true do
 		lfs,lfe,wordString = strfind(arg1,"|%x+|+Hplayer:(%w+)|+h%[.-%]|+h|+r",lfs)
 		if wordString then
-			if GF_WhoTable[GF_RealmName][wordString] then
+			if GF_WhoTable[GF_RealmName][wordString] and GF_WhoTable[GF_RealmName][wordString][1] > 0 then
 				arg1 = strsub(arg1,1,lfs).."cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][wordString][2]] or "ffffff").."|Hplayer:"..wordString.."|h["..wordString..", "..GF_WhoTable[GF_RealmName][wordString][1].."]|h|"..strsub(arg1,lfe)
 			end
 			lfs = lfe + 1
@@ -1858,8 +1860,14 @@ function GF_UpdateFriendsList()
 				GF_WhoTable[GF_RealmName][name] = { level, GF_Classes[class], "", time()}
 				if online and not GF_SavedVariables.friendsToRemove[name] then GF_Friends[name] = true end
 			end
-			if name == triedToWhoName and GF_WhoTable[GF_RealmName][name] and GF_WhoTable[GF_RealmName][name][1] > 0 then
-				DEFAULT_CHAT_FRAME:AddMessage("|cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][name][2]] or "ffffff").."|Hplayer:"..name.."|h["..name.."]|h|r is Level "..GF_WhoTable[GF_RealmName][name][1].." in "..area,1,1,0.5)
+			if name == triedToWhoName then
+				if GF_WhoTable[GF_RealmName][name] then
+					if GF_WhoTable[GF_RealmName][name][1] > 0 then
+						DEFAULT_CHAT_FRAME:AddMessage("|cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][name][2]] or "ffffff").."|Hplayer:"..name.."|h["..name.."]|h|r"..GF_IS_LEVEL..GF_WhoTable[GF_RealmName][name][1]..GF_IN..area,1,1,0.5)
+					else
+						DEFAULT_CHAT_FRAME:AddMessage(GF_COULDNT_GET_DATA.."|cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][name][2]] or "ffffff").."|Hplayer:"..name.."|h["..name.."]|h|r",1,1,0.5)
+					end
+				end
 				triedToWhoName = nil
 			end
 			if GF_SavedVariables.friendsToRemove[name] then RemoveFriend(i) GF_PerCharVariables.friendUnknown[name] = time() + 900 counter = counter + 1 end
@@ -2130,7 +2138,7 @@ function UpdateOutOfCombat()
 end
 function UpdateInCombat()
 	for name,data in pairs(PlayersInCombat) do
-		if GF_PlayersCurrentlyInGroup[name] then
+		if GF_PlayersCurrentlyInGroup[name] and GF_PerCharVariables.CurrentGroup["TempData"][3][name] then
 			GF_PerCharVariables.CurrentGroup["TempData"][3][name][5] = GF_PerCharVariables.CurrentGroup["TempData"][3][name][5] + math.max(GetTime() - data,1)
 			PlayersInCombat[name] = GetTime()
 		else
@@ -2150,16 +2158,16 @@ function GF_UpdateDPSMeter()
 		if tempTable[i] then
 			getglobal("GF_DPSMeterEntry"..i.."NameLabel"):SetText("|cff"..(GF_ClassColors[tempTable[i][2][2]] or "9d9d9d")..tempTable[i][1].."|r")
 			if GF_PerCharVariables.dpsmeter == 1 then
-				if tempTable[i][2][3] > 100000 then
-					getglobal("GF_DPSMeterEntry"..i.."DataLabel"):SetText((tempTable[i][2][3]/1000).."K")
+				if tempTable[1][2][3] > 100000 then
+					getglobal("GF_DPSMeterEntry"..i.."DataLabel"):SetText(ceil(tempTable[i][2][3]/1000).."K")
 				else
 					getglobal("GF_DPSMeterEntry"..i.."DataLabel"):SetText(tempTable[i][2][3])
 				end
 			elseif GF_PerCharVariables.dpsmeter == 2 then
 				getglobal("GF_DPSMeterEntry"..i.."DataLabel"):SetText(ceil(tempTable[i][2][3]/tempTable[i][2][5]))
 			elseif GF_PerCharVariables.dpsmeter == 3 then
-				if tempTable[i][2][4] > 100000 then
-					getglobal("GF_DPSMeterEntry"..i.."DataLabel"):SetText((tempTable[i][2][4]/1000).."K")
+				if tempTable[1][2][4] > 100000 then
+					getglobal("GF_DPSMeterEntry"..i.."DataLabel"):SetText(ceil(tempTable[i][2][4]/1000).."K")
 				else
 					getglobal("GF_DPSMeterEntry"..i.."DataLabel"):SetText(tempTable[i][2][4])
 				end
@@ -2564,7 +2572,7 @@ function GF_Frame:COMBAT_LOG_EVENT_UNFILTERED(event,tim,token,sourceGUID,source,
 	end
 end
 function GF_FilterDamage(source,target,damage,over)
-	if source ~= target then
+	if GF_PerCharVariables.CurrentGroup["TempData"][3][source] and source ~= target then
 		GF_PerCharVariables.CurrentGroup["TempData"][3][source][3] = GF_PerCharVariables.CurrentGroup["TempData"][3][source][3] + damage
 		if not PlayersInCombat[source] then PlayersInCombat[source] = GetTime() SomeoneInCombat = true end
 	end
@@ -2572,7 +2580,7 @@ end
 function GF_FilterHealing(source,target,healing,over)
 	local unitid
 	if GF_PlayersCurrentlyInGroup[target] and UnitExists(GF_PlayersCurrentlyInGroup[target]) then unitid = GF_PlayersCurrentlyInGroup[target] elseif GF_PetCurrentlyInGroup[target] and UnitExists(GF_PetCurrentlyInGroup[target][2]) then unitid = GF_PetCurrentlyInGroup[target][2] end
-	if unitid and (SomeoneInCombat or UnitAffectingCombat(GF_PlayersCurrentlyInGroup[source]) or UnitAffectingCombat(unitid)) then
+	if GF_PerCharVariables.CurrentGroup["TempData"][3][source] and unitid and (SomeoneInCombat or UnitAffectingCombat(GF_PlayersCurrentlyInGroup[source]) or UnitAffectingCombat(unitid)) then
 		if not PlayersInCombat[source] then
 			PlayersInCombat[source] = GetTime()
 			SomeoneInCombat = true
@@ -4065,7 +4073,7 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 				if groupstosave[1] then
 					GF_PerCharVariables.groupfinishtimer = { GetTime() + 120,groupstosave }
 					local wordString = ""
-					for i=1,#groupstosave do if GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]][2] + 600 < time() then wordString = wordString..groupstosave[i]..", " end end
+					for i=1,#groupstosave do if GF_PerCharVariables.CurrentGroup[groupstosave[i]][2] + 600 < time() then wordString = wordString..groupstosave[i]..", " end end
 					if wordString ~= "" then DEFAULT_CHAT_FRAME:AddMessage(GF_NOT_IN_GROUP_SAVING..strsub(wordString,1,-3)..GF_IN_TWO_MINUTES,1,1,0.5) end
 				end
 			end
@@ -6368,7 +6376,20 @@ function CompileQuestTemp() -- /script CompileQuestTemp()
 		GF_SavedVariables.questconversion[entryname] = wtable
 	end
 end
-
+function GF_ReportDamageMeter()
+	if not GroupHistoryLogTable then return end
+	if ChatEdit_GetActiveWindow() then
+		local playerTable = {}
+		for pname,data in pairs(GroupHistoryLogTable[3]) do
+			table.insert(playerTable, {data[3],ceil(data[3]/data[5]),data[4],pname,data[1],data[2],strlen(pname)+strlen(data[1])})
+		end
+		table.sort(playerTable, function(a,b) return a[GF_PerCharVariables.dpsmeter]>b[GF_PerCharVariables.dpsmeter] end)
+		for i=1, getn(playerTable) do
+			SendChatMessage("|cff"..(GF_ClassColors[playerTable[i][6]] or "9d9d9d").."|Hplayer:"..playerTable[i][4].."|h["..playerTable[i][4]..", "..playerTable[i][5].."]|h|r"..strsub("-------------------------",1,-(strlen(playerTable[i][GF_PerCharVariables.dpsmeter]) + playerTable[i][7])).." "..playerTable[i][GF_PerCharVariables.dpsmeter].." "..GF_BUTTONS_LIST["DPSMeter"][GF_PerCharVariables.dpsmeter],ChatEdit_GetActiveWindow():GetAttribute("chatType"),nil,ChatEdit_GetActiveWindow():GetAttribute("channelTarget") or ChatEdit_GetActiveWindow():GetAttribute("tellTarget"))
+			if i == 5 then break end
+		end
+	end
+end
 function ImportFromPFDB() -- /script ImportFromPFDB()
 	GF_SavedVariables.questconversion = {}
 	for entryid,data in pairs(pfDB["quests"]["enUS-epoch"]) do
