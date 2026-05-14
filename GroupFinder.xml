@@ -883,6 +883,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			<OnLeave>
 				GameTooltip:Hide()
 			</OnLeave>
+			<OnLoad>
+				self:SetPushedTextOffset(0,0)
+			</OnLoad>
 		</Scripts>
 		<NormalFont style="GF_ButtonFont"/>
 		<HighlightFont style="GF_ButtonFontWhite"/>
@@ -4840,7 +4843,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 									</OnLoad>
 								</Scripts>
 							</CheckButton>
-							<CheckButton name="GF_AlwaysShowGuildFriendsCheckButton" inherits="GF_CheckButtonTemplate_Label">
+							<Button name="GF_AlwaysShowDropdown" inherits="GF_ButtonTemplate">
 								<Anchors>
 									<Anchor point="TOPRIGHT">
 										<Offset>
@@ -4848,18 +4851,78 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 										</Offset>
 									</Anchor>
 								</Anchors>
+								<Layers>
+									<Layer level="ARTWORK">
+										<FontString inherits="GF_NormalFont" name="GF_AlwaysShowTextLabel" nonspacewrap="false" justifyH="LEFT"  text="GF_ALWAYS_SHOW">
+											<Anchors>
+												<Anchor point="LEFT" relativeTo="GF_AlwaysShowDropdown" relativePoint="RIGHT">
+													<Offset>
+														<AbsDimension x="0" y="0"/>
+													</Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
 								<Scripts>
 									<OnClick>
-										if self:GetChecked() then GF_SavedVariables.alwaysshowguild = true else GF_SavedVariables.alwaysshowguild = false end
+										if not GF_AlwaysShow:IsShown() then
+											GF_ButtonListFunctions(gsub(self:GetName(),"%d","").."Show")
+										else
+											GF_AlwaysShow:Hide()
+										end
 									</OnClick>
-									<OnLoad>
-										getglobal(self:GetName().."TextLabel"):SetText(GF_ALWAYS_SHOW_GUILD)
-									</OnLoad>
+									<OnLeave>
+										if not GetMouseFocus() or not GetMouseFocus():GetName() or not string.find(GetMouseFocus():GetName(), "AlwaysShow") then 
+											GF_MenusToHide["GF_AlwaysShow"] = {"AlwaysShow",GetTime()}
+											GF_OnUpdateFunctions["HideMenus"] = GF_HideDropdownMenus
+										end
+									</OnLeave>
 								</Scripts>
-							</CheckButton>
+								<NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up" setAllPoints="true"/>
+								<PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Down" setAllPoints="true"/>
+								<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD" setAllPoints="true"/>
+							</Button>
+							<Frame name="GF_AlwaysShow" clampedToScreen="true" enableMouse="true" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true">
+								<Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border">
+									<BackgroundInsets>
+										<AbsInset left="4" right="4" top="4" bottom="4"/>
+									</BackgroundInsets>
+									<EdgeSize>
+										<AbsValue val="16"/>
+									</EdgeSize>
+									<BorderColor r="0.6" g="0.6" b="0.6"/>
+								</Backdrop>
+								<Layers>
+									<Layer level ="BACKGROUND">
+										<Texture file="Interface\ChatFrame\ChatFrameBackground">
+											<Anchors>
+												<Anchor point="TOPLEFT">
+													<Offset x="4" y="-4"/>
+												</Anchor>
+												<Anchor point="BOTTOMRIGHT">
+													<Offset x="-4" y="4"/>
+												</Anchor>
+											</Anchors>
+											<Gradient orientation="VERTICAL">
+												<MinColor r="0" g="0" b="0" a="0.9"/>
+												<MaxColor r="0.2" g="0.2" b="0.2" a="0.9"/>
+											</Gradient>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnLeave>
+										if not GetMouseFocus() or not GetMouseFocus():GetName() or not string.find(GetMouseFocus():GetName(), "AlwaysShow") then 
+											GF_MenusToHide["GF_AlwaysShow"] = {"AlwaysShow",GetTime()}
+											GF_OnUpdateFunctions["HideMenus"] = GF_HideDropdownMenus
+										end
+									</OnLeave>
+								</Scripts>
+							</Frame>
 							<Button name="GF_FontNameDropdown" inherits="GF_ButtonTemplate">
 								<Anchors>
-									<Anchor point="TOPLEFT" relativeTo="GF_AlwaysShowGuildFriendsCheckButton" relativePoint="BOTTOMLEFT">
+									<Anchor point="TOPLEFT" relativeTo="GF_AlwaysShowDropdown" relativePoint="BOTTOMLEFT">
 										<Offset>
 											<AbsDimension x="0" y="-8"/>
 										</Offset>
@@ -6053,6 +6116,42 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						<HighlightFont style="GF_ButtonFontWhite"/>
 						<DisabledFont style="GF_ButtonFont"/>
 					</Button>
+					<CheckButton name="GF_ShowGroupLogEntryFrameReportDamageCheckButton" inherits="GF_CheckButtonTemplate_Label">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="GF_ShowGroupLogEntryFrameReportButton" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if self:GetChecked() then GF_PerCharVariables.dpsmetersenddamage = true else GF_PerCharVariables.dpsmetersenddamage = false end
+								GF_PerCharVariables.dpsmetersendhealing = GF_ShowGroupLogEntryFrameReportHealingCheckButton:SetChecked(false)
+							</OnClick>
+							<OnLoad>
+								getglobal(self:GetName().."TextLabel"):SetText(GF_DAMAGE)
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="GF_ShowGroupLogEntryFrameReportHealingCheckButton" inherits="GF_CheckButtonTemplate_Label">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="GF_ShowGroupLogEntryFrameReportDamageCheckButtonTextLabel" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if self:GetChecked() then GF_PerCharVariables.dpsmetersendhealing = true else GF_PerCharVariables.dpsmetersendhealing = false end
+								GF_PerCharVariables.dpsmetersenddamage = GF_ShowGroupLogEntryFrameReportDamageCheckButton:SetChecked(false)
+							</OnClick>
+							<OnLoad>
+								getglobal(self:GetName().."TextLabel"):SetText(GF_HEALING)
+							</OnLoad>
+						</Scripts>
+					</CheckButton>
 				</Frames>
 				<Scripts>
 					<OnLoad>
@@ -6096,6 +6195,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				GF_LFGHardCore:Hide()
 				GF_GroupChannelName:Hide()
 				GF_FontName:Hide()
+				GF_AlwaysShow:Hide()
 				GF_BlockList:Hide()
 				GF_AutoBlacklistDropdownMenu:Hide()
 				
