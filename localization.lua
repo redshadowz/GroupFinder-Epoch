@@ -87,11 +87,6 @@ GF_LOG_RESET_MESSAGES = "Reset Messages"
 GF_LOG_FOREIGN = "Foreign"
 GF_LOG_CHANNEL = "Channel"
 
-GF_LOG_GUILD = "Guild"
-GF_LOG_FRIEND = "Friend"
-GF_LOG_PARTY = "Party"
-GF_LOG_SAY = "Say"
-
 -- Log Types
 GF_LOGGED_ME = "[M]" -- Text added to Log tab when a message is from myself
 GF_LOGGED_GROUPS = "[G]" -- Text added to Log tab when a message is a group
@@ -985,42 +980,42 @@ GF_WORD_FIX_TRADE = { -- Trade trigger words/phrases.
 ["clothbar"] = {"A","A"},["leatherbar"] = {"A","A"},["orebar"] = {"A","A"},["barore"] = {"A","A"},["stoneore"] = {"A","A"},["clothforbar"] = {"A","C"},["leatherforbar"] = {"A","C"},["oreforbar"] = {"A","C"},["barforore"] = {"A","C"},["stoneforore"] = {"A","C"},
 ["clothstone"] = {"A","A"},["leatherstone"] = {"A","A"},["orestone"] = {"A","A"},["barstone"] = {"A","A"},["stonebar"] = {"A","A"},["clothforstone"] = {"A","C"},["leatherforstone"] = {"A","C"},["oreforstone"] = {"A","C"},["barforstone"] = {"A","C"},["stoneforbar"] = {"A","C"},
 
-["strengthhead"] = {"A","C"},["agilityhead"] = {"A","C"},["frhead"] = {"A","C"},["arhead"] = {"A","C"},["srhead"] = {"A","C"},["nrhead"] = {"A","C"},["staminahead"] = {"A","C"},["healthhead"] = {"A","C"},["hphead"] = {"A","C"},["aphead"] = {"A","C"},["spelldamagehead"] = {"A","C"},["hastehead"] = {"A","C"},["hithead"] = {"A","C"},["manahead"] = {"A","C"},["mphead"] = {"A","C"},
-["strengthlegs"] = {"A","C"},["agilitylegs"] = {"A","C"},["frlegs"] = {"A","C"},["arlegs"] = {"A","C"},["srlegs"] = {"A","C"},["nrlegs"] = {"A","C"},["staminalegs"] = {"A","C"},["healthlegs"] = {"A","C"},["hplegs"] = {"A","C"},["aplegs"] = {"A","C"},["spelldamagelegs"] = {"A","C"},["hastelegs"] = {"A","C"},["hitlegs"] = {"A","C"},["manalegs"] = {"A","C"},["mplegs"] = {"A","C"},
-["headstrength"] = {"C","A"},["headagility"] = {"C","A"},["headfr"] = {"C","A"},["headar"] = {"C","A"},["headsr"] = {"C","A"},["headnr"] = {"C","A"},["headstamina"] = {"C","A"},["headhealth"] = {"C","A"},["headhp"] = {"C","A"},["headap"] = {"C","A"},["headspelldamage"] = {"C","A"},["headhaste"] = {"C","A"},["headhit"] = {"C","A"},["headmana"] = {"C","A"},["headmp"] = {"C","A"},
-["legsstrength"] = {"C","A"},["legsagility"] = {"C","A"},["legsfr"] = {"C","A"},["legsar"] = {"C","A"},["legssr"] = {"C","A"},["legsnr"] = {"C","A"},["legsstamina"] = {"C","A"},["legshealth"] = {"C","A"},["legshp"] = {"C","A"},["legsap"] = {"C","A"},["legsspelldamage"] = {"C","A"},["legshaste"] = {"C","A"},["legshit"] = {"C","A"},["legsmana"] = {"C","A"},["legsmp"] = {"C","A"},
-["firering"] = {"A","C"},["arcanering"] = {"A","C"},["frring"] = {"A","C"},["arring"] = {"A","C"},["srring"] = {"A","C"},["nrring"] = {"A","C"},["firedamagering"] = {"A","C"},["arcanedamagering"] = {"A","C"},["intellectring"] = {"A","C"},["agilityring"] = {"A","C"},["staminaring"] = {"A","C"},["strengthring"] = {"A","C"},["vampirismring"] = {"A","C"},["spiritring"] = {"A","C"},["healring"] = {"A","C"},["blockring"] = {"A","C"},["armorring"] = {"A","C"},["mpring"] = {"A","C"},["statring"] = {"A","C"},["spelldamagering"] = {"A","C"},
-["fireneck"] = {"A","C"},["arcaneneck"] = {"A","C"},["frneck"] = {"A","C"},["arneck"] = {"A","C"},["srneck"] = {"A","C"},["nrneck"] = {"A","C"},["firedamageneck"] = {"A","C"},["arcanedamageneck"] = {"A","C"},["intellectneck"] = {"A","C"},["agilityneck"] = {"A","C"},["staminaneck"] = {"A","C"},["strengthneck"] = {"A","C"},["vampirismneck"] = {"A","C"},["spiritneck"] = {"A","C"},["healneck"] = {"A","C"},["blockneck"] = {"A","C"},["armorneck"] = {"A","C"},["mpneck"] = {"A","C"},["statneck"] = {"A","C"},["spelldamageneck"] = {"A","C"},
-["ringfire"] = {"C","A"},["ringarcane"] = {"C","A"},["ringfr"] = {"C","A"},["ringar"] = {"C","A"},["ringsr"] = {"C","A"},["ringnr"] = {"C","A"},["ringfiredamage"] = {"C","A"},["ringarcanedamage"] = {"C","A"},["ringintellect"] = {"C","A"},["ringagility"] = {"C","A"},["ringstamina"] = {"C","A"},["ringstrength"] = {"C","A"},["ringvampirism"] = {"C","A"},["ringspirit"] = {"C","A"},["ringheal"] = {"C","A"},["ringblock"] = {"C","A"},["ringarmor"] = {"C","A"},["ringmp"] = {"C","A"},["ringstat"] = {"C","A"},["ringspelldamage"] = {"C","A"},
-["neckfire"] = {"C","A"},["neckarcane"] = {"C","A"},["neckfr"] = {"C","A"},["neckar"] = {"C","A"},["necksr"] = {"C","A"},["necknr"] = {"C","A"},["neckfiredamage"] = {"C","A"},["neckarcanedamage"] = {"C","A"},["neckintellect"] = {"C","A"},["neckagility"] = {"C","A"},["neckstamina"] = {"C","A"},["neckstrength"] = {"C","A"},["neckvampirism"] = {"C","A"},["neckspirit"] = {"C","A"},["neckheal"] = {"C","A"},["neckblock"] = {"C","A"},["neckarmor"] = {"C","A"},["neckmp"] = {"C","A"},["neckstat"] = {"C","A"},["neckspelldamage"] = {"C","A"},
-["agilitycloak"] = {"A","C"},["armorcloak"] = {"A","C"},["resistcloak"] = {"A","C"},["allresistcloak"] = {"A","C"},["resistallcloak"] = {"A","C"},["frcloak"] = {"A","C"},["srcloak"] = {"A","C"},["nrcloak"] = {"A","C"},["arcloak"] = {"A","C"},["dodgecloak"] = {"A","C"},["subtletycloak"] = {"A","C"},["stealthcloak"] = {"A","C"},["subcloak"] = {"A","C"},
-["agilityback"] = {"A","C"},["armorback"] = {"A","C"},["resistback"] = {"A","C"},["allresistback"] = {"A","C"},["resistallback"] = {"A","C"},["frback"] = {"A","C"},["srback"] = {"A","C"},["nrback"] = {"A","C"},["arback"] = {"A","C"},["dodgeback"] = {"A","C"},["subtletyback"] = {"A","C"},["stealthback"] = {"A","C"},["subback"] = {"A","C"},
-["cloakagility"] = {"C","A"},["cloakarmor"] = {"C","A"},["cloakresist"] = {"C","A"},["cloakallresist"] = {"C","A"},["cloakresistall"] = {"C","A"},["cloakfr"] = {"C","A"},["cloaksr"] = {"C","A"},["cloaknr"] = {"C","A"},["cloakar"] = {"C","A"},["cloakdodge"] = {"C","A"},["cloaksubtlety"] = {"C","A"},["cloakstealth"] = {"C","A"},["cloaksub"] = {"C","A"},
-["backagility"] = {"C","A"},["backarmor"] = {"C","A"},["backresist"] = {"C","A"},["backallresist"] = {"C","A"},["backresistall"] = {"C","A"},["backfr"] = {"C","A"},["backsr"] = {"C","A"},["backnr"] = {"C","A"},["backar"] = {"C","A"},["backdodge"] = {"C","A"},["backsubtlety"] = {"C","A"},["backstealth"] = {"C","A"},["backsub"] = {"C","A"},
-["mpchest"] = {"A","C"},["statchest"] = {"A","C"},["healthchest"] = {"A","C"},["manachest"] = {"A","C"},
-["chestmp"] = {"C","A"},["cheststat"] = {"C","A"},["chesthealth"] = {"C","A"},["chestmana"] = {"C","A"},
-["strengthwrist"] = {"A","C"},["staminawrist"] = {"A","C"},["intellectwrist"] = {"A","C"},["spelldamagewrist"] = {"A","C"},["healwrist"] = {"A","C"},["mpwrist"] = {"A","C"},["agilitywrist"] = {"A","C"},["defensewrist"] = {"A","C"},["vampirismwrist"] = {"A","C"},["spiritwrist"] = {"A","C"},["healthwrist"] = {"A","C"},
-["wriststrength"] = {"C","A"},["wriststamina"] = {"C","A"},["wristintellect"] = {"C","A"},["wristspelldamage"] = {"C","A"},["wristheal"] = {"C","A"},["wristmp"] = {"C","A"},["wristagility"] = {"C","A"},["wristdefense"] = {"C","A"},["wristvampirism"] = {"C","A"},["wristspirit"] = {"C","A"},["wristhealth"] = {"C","A"},
-["agilitygloves"] = {"A","C"},["strengthgloves"] = {"A","C"},["hastegloves"] = {"A","C"},["ridinggloves"] = {"A","C"},["ridingskillgloves"] = {"A","C"},["mountspeedgloves"] = {"A","C"},["arcanegloves"] = {"A","C"},["shadowgloves"] = {"A","C"},["firegloves"] = {"A","C"},["naturegloves"] = {"A","C"},["healgloves"] = {"A","C"},["spelldamagegloves"] = {"A","C"},["threatgloves"] = {"A","C"},["herbgloves"] = {"A","C"},["skingloves"] = {"A","C"},["fishgloves"] = {"A","C"},["minegloves"] = {"A","C"},
-["agilityhand"] = {"A","C"},["strengthhand"] = {"A","C"},["hastehand"] = {"A","C"},["ridinghand"] = {"A","C"},["ridingskillhand"] = {"A","C"},["mountspeedhand"] = {"A","C"},["arcanehand"] = {"A","C"},["shadowhand"] = {"A","C"},["firehand"] = {"A","C"},["naturehand"] = {"A","C"},["healhand"] = {"A","C"},["spelldamagehand"] = {"A","C"},["threathand"] = {"A","C"},["herbhand"] = {"A","C"},["skinhand"] = {"A","C"},["fishhand"] = {"A","C"},["minehand"] = {"A","C"},
-["glovesagility"] = {"C","A"},["glovesstrength"] = {"C","A"},["gloveshaste"] = {"C","A"},["glovesriding"] = {"C","A"},["glovesridingskill"] = {"C","A"},["glovesmountspeed"] = {"C","A"},["glovesarcane"] = {"C","A"},["glovesshadow"] = {"C","A"},["glovesfire"] = {"C","A"},["glovesnature"] = {"C","A"},["glovesheal"] = {"C","A"},["glovesspelldamage"] = {"C","A"},["glovesthreat"] = {"C","A"},["glovesherb"] = {"C","A"},["glovesskin"] = {"C","A"},["glovesfish"] = {"C","A"},["glovesmine"] = {"C","A"},
-["handagility"] = {"C","A"},["handstrength"] = {"C","A"},["handhaste"] = {"C","A"},["handriding"] = {"C","A"},["handridingskill"] = {"C","A"},["handmountspeed"] = {"C","A"},["handarcane"] = {"C","A"},["handshadow"] = {"C","A"},["handfire"] = {"C","A"},["handnature"] = {"C","A"},["handheal"] = {"C","A"},["handspelldamage"] = {"C","A"},["handthreat"] = {"C","A"},["handherb"] = {"C","A"},["handskin"] = {"C","A"},["handfish"] = {"C","A"},["handmine"] = {"C","A"},
-["staminashield"] = {"A","C"},["spiritshield"] = {"A","C"},["blockshield"] = {"A","C"},
-["shieldstamina"] = {"C","A"},["shieldspirit"] = {"C","A"},["shieldblock"] = {"C","A"},
-["staminaboots"] = {"A","C"},["mpboots"] = {"A","C"},["spiritboots"] = {"A","C"},["speedboots"] = {"A","C"},["minorspeedboots"] = {"A","C"},["runspeedboots"] = {"A","C"},["movespeedboots"] = {"A","C"},["healboots"] = {"A","C"},["vampirismboots"] = {"A","C"},["agilityboots"] = {"A","C"},["hitboots"] = {"A","C"},
-["bootsstamina"] = {"C","A"},["bootsmp"] = {"C","A"},["bootsspirit"] = {"C","A"},["bootsspeed"] = {"C","A"},["bootsminorspeed"] = {"C","A"},["bootsrunspeed"] = {"C","A"},["bootsmovespeed"] = {"C","A"},["bootsheal"] = {"C","A"},["bootsvampirism"] = {"C","A"},["bootsagility"] = {"C","A"},["bootshit"] = {"C","A"},
-["spelldamageweapon"] = {"A","C"},["damageweapon"] = {"A","C"},["spiritweapon"] = {"A","C"},["intellectweapon"] = {"A","C"},["lifestealweapon"] = {"A","C"},["crusaderweapon"] = {"A","C"},["healweapon"] = {"A","C"},["unholyweapon"] = {"A","C"},["strengthweapon"] = {"A","C"},["agilityweapon"] = {"A","C"},["icyweapon"] = {"A","C"},["icychillweapon"] = {"A","C"},["fieryweapon"] = {"A","C"},["strikingweapon"] = {"A","C"},["demonslayingweapon"] = {"A","C"},["wintersmightweapon"] = {"A","C"},["beastslayerweapon"] = {"A","C"},["glowweapon"] = {"A","C"},
-["weaponspelldamage"] = {"C","A"},["weapondamage"] = {"C","A"},["weaponspirit"] = {"C","A"},["weaponintellect"] = {"C","A"},["weaponlifesteal"] = {"C","A"},["weaponcrusader"] = {"C","A"},["weaponheal"] = {"C","A"},["weaponunholy"] = {"C","A"},["weaponstrength"] = {"C","A"},["weaponagility"] = {"C","A"},["weaponicy"] = {"C","A"},["weaponicychill"] = {"C","A"},["weaponfiery"] = {"C","A"},["weaponstriking"] = {"C","A"},["weapondemonslaying"] = {"C","A"},["weaponwintersmight"] = {"C","A"},["weaponbeastslayer"] = {"C","A"},["weaponglow"] = {"C","A"},
-["agilitybelt"] = {"A","C"},["resistbelt"] = {"A","C"},["intellectbelt"] = {"A","C"},["defensebelt"] = {"A","C"},["staminabelt"] = {"A","C"},["strengthbelt"] = {"A","C"},["nrbelt"] = {"A","C"},["srbelt"] = {"A","C"},["frbelt"] = {"A","C"},["arbelt"] = {"A","C"},
-["agilitybeltbuckle"] = {"A","C"},["resistbeltbuckle"] = {"A","C"},["intellectbeltbuckle"] = {"A","C"},["defensebeltbuckle"] = {"A","C"},["staminabeltbuckle"] = {"A","C"},["strengthbeltbuckle"] = {"A","C"},["nrbeltbuckle"] = {"A","C"},["srbeltbuckle"] = {"A","C"},["frbeltbuckle"] = {"A","C"},["arbeltbuckle"] = {"A","C"},
-["beltagility"] = {"C","A"},["beltresist"] = {"C","A"},["beltintellect"] = {"C","A"},["beltdefense"] = {"C","A"},["beltstamina"] = {"C","A"},["beltstrength"] = {"C","A"},["beltnr"] = {"C","A"},["beltsr"] = {"C","A"},["beltfr"] = {"C","A"},["beltar"] = {"C","A"},
-["beltbuckleagility"] = {"C","A"},["beltbuckleresist"] = {"C","A"},["beltbuckleintellect"] = {"C","A"},["beltbuckledefense"] = {"C","A"},["beltbucklestamina"] = {"C","A"},["beltbucklestrength"] = {"C","A"},["beltbucklenr"] = {"C","A"},["beltbucklesr"] = {"C","A"},["beltbucklefr"] = {"C","A"},["beltbucklear"] = {"C","A"},
-["agilitygem"] = {"A","C"},["resistgem"] = {"A","C"},["intellectgem"] = {"A","C"},["defensegem"] = {"A","C"},["staminagem"] = {"A","C"},["strengthgem"] = {"A","C"},["nrgem"] = {"A","C"},["srgem"] = {"A","C"},["frgem"] = {"A","C"},["argem"] = {"A","C"},
-["agilitygemstone"] = {"A","C"},["resistgemstone"] = {"A","C"},["intellectgemstone"] = {"A","C"},["defensegemstone"] = {"A","C"},["staminagemstone"] = {"A","C"},["strengthgemstone"] = {"A","C"},["nrgemstone"] = {"A","C"},["srgemstone"] = {"A","C"},["frgemstone"] = {"A","C"},["argemstone"] = {"A","C"},
-["gemagility"] = {"C","A"},["gemresist"] = {"C","A"},["gemintellect"] = {"C","A"},["gemdefense"] = {"C","A"},["gemstamina"] = {"C","A"},["gemstrength"] = {"C","A"},["gemnr"] = {"C","A"},["gemsr"] = {"C","A"},["gemfr"] = {"C","A"},["gemar"] = {"C","A"},
-["gemstoneagility"] = {"C","A"},["gemstoneresist"] = {"C","A"},["gemstoneintellect"] = {"C","A"},["gemstonedefense"] = {"C","A"},["gemstonestamina"] = {"C","A"},["gemstonestrength"] = {"C","A"},["gemstonenr"] = {"C","A"},["gemstonesr"] = {"C","A"},["gemstonefr"] = {"C","A"},["gemstonear"] = {"C","A"},
-["hasteshoulder"] = {"A","C"},
-["shoulderhaste"] = {"C","A"},
+["strengthhead"] = {"O","I"},["agilityhead"] = {"O","I"},["frhead"] = {"O","I"},["arhead"] = {"O","I"},["srhead"] = {"O","I"},["nrhead"] = {"O","I"},["staminahead"] = {"O","I"},["healthhead"] = {"O","I"},["hphead"] = {"O","I"},["aphead"] = {"O","I"},["spelldamagehead"] = {"O","I"},["hastehead"] = {"O","I"},["hithead"] = {"O","I"},["manahead"] = {"O","I"},["mphead"] = {"O","I"},
+["strengthlegs"] = {"O","I"},["agilitylegs"] = {"O","I"},["frlegs"] = {"O","I"},["arlegs"] = {"O","I"},["srlegs"] = {"O","I"},["nrlegs"] = {"O","I"},["staminalegs"] = {"O","I"},["healthlegs"] = {"O","I"},["hplegs"] = {"O","I"},["aplegs"] = {"O","I"},["spelldamagelegs"] = {"O","I"},["hastelegs"] = {"O","I"},["hitlegs"] = {"O","I"},["manalegs"] = {"O","I"},["mplegs"] = {"O","I"},
+["headstrength"] = {"I","O"},["headagility"] = {"I","O"},["headfr"] = {"I","O"},["headar"] = {"I","O"},["headsr"] = {"I","O"},["headnr"] = {"I","O"},["headstamina"] = {"I","O"},["headhealth"] = {"I","O"},["headhp"] = {"I","O"},["headap"] = {"I","O"},["headspelldamage"] = {"I","O"},["headhaste"] = {"I","O"},["headhit"] = {"I","O"},["headmana"] = {"I","O"},["headmp"] = {"I","O"},
+["legsstrength"] = {"I","O"},["legsagility"] = {"I","O"},["legsfr"] = {"I","O"},["legsar"] = {"I","O"},["legssr"] = {"I","O"},["legsnr"] = {"I","O"},["legsstamina"] = {"I","O"},["legshealth"] = {"I","O"},["legshp"] = {"I","O"},["legsap"] = {"I","O"},["legsspelldamage"] = {"I","O"},["legshaste"] = {"I","O"},["legshit"] = {"I","O"},["legsmana"] = {"I","O"},["legsmp"] = {"I","O"},
+["firering"] = {"O","I"},["arcanering"] = {"O","I"},["frring"] = {"O","I"},["arring"] = {"O","I"},["srring"] = {"O","I"},["nrring"] = {"O","I"},["firedamagering"] = {"O","I"},["arcanedamagering"] = {"O","I"},["intellectring"] = {"O","I"},["agilityring"] = {"O","I"},["staminaring"] = {"O","I"},["strengthring"] = {"O","I"},["vampirismring"] = {"O","I"},["spiritring"] = {"O","I"},["healring"] = {"O","I"},["blockring"] = {"O","I"},["armorring"] = {"O","I"},["mpring"] = {"O","I"},["statring"] = {"O","I"},["spelldamagering"] = {"O","I"},
+["fireneck"] = {"O","I"},["arcaneneck"] = {"O","I"},["frneck"] = {"O","I"},["arneck"] = {"O","I"},["srneck"] = {"O","I"},["nrneck"] = {"O","I"},["firedamageneck"] = {"O","I"},["arcanedamageneck"] = {"O","I"},["intellectneck"] = {"O","I"},["agilityneck"] = {"O","I"},["staminaneck"] = {"O","I"},["strengthneck"] = {"O","I"},["vampirismneck"] = {"O","I"},["spiritneck"] = {"O","I"},["healneck"] = {"O","I"},["blockneck"] = {"O","I"},["armorneck"] = {"O","I"},["mpneck"] = {"O","I"},["statneck"] = {"O","I"},["spelldamageneck"] = {"O","I"},
+["ringfire"] = {"I","O"},["ringarcane"] = {"I","O"},["ringfr"] = {"I","O"},["ringar"] = {"I","O"},["ringsr"] = {"I","O"},["ringnr"] = {"I","O"},["ringfiredamage"] = {"I","O"},["ringarcanedamage"] = {"I","O"},["ringintellect"] = {"I","O"},["ringagility"] = {"I","O"},["ringstamina"] = {"I","O"},["ringstrength"] = {"I","O"},["ringvampirism"] = {"I","O"},["ringspirit"] = {"I","O"},["ringheal"] = {"I","O"},["ringblock"] = {"I","O"},["ringarmor"] = {"I","O"},["ringmp"] = {"I","O"},["ringstat"] = {"I","O"},["ringspelldamage"] = {"I","O"},
+["neckfire"] = {"I","O"},["neckarcane"] = {"I","O"},["neckfr"] = {"I","O"},["neckar"] = {"I","O"},["necksr"] = {"I","O"},["necknr"] = {"I","O"},["neckfiredamage"] = {"I","O"},["neckarcanedamage"] = {"I","O"},["neckintellect"] = {"I","O"},["neckagility"] = {"I","O"},["neckstamina"] = {"I","O"},["neckstrength"] = {"I","O"},["neckvampirism"] = {"I","O"},["neckspirit"] = {"I","O"},["neckheal"] = {"I","O"},["neckblock"] = {"I","O"},["neckarmor"] = {"I","O"},["neckmp"] = {"I","O"},["neckstat"] = {"I","O"},["neckspelldamage"] = {"I","O"},
+["agilitycloak"] = {"O","I"},["armorcloak"] = {"O","I"},["resistcloak"] = {"O","I"},["allresistcloak"] = {"O","I"},["resistallcloak"] = {"O","I"},["frcloak"] = {"O","I"},["srcloak"] = {"O","I"},["nrcloak"] = {"O","I"},["arcloak"] = {"O","I"},["dodgecloak"] = {"O","I"},["subtletycloak"] = {"O","I"},["stealthcloak"] = {"O","I"},["subcloak"] = {"O","I"},
+["agilityback"] = {"O","I"},["armorback"] = {"O","I"},["resistback"] = {"O","I"},["allresistback"] = {"O","I"},["resistallback"] = {"O","I"},["frback"] = {"O","I"},["srback"] = {"O","I"},["nrback"] = {"O","I"},["arback"] = {"O","I"},["dodgeback"] = {"O","I"},["subtletyback"] = {"O","I"},["stealthback"] = {"O","I"},["subback"] = {"O","I"},
+["cloakagility"] = {"I","O"},["cloakarmor"] = {"I","O"},["cloakresist"] = {"I","O"},["cloakallresist"] = {"I","O"},["cloakresistall"] = {"I","O"},["cloakfr"] = {"I","O"},["cloaksr"] = {"I","O"},["cloaknr"] = {"I","O"},["cloakar"] = {"I","O"},["cloakdodge"] = {"I","O"},["cloaksubtlety"] = {"I","O"},["cloakstealth"] = {"I","O"},["cloaksub"] = {"I","O"},
+["backagility"] = {"I","O"},["backarmor"] = {"I","O"},["backresist"] = {"I","O"},["backallresist"] = {"I","O"},["backresistall"] = {"I","O"},["backfr"] = {"I","O"},["backsr"] = {"I","O"},["backnr"] = {"I","O"},["backar"] = {"I","O"},["backdodge"] = {"I","O"},["backsubtlety"] = {"I","O"},["backstealth"] = {"I","O"},["backsub"] = {"I","O"},
+["mpchest"] = {"O","I"},["statchest"] = {"O","I"},["healthchest"] = {"O","I"},["manachest"] = {"O","I"},
+["chestmp"] = {"I","O"},["cheststat"] = {"I","O"},["chesthealth"] = {"I","O"},["chestmana"] = {"I","O"},
+["strengthwrist"] = {"O","I"},["staminawrist"] = {"O","I"},["intellectwrist"] = {"O","I"},["spelldamagewrist"] = {"O","I"},["healwrist"] = {"O","I"},["mpwrist"] = {"O","I"},["agilitywrist"] = {"O","I"},["defensewrist"] = {"O","I"},["vampirismwrist"] = {"O","I"},["spiritwrist"] = {"O","I"},["healthwrist"] = {"O","I"},
+["wriststrength"] = {"I","O"},["wriststamina"] = {"I","O"},["wristintellect"] = {"I","O"},["wristspelldamage"] = {"I","O"},["wristheal"] = {"I","O"},["wristmp"] = {"I","O"},["wristagility"] = {"I","O"},["wristdefense"] = {"I","O"},["wristvampirism"] = {"I","O"},["wristspirit"] = {"I","O"},["wristhealth"] = {"I","O"},
+["agilitygloves"] = {"O","I"},["strengthgloves"] = {"O","I"},["hastegloves"] = {"O","I"},["ridinggloves"] = {"O","I"},["ridingskillgloves"] = {"O","I"},["mountspeedgloves"] = {"O","I"},["arcanegloves"] = {"O","I"},["shadowgloves"] = {"O","I"},["firegloves"] = {"O","I"},["naturegloves"] = {"O","I"},["healgloves"] = {"O","I"},["spelldamagegloves"] = {"O","I"},["threatgloves"] = {"O","I"},["herbgloves"] = {"O","I"},["skingloves"] = {"O","I"},["fishgloves"] = {"O","I"},["minegloves"] = {"O","I"},
+["agilityhand"] = {"O","I"},["strengthhand"] = {"O","I"},["hastehand"] = {"O","I"},["ridinghand"] = {"O","I"},["ridingskillhand"] = {"O","I"},["mountspeedhand"] = {"O","I"},["arcanehand"] = {"O","I"},["shadowhand"] = {"O","I"},["firehand"] = {"O","I"},["naturehand"] = {"O","I"},["healhand"] = {"O","I"},["spelldamagehand"] = {"O","I"},["threathand"] = {"O","I"},["herbhand"] = {"O","I"},["skinhand"] = {"O","I"},["fishhand"] = {"O","I"},["minehand"] = {"O","I"},
+["glovesagility"] = {"I","O"},["glovesstrength"] = {"I","O"},["gloveshaste"] = {"I","O"},["glovesriding"] = {"I","O"},["glovesridingskill"] = {"I","O"},["glovesmountspeed"] = {"I","O"},["glovesarcane"] = {"I","O"},["glovesshadow"] = {"I","O"},["glovesfire"] = {"I","O"},["glovesnature"] = {"I","O"},["glovesheal"] = {"I","O"},["glovesspelldamage"] = {"I","O"},["glovesthreat"] = {"I","O"},["glovesherb"] = {"I","O"},["glovesskin"] = {"I","O"},["glovesfish"] = {"I","O"},["glovesmine"] = {"I","O"},
+["handagility"] = {"I","O"},["handstrength"] = {"I","O"},["handhaste"] = {"I","O"},["handriding"] = {"I","O"},["handridingskill"] = {"I","O"},["handmountspeed"] = {"I","O"},["handarcane"] = {"I","O"},["handshadow"] = {"I","O"},["handfire"] = {"I","O"},["handnature"] = {"I","O"},["handheal"] = {"I","O"},["handspelldamage"] = {"I","O"},["handthreat"] = {"I","O"},["handherb"] = {"I","O"},["handskin"] = {"I","O"},["handfish"] = {"I","O"},["handmine"] = {"I","O"},
+["staminashield"] = {"O","I"},["spiritshield"] = {"O","I"},["blockshield"] = {"O","I"},
+["shieldstamina"] = {"I","O"},["shieldspirit"] = {"I","O"},["shieldblock"] = {"I","O"},
+["staminaboots"] = {"O","I"},["mpboots"] = {"O","I"},["spiritboots"] = {"O","I"},["speedboots"] = {"O","I"},["minorspeedboots"] = {"O","I"},["runspeedboots"] = {"O","I"},["movespeedboots"] = {"O","I"},["healboots"] = {"O","I"},["vampirismboots"] = {"O","I"},["agilityboots"] = {"O","I"},["hitboots"] = {"O","I"},
+["bootsstamina"] = {"I","O"},["bootsmp"] = {"I","O"},["bootsspirit"] = {"I","O"},["bootsspeed"] = {"I","O"},["bootsminorspeed"] = {"I","O"},["bootsrunspeed"] = {"I","O"},["bootsmovespeed"] = {"I","O"},["bootsheal"] = {"I","O"},["bootsvampirism"] = {"I","O"},["bootsagility"] = {"I","O"},["bootshit"] = {"I","O"},
+["spelldamageweapon"] = {"O","I"},["damageweapon"] = {"O","I"},["spiritweapon"] = {"O","I"},["intellectweapon"] = {"O","I"},["lifestealweapon"] = {"O","I"},["crusaderweapon"] = {"O","I"},["healweapon"] = {"O","I"},["unholyweapon"] = {"O","I"},["strengthweapon"] = {"O","I"},["agilityweapon"] = {"O","I"},["icyweapon"] = {"O","I"},["icychillweapon"] = {"O","I"},["fieryweapon"] = {"O","I"},["strikingweapon"] = {"O","I"},["demonslayingweapon"] = {"O","I"},["wintersmightweapon"] = {"O","I"},["beastslayerweapon"] = {"O","I"},["glowweapon"] = {"O","I"},
+["weaponspelldamage"] = {"I","O"},["weapondamage"] = {"I","O"},["weaponspirit"] = {"I","O"},["weaponintellect"] = {"I","O"},["weaponlifesteal"] = {"I","O"},["weaponcrusader"] = {"I","O"},["weaponheal"] = {"I","O"},["weaponunholy"] = {"I","O"},["weaponstrength"] = {"I","O"},["weaponagility"] = {"I","O"},["weaponicy"] = {"I","O"},["weaponicychill"] = {"I","O"},["weaponfiery"] = {"I","O"},["weaponstriking"] = {"I","O"},["weapondemonslaying"] = {"I","O"},["weaponwintersmight"] = {"I","O"},["weaponbeastslayer"] = {"I","O"},["weaponglow"] = {"I","O"},
+["agilitybelt"] = {"O","I"},["resistbelt"] = {"O","I"},["intellectbelt"] = {"O","I"},["defensebelt"] = {"O","I"},["staminabelt"] = {"O","I"},["strengthbelt"] = {"O","I"},["nrbelt"] = {"O","I"},["srbelt"] = {"O","I"},["frbelt"] = {"O","I"},["arbelt"] = {"O","I"},
+["agilitybeltbuckle"] = {"O","I"},["resistbeltbuckle"] = {"O","I"},["intellectbeltbuckle"] = {"O","I"},["defensebeltbuckle"] = {"O","I"},["staminabeltbuckle"] = {"O","I"},["strengthbeltbuckle"] = {"O","I"},["nrbeltbuckle"] = {"O","I"},["srbeltbuckle"] = {"O","I"},["frbeltbuckle"] = {"O","I"},["arbeltbuckle"] = {"O","I"},
+["beltagility"] = {"I","O"},["beltresist"] = {"I","O"},["beltintellect"] = {"I","O"},["beltdefense"] = {"I","O"},["beltstamina"] = {"I","O"},["beltstrength"] = {"I","O"},["beltnr"] = {"I","O"},["beltsr"] = {"I","O"},["beltfr"] = {"I","O"},["beltar"] = {"I","O"},
+["beltbuckleagility"] = {"I","O"},["beltbuckleresist"] = {"I","O"},["beltbuckleintellect"] = {"I","O"},["beltbuckledefense"] = {"I","O"},["beltbucklestamina"] = {"I","O"},["beltbucklestrength"] = {"I","O"},["beltbucklenr"] = {"I","O"},["beltbucklesr"] = {"I","O"},["beltbucklefr"] = {"I","O"},["beltbucklear"] = {"I","O"},
+["agilitygem"] = {"O","I"},["resistgem"] = {"O","I"},["intellectgem"] = {"O","I"},["defensegem"] = {"O","I"},["staminagem"] = {"O","I"},["strengthgem"] = {"O","I"},["nrgem"] = {"O","I"},["srgem"] = {"O","I"},["frgem"] = {"O","I"},["argem"] = {"O","I"},
+["agilitygemstone"] = {"O","I"},["resistgemstone"] = {"O","I"},["intellectgemstone"] = {"O","I"},["defensegemstone"] = {"O","I"},["staminagemstone"] = {"O","I"},["strengthgemstone"] = {"O","I"},["nrgemstone"] = {"O","I"},["srgemstone"] = {"O","I"},["frgemstone"] = {"O","I"},["argemstone"] = {"O","I"},
+["gemagility"] = {"I","O"},["gemresist"] = {"I","O"},["gemintellect"] = {"I","O"},["gemdefense"] = {"I","O"},["gemstamina"] = {"I","O"},["gemstrength"] = {"I","O"},["gemnr"] = {"I","O"},["gemsr"] = {"I","O"},["gemfr"] = {"I","O"},["gemar"] = {"I","O"},
+["gemstoneagility"] = {"I","O"},["gemstoneresist"] = {"I","O"},["gemstoneintellect"] = {"I","O"},["gemstonedefense"] = {"I","O"},["gemstonestamina"] = {"I","O"},["gemstonestrength"] = {"I","O"},["gemstonenr"] = {"I","O"},["gemstonesr"] = {"I","O"},["gemstonefr"] = {"I","O"},["gemstonear"] = {"I","O"},
+["hasteshoulder"] = {"O","I"},
+["shoulderhaste"] = {"I","O"},
 
 -- Triggers
 ["please"] = true,["gold"] = true,["silver"] = true,
@@ -4552,7 +4547,7 @@ GF_Error_Messages = {
 [SPELL_FAILED_UNIT_NOT_INFRONT] = true,
 }
 GF_LFT_ALIAS = {
---["razorfen"] = {"rfk","rfd"},["sm"] = {"smgy","smlib","smarm","smcath"},["scarletmonastery"] = {"smgy","smlib","smarm","smcath"},["scarlet"] = {"smgy","smlib","smarm","smcath"},["brs"] = {"brs"},["blackrockspire"] = {"brs"},["blackrock"] = {"brs"},["diremaul"] = {"dm"},
+--["razorfen"] = {"rfk","rfd"},["sm"] = {"smgy","smlib","smarmory","smcath"},["scarletmonastery"] = {"smgy","smlib","smarmory","smcath"},["scarlet"] = {"smgy","smlib","smarmory","smcath"},["brs"] = {"brs"},["blackrockspire"] = {"brs"},["blackrock"] = {"brs"},["diremaul"] = {"dm"},
 ["rfc"] = {"rfc"},["ragefire"] = {"rfc"},["ragefirechasm"] = {"rfc"},
 ["dm"] = {"dm"},["deadmines"] = {"dm"},
 ["wc"] = {"wc"},["wailingcaverns"] = {"wc"},
@@ -4564,23 +4559,23 @@ GF_LFT_ALIAS = {
 ["rfd"] = {"rfd"},["razorfendowns"] = {"rfd"},["downs"] = {"rfd"},
 ["gy"] = {"smgy"},["smgy"] = {"smgy"},
 ["smlib"] = {"smlib"},["library"] = {"smlib"},
-["smarm"] = {"smarm"},["armory"] = {"smarm"},
+["smarm"] = {"smarmory"},["armory"] = {"smarmory"},
 ["smcath"] = {"smcath"},["cathedral"] = {"smcath"},
 ["ulda"] = {"ulda"},["uldaman"] = {"ulda"},
 ["zf"] = {"zf"},["zulfarrak"] = {"zf"},["mallet"] = {"zf"},
-["mara"] = {"maraudonorange","maraudonpurple"},["maraudon"] = {"maraudonorange","maraudonpurple"},
-["maraudonorange"] = {"maraudonorange"},["maraudonpurple"] = {"maraudonpurple"},["orangeside"] = {"maraudonorange"},["purpleside"] = {"maraudonpurple"},
-["princess"] = {"maraudonprincess"},["maraudonprincess"] = {"maraudonprincess"},["princessrun"] = {"maraudonprincess"},
+["mara"] = {"maraorange","marapurple"},["maraudon"] = {"maraorange","marapurple"},
+["maraudonorange"] = {"maraorange"},["maraudonpurple"] = {"marapurple"},["orangeside"] = {"maraorange"},["purpleside"] = {"marapurple"},
+["princess"] = {"maraprincess"},["maraudonprincess"] = {"maraprincess"},["princessrun"] = {"maraprincess"},
 ["st"] = {"st"},["sunken"] = {"st"},["atalhakkar"] = {"st"},["sunkentemple"] = {"st"},
-["brd"] = {"brd"},["arena"] = {"brdarena"},["emperor"] = {"brdemperor"},["blackrockdepths"] = {"brd"},["brdarena"] = {"brdarena"},["brdemperor"] = {"brdemperor"},["jailbreak"] = {"brd"},
+["brd"] = {"brd"},["arena"] = {"brdarena"},["emperor"] = {"brdemp"},["blackrockdepths"] = {"brd"},["brdarena"] = {"brdarena"},["brdemperor"] = {"brdemp"},["jailbreak"] = {"brd"},
 
 ["lbrs"] = {"lbrs"},["lowerblackrock"] = {"lbrs"},["lowerblackrockspire"] = {"lbrs"},
 
 ["dme"] = {"dme"},["dmn"] = {"dmn"},["dmt"] = {"dmt"},["dmw"] = {"dmw"},
-["scholomance"] = {"scholomance"},["krastinov"] = {"scholomance"},
-["stratholme"] = {"livestrat","udstrat"},["stratrep"] = {"udstrat"},["repfarmstrat"] = {"udstrat"},["stratrepfarm"] = {"udstrat"},
-["livestrat"] = {"livestrat"},
-["baron"] = {"udstrat"},["udstrat"] = {"udstrat"},
+["scholomance"] = {"scholo"},["krastinov"] = {"scholo"},
+["stratholme"] = {"stratlive","stratud"},["stratrep"] = {"stratud"},["repfarmstrat"] = {"stratud"},["stratrepfarm"] = {"stratud"},
+["livestrat"] = {"stratlive"},
+["baron"] = {"stratud"},["udstrat"] = {"stratud"},
 ["ubrs"] = {"ubrs"},["rend"] = {"ubrs"},["valthalak"] = {"ubrs"},["upperblackrock"] = {"ubrs"},["upperblackrockspire"] = {"ubrs"},
 
 -- Turtle
@@ -4588,12 +4583,12 @@ GF_LFT_ALIAS = {
 ["dmr"] = {"dmr"},["dragonmaw"] = {"dmr"},["dragonmawretreat"] = {"dmr"},
 ["crescent"] = {"tcg"},["grove"] = {"tcg"},["crescentgrove"] = {"tcg"},["cg"] = {"tcg"},["tcg"] = {"tcg"},
 
-["gc"] = {"gc"},["gilneas"] = {"gc"},["gilneascity"] = {"gc"},
+["gc"] = {"gilneas"},["gilneas"] = {"gilneas"},["gilneascity"] = {"gilneas"},
 ["hateforge"] = {"hfq"},["quarry"] = {"hfq"},["hq"] = {"hfq"},["hf"] = {"hfq"},["hfq"] = {"hfq"},["hateforgequarry"] = {"hfq"},
 
 ["sv"] = {"swv"},["swv"] = {"swv"},["vault"] = {"swv"},["stormwindvault"] = {"swv"},
-["morass"] = {"cot"},["bm"] = {"cot"},["cot"] = {"cot"},["blackmorass"] = {"cot"},["cavernsoftime"] = {"cot"},
-["crypt"] = {"crypt"},["karazhancrypt"] = {"crypt"},
+["morass"] = {"cotbm"},["bm"] = {"cotbm"},["cot"] = {"cotbm"},["blackmorass"] = {"cotbm"},["cavernsoftime"] = {"cotbm"},
+["crypt"] = {"kc"},["karazhancrypt"] = {"kc"},
 ["stormwrought"] = {"swc","swd"},["stormwroughtruins"] = {"swc","swd"},["swr"] = {"swc","swd"},
 ["swc"] = {"swc"},["stormwroughtcastle"] = {"swc"},
 ["swd"] = {"swd"},["stormwroughtdescent"] = {"swd"},
@@ -4602,6 +4597,13 @@ GF_LFT_ALIAS = {
 -- Epoch Alias
 ["gmm"] = {"ggm"},["glittermurk"] = {"ggm"},["glittermurkmine"] = {"ggm"},
 ["bh"] = {"bh"},["baradinhold"] = {"bh"},
+}
+GF_ALWAYS_SHOWN_ALIAS = {
+[CHAT_MSG_GUILD] = "GUILD",
+[FRIEND] = "FRIEND",
+[CHAT_MSG_PARTY] = "PARTY",
+[CHAT_MSG_SAY] = "SAY",
+[CHAT_MSG_YELL] = "YELL",
 }
 
 GF_QUEST_CONVERT = {
@@ -4736,10 +4738,10 @@ for i=1, getn(GF_EpochSearchList) do table.insert(GF_BUTTONS_LIST.SearchList, 27
 for i=1, getn(GF_EpochGroupButtonsListGetWhoLevel) do table.insert(GF_BUTTONS_LIST.GetWhoLevel, 32, GF_EpochGroupButtonsListGetWhoLevel[i]) end
 for i=1, getn(GF_EpochGroupButtonsListDungeons) do table.insert(GF_BUTTONS_LIST.LFGDungeon, GF_EpochGroupButtonsListDungeons[i]) end
 if IsAddOnLoaded("LFG") and LFGMain and LFGRoleCheckRoleTank and LFGRoleCheckAcceptRole then
-	GF_LFT_DUNGEONS = { ["Baradin Hold"] = "bh",["Blackfathom Deeps"] = "bfd",["Blackrock Depths"] = "brd",["Blackrock Depths Arena"] = "brdarena",["Blackrock Depths Emperor"] = "brdemperor",["The Deadmines"] = "dm",
-	["Glittermurk Mines"] = "ggm",["Gnomeregan"] = "gnomer",["Lower Blackrock Spire"] = "lbrs",["Maraudon Orange"] = "maraudonorange",["Maraudon Princess"] = "maraudonprincess",["Maraudon Purple"] = "maraudonpurple",
-	["Ragefire Chasm"] = "rfc",["Razorfen Downs"] = "rfd",["Razorfen Kraul"] = "rfk",["Scholomance"] = "scholomance",["Shadowfang Keep"] = "sfk",["Scarlet Monastery Armory"] = "smarm",["Scarlet Monastery Cathedral"] = "smcath",
-	["Scarlet Monastery Library"] = "smlib",["Scarlet Monastery Graveyard"] = "smgy",["Temple of Atal'Hakkar"] = "st",["The Stockade"] = "stocks",["Stratholme: Scarlet Bastion"] = "livestrat",["Stratholme: Undead District"] = "udstrat",
+	GF_LFT_DUNGEONS = { ["Baradin Hold"] = "bh",["Blackfathom Deeps"] = "bfd",["Blackrock Depths"] = "brd",["Blackrock Depths Arena"] = "brdarena",["Blackrock Depths Emperor"] = "brdemp",["The Deadmines"] = "dm",
+	["Glittermurk Mines"] = "ggm",["Gnomeregan"] = "gnomer",["Lower Blackrock Spire"] = "lbrs",["Maraudon Orange"] = "maraorange",["Maraudon Princess"] = "maraprincess",["Maraudon Purple"] = "marapurple",
+	["Ragefire Chasm"] = "rfc",["Razorfen Downs"] = "rfd",["Razorfen Kraul"] = "rfk",["Scholomance"] = "scholo",["Shadowfang Keep"] = "sfk",["Scarlet Monastery Armory"] = "smarmory",["Scarlet Monastery Cathedral"] = "smcath",
+	["Scarlet Monastery Library"] = "smlib",["Scarlet Monastery Graveyard"] = "smgy",["Temple of Atal'Hakkar"] = "st",["The Stockade"] = "stocks",["Stratholme: Scarlet Bastion"] = "stratlive",["Stratholme: Undead District"] = "stratud",
 	["Uldaman"] = "ulda",["Upper Blackrock Spire"] = "ubrs",["Wailing Caverns"] = "wc",["Zul'Farrak"] = "zf", }
 end
 	end

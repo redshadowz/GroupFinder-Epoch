@@ -84,6 +84,7 @@ GF_ChatJoinedChannels						= {}
 local channellist							= {}
 GF_WhisperLogCurrentButtonID				= 0
 GF_WhisperLogCurrentButtonName				= ""
+GF_WhisperLogLastWhisperLog					= 0
 GF_WhisperLogData							= {}
 GF_WhisperLogOffset							= 0
 GF_GroupHistory								= {}
@@ -96,7 +97,8 @@ local GF_TextColors = { ["SYSTEM"] = {1,1,0},["SAY"] = {1,1,1},["YELL"] = {1,0.2
 ["EMOTE"] = {1,0.502,0.251},["TEXT_EMOTE"] = {1,0.502,0.251},["COMBAT_FACTION_CHANGE"] = {0.502,0.502,1},["COMBAT_XP_GAIN"] = {0.4353,0.4353,1},["COMBAT_HONOR_GAIN"] = {0.8784,0.792,0.0392},["MONSTER_SAY"] = {1,1,1},
 ["MONSTER_EMOTE"] = {1,0.502,0.251},["MONSTER_YELL"] = {1,0.251,0.251},["HARDCORE"] = {0.902,0.8,0.502}, } --["HARDCORE"] = {0.651,0.6,0.451} }
 local EventIDAlias = { ["SAY"] = "[S] ",["YELL"] = "[Y] ",["GUILD"] = "[G] ",["OFFICER"] = "[O] ",["WHISPER"] = "",["WHISPER_INFORM"] = "[To] ",["PARTY"] = "[P] ",["RAID"] = "[R] ",["RAID_LEADER"] = "[RL] ",["RAID_WARNING"] = "[RW] ",
-["BATTLEGROUND"] = "[BG] ",["BATTLEGROUND_LEADER"] = "[BL] ",["SYSTEM"] = "",}
+["BATTLEGROUND"] = "[BG] ",["BATTLEGROUND_LEADER"] = "[BL] ",["SYSTEM"] = "",["FRIEND"] = "[F] ",[strupper(TRADE)] = "[2] ",[strupper(GENERAL)] = "[1] ",}
+
 local GF_ChatNameAlias = { ["OFFICER"] = "GUILD",["RAID"] = "PARTY",["RAID_LEADER"] = "PARTY",["RAID_WARNING"] = "PARTY",["BATTLEGROUND"] = "PARTY",["BATTLEGROUND_LEADER"] = "PARTY",["WHISPER_INFORM"] = "WHISPER",}
 local GF_ChatBypass = { ["SYSTEM"] = true,["MONEY"] = true,["LOOT"] = true,["COMBAT_FACTION_CHANGE"] = true,["COMBAT_XP_GAIN"] = true,["COMBAT_HONOR_GAIN"] = true,["EMOTE"] = true,["TEXT_EMOTE"] = true,["MONSTER_SAY"] = true,["MONSTER_EMOTE"] = true,["MONSTER_YELL"] = true,}
 local GF_ChatProcess = { ["CHAT_MSG_SYSTEM"] = true,["CHAT_MSG_SAY"] = true,["CHAT_MSG_YELL"] = true,["CHAT_MSG_CHANNEL"] = true,["CHAT_MSG_GUILD"] = true,["CHAT_MSG_OFFICER"] = true,["CHAT_MSG_WHISPER"] = true,["CHAT_MSG_WHISPER_INFORM"] = true,
@@ -283,7 +285,7 @@ function GF_LoadVariables()
 		if GF_PerCharVariables.dpsmeter == nil then GF_PerCharVariables.dpsmeter = 1 end
 		if GF_PerCharVariables.dpsmetershown == nil then GF_PerCharVariables.dpsmetershown = false end
 		if GF_PerCharVariables.usedpsmeter == nil then GF_PerCharVariables.usedpsmeter = true end
-		if GF_PerCharVariables.sendplayerinfo == nil then GF_PerCharVariables.sendplayerinfo = true end
+		if GF_PerCharVariables.sendplayerinfo == nil then GF_PerCharVariables.sendplayerinfo = false end
 
 		if GF_PerCharVariables.dpsmetersenddamage == nil then GF_PerCharVariables.dpsmetersenddamage = true end
 		if GF_PerCharVariables.dpsmetersendhealing == nil then GF_PerCharVariables.dpsmetersendhealing = false end
@@ -431,6 +433,7 @@ function GF_LoadSettings()
 	GF_SetDropdownWidths()
 	GF_SetLFGRoleButtons()
 	GF_SetupDPSMeter()
+	GF_SetAlwaysShowTextLabel()
 	GF_Combat_Log_FilterList = { ["SPELL_PERIODIC_DAMAGE"] = GF_FilterDamage,["SPELL_DAMAGE"] = GF_FilterDamage,["SWING_DAMAGE"] = GF_FilterDamage,["RANGE_DAMAGE"] = GF_FilterDamage,["DAMAGE_SHIELD"] = GF_FilterDamage,["DAMAGE_SPLIT"] = GF_FilterDamage,["SPELL_HEAL"] = GF_FilterHealing,["SPELL_PERIODIC_HEAL"] = GF_FilterHealing,["SPELL_HEAL_ABSORBED"] = GF_FilterHealing }
 	GF_CheckSearchButtonHasValues()
 	if searchButtonHasValues or GF_PerCharVariables.searchbuttonstext[GF_BUTTONS_LIST["SearchList"][#GF_BUTTONS_LIST["SearchList"]][4]] then GF_SearchListDropdown:LockHighlight() GF_SearchListClearButton:Show() end
@@ -1704,32 +1707,38 @@ function GF_CheckForDelayedMessages()
 				if GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][6]] and GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][6]][1] ~= 0 and GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][6]][1] < GF_SavedVariables.blockmessagebelowlevel then GF_LogHistory[GF_RealmName]["Delay"][i][4] = 9 end
 				GF_AddLogMessage(GF_LogHistory[GF_RealmName]["Delay"][i][3],GF_LogHistory[GF_RealmName]["Delay"][i][4],GF_LogHistory[GF_RealmName]["Delay"][i][5],GF_LogHistory[GF_RealmName]["Delay"][i][6],GF_LogHistory[GF_RealmName]["Delay"][i][7],GF_LogHistory[GF_RealmName]["Delay"][i][8],GF_LogHistory[GF_RealmName]["Delay"][i][9],true)
 				table.remove(GF_LogHistory[GF_RealmName]["Delay"],i)
+				if not GF_LogHistory[GF_RealmName]["Delay"][i] then break end
 			end
 			if GF_LogHistory[GF_RealmName]["Delay"][i][1] == "Channel" and (not GF_SavedVariables.friendsToRemove[GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_SavedVariables.friendsToRemove[GF_LogHistory[GF_RealmName]["Delay"][i][4]] + 5 < time()) and (GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_LogHistory[GF_RealmName]["Delay"][i][2] < time()) then
 				if not GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]][1] == 0 or GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]][1] >= GF_SavedVariables.blockmessagebelowlevel then
 					GF_AddChannelMessage(GF_LogHistory[GF_RealmName]["Delay"][i][3],GF_LogHistory[GF_RealmName]["Delay"][i][4],GF_LogHistory[GF_RealmName]["Delay"][i][5],GF_LogHistory[GF_RealmName]["Delay"][i][6],true)
 				end
 				table.remove(GF_LogHistory[GF_RealmName]["Delay"],i)
+				if not GF_LogHistory[GF_RealmName]["Delay"][i] then break end
 			end
 			if GF_LogHistory[GF_RealmName]["Delay"][i][1] == "Chat" and (not GF_SavedVariables.friendsToRemove[GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_SavedVariables.friendsToRemove[GF_LogHistory[GF_RealmName]["Delay"][i][4]] + 5 < time()) and (GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_LogHistory[GF_RealmName]["Delay"][i][2] < time()) then
 				if not GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]][1] == 0 or GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]][1] >= GF_SavedVariables.blockmessagebelowlevel then
 					GF_AddChatMessage(GF_LogHistory[GF_RealmName]["Delay"][i][3],GF_LogHistory[GF_RealmName]["Delay"][i][4],GF_LogHistory[GF_RealmName]["Delay"][i][5],true)
 				end
 				table.remove(GF_LogHistory[GF_RealmName]["Delay"],i)
+				if not GF_LogHistory[GF_RealmName]["Delay"][i] then break end
 			end
 			if GF_LogHistory[GF_RealmName]["Delay"][i][1] == "Whisper" and (not GF_SavedVariables.friendsToRemove[GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_SavedVariables.friendsToRemove[GF_LogHistory[GF_RealmName]["Delay"][i][4]] + 5 < time()) and (GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_LogHistory[GF_RealmName]["Delay"][i][2] < time()) then
 				GF_WhisperReceivedAddToWhisperHistoryList(GF_LogHistory[GF_RealmName]["Delay"][i][3],GF_LogHistory[GF_RealmName]["Delay"][i][4],GF_LogHistory[GF_RealmName]["Delay"][i][5],true)
 				table.remove(GF_LogHistory[GF_RealmName]["Delay"],i)
+				if not GF_LogHistory[GF_RealmName]["Delay"][i] then break end
 			end
 			if GF_LogHistory[GF_RealmName]["Delay"][i][1] == "Minimap" and (not GF_SavedVariables.friendsToRemove[GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_SavedVariables.friendsToRemove[GF_LogHistory[GF_RealmName]["Delay"][i][4]] + 5 < time()) and (GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_LogHistory[GF_RealmName]["Delay"][i][2] < time()) then
 				if not GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]] or GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]][1] == 0 or GF_WhoTable[GF_RealmName][GF_LogHistory[GF_RealmName]["Delay"][i][4]][1] >= GF_SavedVariables.blockmessagebelowlevel then
 					GF_ShowGroupsOnMinimap(GF_LogHistory[GF_RealmName]["Delay"][i][3],GF_LogHistory[GF_RealmName]["Delay"][i][4],true)
 				end
 				table.remove(GF_LogHistory[GF_RealmName]["Delay"],i)
+				if not GF_LogHistory[GF_RealmName]["Delay"][i] then break end
 			end
 			if GF_LogHistory[GF_RealmName]["Delay"][i][1] == "Item" and (GF_LogHistory[GF_RealmName]["Delay"][i][2] < time() and GF_ChatReplaceItemLink(arg1,true) or GF_LogHistory[GF_RealmName]["Delay"][i][2] + 2 < time()) then
 				GF_ProcessChatMessages(GF_LogHistory[GF_RealmName]["Delay"][i][3],GF_LogHistory[GF_RealmName]["Delay"][i][4],GF_LogHistory[GF_RealmName]["Delay"][i][5],GF_LogHistory[GF_RealmName]["Delay"][i][6],GF_LogHistory[GF_RealmName]["Delay"][i][7],GF_LogHistory[GF_RealmName]["Delay"][i][8],true)
 				table.remove(GF_LogHistory[GF_RealmName]["Delay"],i)
+				if not GF_LogHistory[GF_RealmName]["Delay"][i] then break end
 			end
 		else
 			break
@@ -2709,7 +2718,7 @@ function GF_ProcessChatMessages(event,arg1,arg2,arg8,arg9,arg12,delayed) -- Chat
 	--if fixedType then logType = fixedType arg1 = ">>"..strsub(arg1,3) end
 	if logType > 7 and GF_PlayerMessages[arg2] and GF_PlayerMessages[arg2][1] and GF_PlayerMessages[arg2][1][1] then GF_PlayerMessages[arg2][1][1] = time() + 1 end -- To block multiple messages in series(Guild,Trade,Blacklist,Level)
 	if not arg9 or not GF_CHANNEL_NO_LOG_LIST[strlower(arg9)] then GF_AddLogMessage(arg1,logType,true,arg2,arg8,arg9,event) end
-	if GF_ChatCheckFilters(logType,arg1,arg2,event) or arg2 == "SYSTEM" or arg2 == UnitName("player") or GF_PerCharVariables.alwaysShown[event] or GF_PerCharVariables.alwaysShown[strupper(arg9)]
+	if GF_ChatCheckFilters(logType,arg1,arg2,event) or arg2 == "SYSTEM" or arg2 == UnitName("player") or GF_PerCharVariables.alwaysShown[event] or GF_PerCharVariables.alwaysShown[strupper(string.gsub(arg9, " - .*", ""))]
 	or (GF_Guildies[arg2] and GF_PerCharVariables.alwaysShown["GUILD"]) or (GF_Friends[arg2] and GF_PerCharVariables.alwaysShown["FRIEND"]) or (GF_PlayersCurrentlyInGroup[arg2] and GF_PerCharVariables.alwaysShown["PARTY"]) then
 		if delayed then
 			if event == "CHANNEL" then GF_AddChannelMessage(arg1,arg2,arg8,arg9) else GF_AddChatMessage(arg1,arg2,event) end
@@ -4086,6 +4095,10 @@ function GF_PruneTheClassWhoTable()
 end
 
 function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ignore/blacklist or adds their character information)
+-- I'm still periodically having issues where there are no names on the dps meter
+-- I'm also having an issue where names get transferred to a new group because it thinks it's the same group
+-- A group I ran earlier, I dropped, and it didn't say anything about saving the group, but then at some point later, it saved(or was it after I reloaded?)
+
 	local lastParty,lastPartyOnline = GF_NumPartyMembers,GF_NumPartyMembersOnline
 	GF_NumPartyMembers = GF_GetNumGroupMembers()
 	if GF_CurrentZone ~= GetRealZoneText() then -- If zone changes, this saves TempData to old GF_CurrentZone, then loads new GF_CurrentZone to TempData or creates a blank TempData and GF_CurrentZone
@@ -4200,7 +4213,7 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 			end
 		end
 	end
-	if not GF_PerCharVariables.CurrentGroup["TempData"][6] then GF_GroupHistoryDisplayLogCurrent("TempData",true) end
+	if GF_WhisperLogLastWhisperLog == 2 and GF_WhisperLogCurrentButtonID == 1 and not GF_PerCharVariables.CurrentGroup["TempData"][6] then GF_GroupHistoryDisplayLogCurrent("TempData",true) end
 	GF_UpdateDPSMeter()
 	GF_OnUpdateFunctions["UpdateGroup"] = nil
 end
@@ -4649,6 +4662,7 @@ function GF_WhisperHistoryButtonPressed(id,override,nolog) -- Whisper/Guild Hist
 	if id > 1 then getglobal("GF_WhisperHistoryButtonCheckButton"..id):Show() end
 	
 	GF_WhisperLogCurrentButtonID = id
+	GF_WhisperLogLastWhisperLog = GF_SavedVariables.showwhisperlogs
 	GF_WhisperLogCurrentButtonName = getglobal("GF_WhisperHistoryButton"..id):GetText()
 	if nolog then return end
 	if id == 0 then
@@ -4675,7 +4689,7 @@ function GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event,delayed)
 	end
 	table.insert(GF_LogHistory[GF_RealmName],1,{arg1,4,event})
 	if #GF_LogHistory[GF_RealmName] > 500 then table.remove(GF_LogHistory[GF_RealmName],501) end
-	if GF_WhisperLogCurrentButtonID == 0 or GF_SavedVariables.showwhisperlogs == 1 and (GF_WhisperLogCurrentButtonID == 1 or arg2 == getglobal("GF_WhisperHistoryButton"..GF_WhisperLogCurrentButtonID):GetText()) then
+	if GF_WhisperLogCurrentButtonID == 0 or GF_WhisperLogLastWhisperLog == 1 and (GF_WhisperLogCurrentButtonID == 1 or arg2 == getglobal("GF_WhisperHistoryButton"..GF_WhisperLogCurrentButtonID):GetText()) then
 		if GF_ConvertMessagesToLinks then
 			local _,_,startString,endString = strfind(arg1, "(.-%].-|Hplayer.-|h|r:? )(.*)")
 			if startString then
@@ -4707,7 +4721,7 @@ function GF_GroupFinishedAddToGroupHistoryList()
 		for j=1, #GF_PerCharVariables.CurrentGroup do if GF_PerCharVariables.CurrentGroup[j] == GF_PerCharVariables.groupfinishtimer[2][i] then table.remove(GF_PerCharVariables.CurrentGroup,j) GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]] = nil break end end
 	end
 	GF_PerCharVariables.groupfinishtimer = nil
-	if GF_SavedVariables.showwhisperlogs == 2 and GF_WhisperLogCurrentButtonID == 1 then GF_UpdateTicker = GetTime() + .1 GF_OnUpdateFunctions["GroupLog"] = GF_UpdateGroupLog end
+	if GF_WhisperLogLastWhisperLog == 2 and GF_WhisperLogCurrentButtonID == 1 then GF_UpdateTicker = GetTime() + .1 GF_OnUpdateFunctions["GroupLog"] = GF_UpdateGroupLog end
 end
 function GF_UpdateGroupLog()
 	GF_OnUpdateFunctions["GroupLog"] = nil
@@ -5385,6 +5399,12 @@ function GF_GetWhoLevelDropdownShow()
 	GF_GetDropDownButtons("GetWhoLevel",6)
 	if GF_PerCharVariables.getwhowhisperlevel == 0 then GF_GetWhoLevel1:SetChecked(true) end
 end
+function GF_AlwaysShowDropdownShow()
+	GF_BUTTONS_LIST["AlwaysShow"] = {{CHAT_MSG_GUILD},{FRIEND},{CHAT_MSG_PARTY},{CHAT_MSG_SAY},{CHAT_MSG_YELL},{GF_WORLD_CHANNEL_NAME},{GF_LFG_CHANNEL_NAME},{TRADE},{GENERAL},[strlower(GF_WORLD_CHANNEL_NAME)] = true,[strlower(GF_LFG_CHANNEL_NAME)] = true,[strlower(TRADE)] = true,[strlower(GENERAL)] = true,}
+	local chanList = { GetChannelList() }
+	for i=1,#chanList do if not tonumber(chanList[i]) and not GF_BUTTONS_LIST["AlwaysShow"][strlower(chanList[i])] then table.insert(GF_BUTTONS_LIST["AlwaysShow"],{chanList[i]}) end end
+	GF_GetDropDownButtons("AlwaysShow",6,true)
+end
 function GF_BlockListDropdownShow()
 	GF_GetDropDownButtons("BlockList",15,true)
 end
@@ -5441,12 +5461,6 @@ function GF_HideDropdownMenus()
 	GF_MenusToHide = {}
 	GF_OnUpdateFunctions["HideMenus"] = nil
 end
-function GF_AlwaysShowDropdownShow()
-	GF_BUTTONS_LIST["AlwaysShow"] = {{CHAT_MSG_GUILD},{GF_LOG_FRIEND},{GF_LOG_PARTY},{CHAT_MSG_SAY},{CHAT_MSG_YELL},{GF_WORLD_CHANNEL_NAME},{GF_LFG_CHANNEL_NAME},{TRADE},{GENERAL},[strlower(GF_WORLD_CHANNEL_NAME)] = true,[strlower(GF_LFG_CHANNEL_NAME)] = true,[strlower(TRADE)] = true,[strlower(GENERAL)] = true,}
-	local chanList = { GetChannelList() }
-	for i=1,#chanList do if not tonumber(chanList[i]) and not GF_BUTTONS_LIST["AlwaysShow"][strlower(chanList[i])] then table.insert(GF_BUTTONS_LIST["AlwaysShow"],{chanList[i]}) end end
-	GF_GetDropDownButtons("AlwaysShow",6,true)
-end
 
 function GF_ButtonListFunctions(fName,entryName,entryID,add) -- Functions for Button Add/Remove
 	GF_PerCharVariables.searchlfgtext = GF_LFGDescriptionEditBox:GetText()
@@ -5462,6 +5476,14 @@ function GF_GetWhoLevelAddRemove(entryName,entryID,add)
 	GF_PerCharVariables.wholevelrange = GF_BUTTONS_LIST["GetWhoLevel"][entryID][5]
 	if GF_PerCharVariables.getwhowhisperlevel == 0 then GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." "..UnitLevel("player").."±") elseif GF_PerCharVariables.getwhowhisperlevel > 60 then GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." 60±") else GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." "..GF_PerCharVariables.getwhowhisperlevel.."±") end					
 	GF_GetWhoLevel:Hide()
+end
+function GF_AlwaysShowAddRemove(entryName,entryID,add)
+	if add then
+		if GF_ALWAYS_SHOWN_ALIAS[entryName] then GF_PerCharVariables.alwaysShown[GF_ALWAYS_SHOWN_ALIAS[entryName]] = true else GF_PerCharVariables.alwaysShown[strupper(entryName)] = true end
+	else
+		GF_PerCharVariables.alwaysShown[strupper(entryName)] = nil
+	end
+	GF_SetAlwaysShowTextLabel()
 end
 function GF_BlockListAddRemove(entryName,entryID,add)
 	table.remove(GF_BUTTONS_LIST["BlockList"],entryID)
@@ -5582,12 +5604,19 @@ end
 function GF_LFGCommonCleanup(entryName)
 	GF_PerCharVariables.searchlfgtext = gsub(gsub(gsub(gsub(gsub(gsub(gsub(GF_PerCharVariables.searchlfgtext, "^%d+", ""),"for "..entryName,""),"need "..entryName,""),entryName,""),"/ "," "), "%(HC%)", ""),"%s%s+"," ")
 end
-function GF_AlwaysShowAddRemove(entryName,entryID,add)
-	if add then 
-		GF_PerCharVariables.alwaysShown[strupper(entryName)] = true
-	else
-		GF_PerCharVariables.alwaysShown[strupper(entryName)] = nil
+
+function GF_SetAlwaysShowTextLabel()
+	local wordString = GF_ALWAYS_SHOW.." "
+	local count = 0
+	for name,_ in pairs(GF_PerCharVariables.alwaysShown) do
+		if count >= 5 then break end
+		if EventIDAlias[name] then wordString = wordString..EventIDAlias[name] count = count + 1 end
 	end
+	for name,_ in pairs(GF_PerCharVariables.alwaysShown) do
+		if count >= 5 then break end
+		if not EventIDAlias[name] and GetChannelName(name) ~= 0 then wordString = wordString.."["..GetChannelName(name).."] " count = count + 1 end
+	end
+	GF_AlwaysShowTextLabel:SetText(wordString)
 end
 
 function GF_ClickQueueLFT() -- TODO: Does this work properly when in a group as leader?
