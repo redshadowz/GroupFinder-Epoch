@@ -454,12 +454,8 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						GF_SavedVariables = {}
-						GF_PerCharVariables = {}
-						GF_LoadVariables()
-						GF_LoadSettings()
+						GF_ConfirmationDialogFunctions(gsub(self:GetName(),"%d","").."Sent")
 						self:GetParent():Hide()
-						DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_YOUR_SETTINGS_RESET, 1, 1, 0.5)
 					</OnClick>
 					<OnHide>
 						self:GetParent():Hide()
@@ -4293,7 +4289,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 									</OnClick>
 								</Scripts>
 							</Button>
-							<Button name="GF_ConvertLogMessagesToURL" inherits="GF_ButtonTemplate" text="GF_LOG_CONVERT_URL">
+							<Button name="GF_ConvertLogMessagesToURL" inherits="GF_ButtonTemplate" text="GF_LOG_CONVERT_URL" hidden="true">
 								<Size>
 									<AbsDimension x="125" y="20"/>
 								</Size>
@@ -4317,6 +4313,68 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 									</OnClick>
 								</Scripts>
 							</Button>
+							<Button name="GF_SaveCurrentGroupButton" inherits="GF_ButtonTemplate" text="GF_LOG_SAVE_GROUP" hidden="true">
+								<Size>
+									<AbsDimension x="90" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT" relativeTo="GF_GroupLogButton" relativePoint="LEFT">
+										<Offset>
+											<AbsDimension x="-5" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										GF_SaveCurrentGroupDialog:Show()
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Frame name="GF_SaveCurrentGroupDialog" inherits="GF_DialogFrameTemplate_ResetSettings" hidden="true">
+								<Anchors>
+									<Anchor point="CENTER" relativeTo="GF_SettingsFrame">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										GF_SaveCurrentGroupDialogHeadingLabel:SetText(GF_ARE_YOU_SURE_SAVE_GROUP)
+									</OnLoad>
+								</Scripts>
+							</Frame>
+							<Button name="GF_ResetCurrentGroupButton" inherits="GF_ButtonTemplate" text="GF_LOG_RESET_GROUP" hidden="true">
+								<Size>
+									<AbsDimension x="90" y="20"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT" relativeTo="GF_SaveCurrentGroupButton" relativePoint="LEFT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										GF_ResetCurrentGroupDialog:Show()
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Frame name="GF_ResetCurrentGroupDialog" inherits="GF_DialogFrameTemplate_ResetSettings" hidden="true">
+								<Anchors>
+									<Anchor point="CENTER" relativeTo="GF_SettingsFrame">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										GF_ResetCurrentGroupDialogHeadingLabel:SetText(GF_ARE_YOU_SURE_RESET_GROUP)
+									</OnLoad>
+								</Scripts>
+							</Frame>
 						</Frames>
 					</Frame>
 				</Frames>

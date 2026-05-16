@@ -103,16 +103,16 @@ local GF_ChatNameAlias = { ["OFFICER"] = "GUILD",["RAID"] = "PARTY",["RAID_LEADE
 local GF_ChatBypass = { ["SYSTEM"] = true,["MONEY"] = true,["LOOT"] = true,["COMBAT_FACTION_CHANGE"] = true,["COMBAT_XP_GAIN"] = true,["COMBAT_HONOR_GAIN"] = true,["EMOTE"] = true,["TEXT_EMOTE"] = true,["MONSTER_SAY"] = true,["MONSTER_EMOTE"] = true,["MONSTER_YELL"] = true,}
 local GF_ChatProcess = { ["CHAT_MSG_SYSTEM"] = true,["CHAT_MSG_SAY"] = true,["CHAT_MSG_YELL"] = true,["CHAT_MSG_CHANNEL"] = true,["CHAT_MSG_GUILD"] = true,["CHAT_MSG_OFFICER"] = true,["CHAT_MSG_WHISPER"] = true,["CHAT_MSG_WHISPER_INFORM"] = true,
 ["CHAT_MSG_PARTY"] = true,["CHAT_MSG_RAID"] = true,["CHAT_MSG_RAID_LEADER"] = true,["CHAT_MSG_RAID_WARNING"] = true,["CHAT_MSG_BATTLEGROUND"] = true,["CHAT_MSG_BATTLEGROUND_LEADER"] = true,["CHAT_MSG_HARDCORE"] = true, }
-local GF_InfoIDS = { [1]="CHAT_MSG_SYSTEM",[27]="CHAT_MSG_SKILL",[28]="CHAT_MSG_COMBAT_XP_GAIN",[34]="CHAT_MSG_LOOT",}
-local ThingsToHide = { "GF_LogBottomButton","GF_LogDownButton","GF_LogUpButton","GF_LogFilterDropdownButton","GF_LogChannelFilterDropdownButton","GF_LogChannelNameDropdown","GF_ConvertLogMessagesToURL","GF_WhisperLogButton","GF_GroupLogButton",-- 9 Log-related
+local ThingsToHide = { "GF_LogBottomButton","GF_LogDownButton","GF_LogUpButton","GF_LogFilterDropdownButton","GF_LogChannelFilterDropdownButton","GF_LogChannelNameDropdown","GF_WhisperLogButton","GF_GroupLogButton",-- 8 Log-related
 "GF_MainFrameCloseButton","GF_GroupChatOptionsFrame", -- 2 both
 "GF_LFGFrameToggleButton","GF_GetWhoFrameToggleButton","GF_AnnounceToLFGButton", -- 3 Group-related
-"GF_SettingsFrameButton","GF_ShowBlacklistButton","GF_ShowGroupsButton","GF_LogFrameButton",
+"GF_SettingsFrameButton","GF_ShowBlacklistButton","GF_ShowGroupsButton","GF_LogFrameButton", -- 4 other(17 to this point)
+"GF_ConvertLogMessagesToURL","GF_SaveCurrentGroupButton","GF_ResetCurrentGroupButton", -- Turn on/off independently
 "GF_QueuetoLFTButton","GF_GetWhoFrame","GF_LFGFrame","GF_MessageFrame","GF_LogFilterDropdownMenu","GF_GroupFilterDropdownMenu","GF_ChatFilterDropdownMenu","GF_LFGHardCore","GF_FontName","GF_AlwaysShow","GF_GroupChannelName","GF_BlockList","GF_AutoBlacklistDropdownMenu","GF_LogChannelName" }
 GF_MenusToHide								= {}
 local GF_DifficultyColors = { ["RED"] = "ff0000",["ORANGE"] = "ff8040",["YELLOW"] = "ffff00",["GREEN"] = "1eff00",["GREY"] = "808080", }
-local GF_TankClasses						= {	["DRUID"]=true,["WARRIOR"]=true,["PALADIN"]=true,["SHAMAN"]=true }
-local GF_HealingClasses						= {	["PRIEST"]=true,["DRUID"]=true,["PALADIN"]=true,["SHAMAN"]=true }
+local GF_TankClasses = { ["DRUID"]=true,["WARRIOR"]=true,["PALADIN"]=true,["SHAMAN"]=true }
+local GF_HealingClasses = { ["PRIEST"]=true,["DRUID"]=true,["PALADIN"]=true,["SHAMAN"]=true }
 local languageName,foundIgnore,foundGuild,foundGuildExclusion,foundLFM,foundLFG,foundClass,foundDungeon,foundRaid,foundTrades,foundTradesExclusion,numGroupWords,foundPvP,foundHC,foundNotHC,foundBlockList,dontCheckSpam,fixedType,searchButtonHasValues
 local lfmlfgName,groupName,foundQuest,foundDFlags,foundPFlags,foundCFlags,lfmPosition,groupPosition,LFTGroups,displayWhoMessageName = {},{},{},{},{},{},{},{},{},{}
 GF_HELP_TEXT_SIMPLE = HELP_TEXT_SIMPLE
@@ -149,7 +149,7 @@ GF_Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 GF_IconMovingFrame = CreateFrame'Frame'
 GF_IconMovingFrame:Hide()
 GF_IconMovingFrame:SetScript('OnUpdate', function() GF_IconDraggingOnUpdate() end)
-local old_UIErrorsFrame_OnEvent = UIErrorsFrame_OnEvent	
+local old_UIErrorsFrame_OnEvent = UIErrorsFrame_OnEvent
 function GF_LoadVariables()
 	if not GF_MessageList then GF_MessageList = {} end
 	if not GF_MessageList[GF_RealmName] then GF_MessageList[GF_RealmName] = {} end
@@ -203,7 +203,7 @@ function GF_LoadVariables()
 		if GF_SavedVariables.logsay == nil then GF_SavedVariables.logsay = true end
 		if GF_SavedVariables.logyell == nil then GF_SavedVariables.logyell = true end
 		if GF_SavedVariables.loghardcore == nil then GF_SavedVariables.loghardcore = true end
-		
+
 		if GF_SavedVariables.joinworld == nil then GF_SavedVariables.joinworld = true end
 		if GF_SavedVariables.spamfilter == nil then GF_SavedVariables.spamfilter = true end
 		if GF_SavedVariables.spamfilterduration == nil then GF_SavedVariables.spamfilterduration = 15 end
@@ -304,7 +304,7 @@ function GF_LoadVariables()
 		SetGuildRosterShowOffline(false)
 	end
 	for i=1,#GF_SavedVariables.blocklist do table.insert(GF_BUTTONS_LIST["BlockList"],{GF_SavedVariables.blocklist[i]}) GF_WORD_BLOCK_LIST[GF_FormatBlockListWords(GF_SavedVariables.blocklist[i])] = true end
-	
+
 	GF_BUTTONS_LIST["FontName"][1][2] = ChatFontNormal:GetFont()
 	if IsAddOnLoaded("pfUI") and pfUI.gui and pfUI.gui.dropdowns and pfUI.gui.dropdowns.fonts then
 		for i=1,#pfUI.gui.dropdowns.fonts do
@@ -329,9 +329,8 @@ function GF_LoadVariables()
 	if GF_SavedVariables.systemfilter then HELP_TEXT_SIMPLE = nil else HELP_TEXT_SIMPLE = GF_HELP_TEXT_SIMPLE end
 
 	GF_CurrentZone = GetRealZoneText()
-	if not GF_PerCharVariables.CurrentGroup then GF_PerCharVariables.CurrentGroup = {} end
-	if not GF_PerCharVariables.CurrentGroup["TempData"] then GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() } end
-	if not GF_PerCharVariables.CurrentGroup[GF_CurrentZone] then table.insert(GF_PerCharVariables.CurrentGroup,GF_CurrentZone) GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() } end
+	if not GF_PerCharVariables.CurrentGroup or not GF_PerCharVariables.CurrentGroup["TempData"] then GF_CreateBlankGroupData() end
+	GF_CreateCurrentZoneData()
 	if GetPlayerInfoByGUID then -- Added to block stuff in WOTLK
 		GF_SavedVariables.usefriendslist = true
 		GF_UseFriendsListCheckButton:Hide()
@@ -938,13 +937,13 @@ function GF_OnLoad() -- Onload, Tooltips, and Frame/Minimap Functions
 			old_QuestLogTitleButton_OnClick(self,button)
 		end
 	end
-	local old_JoinChannelByName = JoinPermanentChannel	
-	function JoinPermanentChannel(channel,a2,a3,a4) -- Changed 
+	local old_JoinChannelByName = JoinPermanentChannel
+	function JoinPermanentChannel(channel,a2,a3,a4) -- Changed
 		old_JoinChannelByName(channel,a2,a3,a4)
 		GF_PerCharVariables.blockedchannels[strlower(channel)] = nil
 		GF_ChatJoinedChannels = {}
 	end
-	local old_LeaveChannelByName = LeaveChannelByName	
+	local old_LeaveChannelByName = LeaveChannelByName
 	function LeaveChannelByName(channel)
 		old_LeaveChannelByName(channel)
 		if strlower(channel) == strlower(GF_SavedVariables.groupchannelname) then GF_SavedVariables.joinworld = false GF_AutoJoinGroupChannelCheckButton:SetChecked(false) end
@@ -975,7 +974,7 @@ end
 function GF_HandleItemRefLinks(link,text,button,chatFrame)
 	if strsub(link,1,6) == "player" then
 		local _,_,name = string.find(link,"(%a+)",8)
-		if name and strlen(name) > 0 then 
+		if name and strlen(name) > 0 then
 			if button == "LeftButton" then
 				if GF_SavedVariables.clickcombos and IsControlKeyDown() then
 					--[[for i=1, GetNumRaidMembers() do
@@ -994,7 +993,7 @@ function GF_HandleItemRefLinks(link,text,button,chatFrame)
 					--return true
 				elseif IsShiftKeyDown() then
 					if GF_LFGDescriptionEditBox:HasFocus() then
-						if GF_WhoTable[GF_RealmName][name] then 
+						if GF_WhoTable[GF_RealmName][name] then
 							GF_LFGDescriptionEditBox:Insert("|cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][name][2]] or "ffffff").."|Hplayer:"..name.."|h["..name.."]|h|r")
 						else
 							GF_LFGDescriptionEditBox:Insert(name)
@@ -1003,7 +1002,7 @@ function GF_HandleItemRefLinks(link,text,button,chatFrame)
 					elseif ChatEdit_GetActiveWindow() then
 						if chatFrame and strfind(chatFrame:GetName(),"GF_NewItem") then
 							ChatEdit_InsertLink(text)
-						elseif GF_WhoTable[GF_RealmName][name] then 
+						elseif GF_WhoTable[GF_RealmName][name] then
 							ChatEdit_InsertLink("|cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][name][2]] or "ffffff").."|Hplayer:"..name.."|h["..name.."]|h|r")
 						else
 							ChatEdit_InsertLink(name)
@@ -1115,7 +1114,7 @@ function GF_ShowTooltip()
 		GameTooltip:SetOwner(getglobal(this:GetName()), "ANCHOR_TOP")
 		GameTooltip:ClearLines()
 		GameTooltip:ClearAllPoints()
-		GameTooltip:SetPoint("TOPLEFT", this:GetName(), "BOTTOMLEFT", 0, -2)		
+		GameTooltip:SetPoint("TOPLEFT", this:GetName(), "BOTTOMLEFT", 0, -2)
 		GameTooltip:AddLine(GF_GenTooltips[this:GetName()].tooltip1)
 		GameTooltip:AddLine(GF_GenTooltips[this:GetName()].tooltip2,1,1,1,1)
 		GameTooltip:Show()
@@ -1208,7 +1207,7 @@ function GF_UpdateMainFrameWidth()
 		if GF_SavedVariables.showwhisperlogs and (GF_SavedVariables.mainframestatus == 0 or not GF_SavedVariables.mainframelogisopen) then
 			GF_LogFrameInternalFrame:SetWidth(568)
 			GF_WhisperHistoryButtonLog:Show()
-		else 
+		else
 			GF_LogFrameInternalFrame:SetWidth(669)
 			GF_WhisperHistoryButtonLog:Hide()
 		end
@@ -1256,17 +1255,17 @@ function GF_UpdateMainFrame()
 			GF_MainFrame:IsMovable(false)
 		else
 			if not GF_SavedVariables.mainframelogisopen then
-				for i=1,11 do
+				for i=1,10 do
 					getglobal(ThingsToHide[i]):Show()
 				end
-				for i=12, 14 do
+				for i=11, 13 do
 					getglobal(ThingsToHide[i]):Hide()
 				end
 			else
-				for i=1,9 do
+				for i=1,8 do
 					getglobal(ThingsToHide[i]):Hide()
 				end
-				for i=10, 14 do
+				for i=11,13 do
 					getglobal(ThingsToHide[i]):Show()
 				end
 			end
@@ -1314,7 +1313,7 @@ function GF_UpdateMainFrame()
 		GF_HideMainFrameHeight:SetParent(GF_MainFrame)
 		GF_HideMainFrameWidth:SetParent(GF_MainFrame)
 		GF_HideMainFrameToggleBoth:SetParent(GF_MainFrame)
-		for i=1,18 do
+		for i=1,17 do
 			getglobal(ThingsToHide[i]):Show()
 		end
 		GF_MainFrame:SetAlpha(GF_SavedVariables.MainFrameTransparency)
@@ -1337,6 +1336,7 @@ function GF_UpdateMainFrame()
 		end
 		tinsert(UISpecialFrames,GF_MainFrame:GetName())
 	end
+	if (GF_SavedVariables.mainframestatus == 0 or (not GF_SavedVariables.mainframelogisopen and GF_MainFrameShowBoth)) then if GF_WhisperLogLastWhisperLog == 2 and GF_WhisperLogCurrentButtonID > 0 then GF_ConvertLogMessagesToURL:Hide() GF_SaveCurrentGroupButton:Show() GF_ResetCurrentGroupButton:Show() else GF_ConvertLogMessagesToURL:Show() GF_SaveCurrentGroupButton:Hide() GF_ResetCurrentGroupButton:Hide() end end
 	GF_UpdateQueueLFTButton()
 end
 function GF_UpdateMinimapIcon()
@@ -1435,7 +1435,7 @@ function GF_LFGGetWhoUpdateOffset()
 
 		GF_GetWhoFrameToggleButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-Button-Disabled")
 		GF_LFGFrameToggleButton:SetNormalTexture("Interface\\Buttons\\UI-Panel-Button-Disabled")
-		
+
 		GF_MessageFrame:SetPoint("BOTTOMLEFT",GF_MainFrame,"BOTTOMLEFT", 10, -5)
 		GF_ResultsListOffsetSize = 22
 	end
@@ -1449,7 +1449,7 @@ function GF_AddChannelMessage(arg1,arg2,arg8,arg9,delayed) -- Message Handlers
 	for i=1,NUM_CHAT_WINDOWS do
 		channellist = { GetChatWindowChannels(i) }
 		for j=1, #channellist do
-			if channellist[j] == arg9 then getglobal("ChatFrame"..i):AddMessage(arg1, info.r, info.g, info.b, info.id) break end
+			if channellist[j] == arg9 then getglobal("ChatFrame"..i):AddMessage(arg1,info.r,info.g,info.b,info.id) break end
 		end
 	end
 end
@@ -1459,13 +1459,13 @@ function GF_AddChatMessage(arg1,arg2,event,delayed)
 	local info = ChatTypeInfo[event]
 	if event == "HARDCORE" and TW_HARDCORE_CHAT1 then
 		for i=1,NUM_CHAT_WINDOWS do
-			if getglobal("TW_HARDCORE_CHAT"..i) == 1 then getglobal("ChatFrame"..i):AddMessage(arg1, GF_TextColors[event][1], GF_TextColors[event][2], GF_TextColors[event][3]) end
+			if getglobal("TW_HARDCORE_CHAT"..i) == 1 then getglobal("ChatFrame"..i):AddMessage(arg1,info.r or GF_TextColors[event][1],info.g or GF_TextColors[event][2],info.b or GF_TextColors[event][3]) end
 		end
 	else
 		for i=1,NUM_CHAT_WINDOWS do
 			channellist = { GetChatWindowMessages(i) }
 			for j=1, #channellist do
-				if channellist[j] == event or channellist[j] == GF_ChatNameAlias[event] then getglobal("ChatFrame"..i):AddMessage(arg1, info.r, info.g, info.b, info.id) break end
+				if channellist[j] == event or channellist[j] == GF_ChatNameAlias[event] then getglobal("ChatFrame"..i):AddMessage(arg1,info.r,info.g,info.b,info.id) break end
 			end
 		end
 	end
@@ -1559,7 +1559,7 @@ function GF_CleanUpMessagesOfBadLinks(arg1) -- Replaces CLINK messages with norm
 		arg1 = gsub(arg1, "{CLINK:(%x+):([%d-]-:[%d-]-:[%d-]-:[%d-]-):([^}]-)}", "|c%1|Hitem:%2|h[%3]|h|r")
 		arg1 = gsub(arg1, "{CLINK:enchant:(%x+):([%d-]-):([^}]-)}", "|c%1|Henchant:%2|h[%3]|h|r")
 		arg1 = gsub(arg1, "{CLINK:spell:(%x+):([%d-]-):([^}]-)}", "|c%1|Hspell:%2|h[%3]|h|r")
-		arg1 = gsub(arg1, "{CLINK:quest:(%x+):([%d-]-):([%d-]-):([^}]-)}", "|c%1|Hquest:%2:%3|h[%4]|h|r")		
+		arg1 = gsub(arg1, "{CLINK:quest:(%x+):([%d-]-):([%d-]-):([^}]-)}", "|c%1|Hquest:%2:%3|h[%4]|h|r")
 	end
 	return arg1
 end
@@ -1577,7 +1577,7 @@ function GF_ShowGroupsOnMinimap(arg1,arg2,delayed)
 		if GF_MiniMapMessages[i] <= GetTime() then
 			if GF_MiniMapMessages[7][arg2] and GF_MiniMapMessages[7][arg2][1] > GetTime() then i = GF_MiniMapMessages[7][arg2][2] end
 			if GF_WhoTable[GF_RealmName][arg2] then
-				if GF_WhoTable[GF_RealmName][arg2][1] == 0 then 
+				if GF_WhoTable[GF_RealmName][arg2][1] == 0 then
 					getglobal("GF_MinimapMessageFrameA"..i):AddMessage("|cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][arg2][2]] or "ffffff").."|Hplayer:"..arg2.."|h "..arg2..", "..GF_WhoTable[GF_RealmName][arg2][2].."|h|r", 1, 1, 1)
 				else
 					getglobal("GF_MinimapMessageFrameA"..i):AddMessage("|cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][arg2][2]] or "ffffff").."|Hplayer:"..arg2.."|h "..arg2..", "..GF_WhoTable[GF_RealmName][arg2][1].." "..GF_WhoTable[GF_RealmName][arg2][2].."|h|r", 1, 1, 1)
@@ -1607,25 +1607,28 @@ function GF_AddLogMessage(arg1,logcode,add,arg2,arg8,arg9,event,delayed)
 		if #GF_LogHistory[GF_RealmName] > 500 then table.remove(GF_LogHistory[GF_RealmName],501) end
 	end
 	if GF_WhisperLogCurrentButtonID == 0 and GF_LogFilters[logcode] and GF_LogFilters[event] and not GF_PerCharVariables.blockedchannels[arg9] then
+		local info = ChatTypeInfo[event]
 		if GF_ConvertMessagesToLinks then
 			local _,_,startString,endString = strfind(arg1, "(.-%].-|Hplayer.-|h|r:? )(.*)")
 			if startString then
 				endString = gsub(gsub(gsub(gsub(endString, "|[cC]%x+|%w+:%w+:[%w:]+|[h]", ""), "|[cC]%x+%p+%w+:(.-)|h.-|h|r", "%1"), "|[cC]%x+", ""), "|[hHrR]?", "")
-				GF_Log:AddMessage(startString.."|cffccccff|Hurl:"..endString.."|h"..endString.."|h|r", GF_TextColors[event][1], GF_TextColors[event][2], GF_TextColors[event][3])
+				GF_Log:AddMessage(startString.."|cffccccff|Hurl:"..endString.."|h"..endString.."|h|r",info.r,info.g,info.b)
 				return
 			end
 		end
-		GF_Log:AddMessage(arg1, GF_TextColors[event][1], GF_TextColors[event][2], GF_TextColors[event][3])
+		GF_Log:AddMessage(arg1,info.r,info.g,info.b)
 	end
 end
 function GF_DisplayLog()
-	if GF_SavedVariables.mainframestatus == 0 or (not GF_SavedVariables.mainframelogisopen and GF_MainFrameShowBoth) then GF_ConvertLogMessagesToURL:Show() end	
+	if GF_SavedVariables.mainframestatus == 0 or (not GF_SavedVariables.mainframelogisopen and GF_MainFrameShowBoth) then GF_ConvertLogMessagesToURL:Show() end
+	GF_SaveCurrentGroupButton:Hide()
+	GF_ResetCurrentGroupButton:Hide()
  	GF_GetJoinedChannels()
 	GF_Log:SetMaxLines(128)
 	local tempHistoryTable = {}
 	local counter = 0
 	for i=1,#GF_LogHistory[GF_RealmName] do
-		if GF_LogFilters[GF_LogHistory[GF_RealmName][i][2]] and GF_LogFilters[GF_LogHistory[GF_RealmName][i][3]] and not GF_PerCharVariables.blockedchannels[GF_LogHistory[GF_RealmName][i][4]] and (GF_LogHistory[GF_RealmName][i][3] ~= "CHANNEL" or GF_ChatJoinedChannels[GF_LogHistory[GF_RealmName][i][4]]) then 
+		if GF_LogFilters[GF_LogHistory[GF_RealmName][i][2]] and GF_LogFilters[GF_LogHistory[GF_RealmName][i][3]] and not GF_PerCharVariables.blockedchannels[GF_LogHistory[GF_RealmName][i][4]] and (GF_LogHistory[GF_RealmName][i][3] ~= "CHANNEL" or GF_ChatJoinedChannels[GF_LogHistory[GF_RealmName][i][4]]) then
 			table.insert(tempHistoryTable,1,GF_LogHistory[GF_RealmName][i])
 			counter = counter + 1
 			if counter == 128 then break end
@@ -1634,16 +1637,18 @@ function GF_DisplayLog()
 	if GF_ConvertMessagesToLinks then
 		for i=1,#tempHistoryTable do
 			local _,_,startString,endString = strfind(tempHistoryTable[i][1], "(.-%].-|Hplayer.-|h|r:? )(.*)")
+			local info = ChatTypeInfo[tempHistoryTable[i][3]]
 			if startString then
 				endString = gsub(gsub(gsub(gsub(endString, "|[cC]%x+|%w+:%w+:[%w:]+|[h]", ""), "|[cC]%x+%p+%w+:.-|h(.-)|h|r", "%1"), "|[cC]%x+", ""), "|[hHrR]?", "")
-				GF_Log:AddMessage(startString.."|cffccccff|Hurl:"..endString.."|h"..endString.."|h|r", GF_TextColors[tempHistoryTable[i][3]][1], GF_TextColors[tempHistoryTable[i][3]][2], GF_TextColors[tempHistoryTable[i][3]][3])
+				GF_Log:AddMessage(startString.."|cffccccff|Hurl:"..endString.."|h"..endString.."|h|r",info.r,info.g,info.b)
 			else
-				GF_Log:AddMessage(tempHistoryTable[i][1], GF_TextColors[tempHistoryTable[i][3]][1], GF_TextColors[tempHistoryTable[i][3]][2], GF_TextColors[tempHistoryTable[i][3]][3])
+				GF_Log:AddMessage(tempHistoryTable[i][1],info.r,info.g,info.b)
 			end
 		end
 	else
 		for i=1,#tempHistoryTable do
-			GF_Log:AddMessage(tempHistoryTable[i][1], GF_TextColors[tempHistoryTable[i][3]][1], GF_TextColors[tempHistoryTable[i][3]][2], GF_TextColors[tempHistoryTable[i][3]][3])
+			local info = ChatTypeInfo[tempHistoryTable[i][3]]
+			GF_Log:AddMessage(tempHistoryTable[i][1],info.r,info.g,info.b)
 		end
 	end
 end
@@ -1820,7 +1825,6 @@ function GF_AddNameToWhoQueue(name,addToTopOfList)
 	for i=1,#GF_WhoQueue do
 		if GF_WhoQueue[i] == name then return end
 	end
-	GF_PerCharVariables.friendUnknown[name] = nil
 	if GF_SavedVariables.usefriendslist then
 		if not GF_SavedVariables.friendsToRemove[name] then
 			if addToTopOfList == 3 then GF_SavedVariables.friendsToRemove[name] = time() + 999999 else GF_SavedVariables.friendsToRemove[name] = time() + 999500 end
@@ -1832,11 +1836,11 @@ function GF_AddNameToWhoQueue(name,addToTopOfList)
 		table.insert(GF_WhoQueue, name)
 		GF_WhoQueue[name] = time()
 	end
-	if GF_UpdateAndRequestTimer > 4 then GF_UpdateAndRequestTimer = GF_NextAvailableWhoTime - time() end
+	if GF_UpdateAndRequestTimer > 4 then GF_UpdateAndRequestTimer = 2 end
 end
 function GF_GetWhoData(arg2,arg12,groupfound)
 	if GF_SavedVariables.usewhoongroups and (not GF_WhoQueue[arg2] or GF_WhoQueue[arg2] + 60 < time()) and (groupfound or GF_SavedVariables.showformattedchat)
-	and (not GF_WhoTable[GF_RealmName][arg2] or GF_WhoTable[GF_RealmName][arg2][4] + 1209600 < time() or (GF_WhoTable[GF_RealmName][arg2][1] < 60 and GF_WhoTable[GF_RealmName][arg2][4] + 86400 < time())) then -- If level 60, get new whodata after 14 days(for guild name changes). If below level 60, get new data every 24 hours.
+	and (not GF_WhoTable[GF_RealmName][arg2] or GF_WhoTable[GF_RealmName][arg2][4] + 1209600 < time() or (GF_WhoTable[GF_RealmName][arg2][1] < 60 and GF_WhoTable[GF_RealmName][arg2][4] + 43200 < time())) then -- If level 60, get new whodata after 14 days(for guild name changes). If below level 60, get new data every 24 hours.
 		if not GF_WhoTable[GF_RealmName][arg2] then GF_GetPlayerInfoByGUID(arg12) end
 		GF_AddNameToWhoQueue(arg2,groupfound)
 	else
@@ -1850,7 +1854,7 @@ function GF_UpdateWhoDataViaFriendsList()
 		GF_UpdateWhoDataViaFriendsListTimer = 5
 		local highestPriorityName
 		local highestPriorityTime = time() + 999999
-		for name,data in pairs(GF_SavedVariables.friendsToRemove) do if data > time() then if data < highestPriorityTime and (not GF_PerCharVariables.friendUnknown[highestPriorityName] or GF_PerCharVariables.friendUnknown[highestPriorityName] < time()) then highestPriorityTime = data highestPriorityName = name end end end
+		for name,data in pairs(GF_SavedVariables.friendsToRemove) do if data >= time() then if data < highestPriorityTime and (not GF_PerCharVariables.friendUnknown[highestPriorityName] or GF_PerCharVariables.friendUnknown[highestPriorityName] < time()) then highestPriorityTime = data highestPriorityName = name end end end
 		for name,data in pairs(GF_PerCharVariables.friendUnknown) do if data and data < time() then GF_PerCharVariables.friendUnknown[name] = nil end end
 		if highestPriorityName then
 			AddFriend(highestPriorityName)
@@ -1871,6 +1875,8 @@ function GF_UpdateFriendsList()
 			elseif GF_ClassColors[GF_Classes[class]] and level and level ~= 0 then
 				GF_WhoTable[GF_RealmName][name] = { level, GF_Classes[class], "", time()}
 				if online and not GF_SavedVariables.friendsToRemove[name] then GF_Friends[name] = true end
+			elseif GF_WhoTable[GF_RealmName][name] then
+				GF_WhoTable[GF_RealmName][name] = { 0, GF_WhoTable[GF_RealmName][name][2], GF_WhoTable[GF_RealmName][name][3], time()}
 			end
 			if name == triedToWhoName then
 				if GF_WhoTable[GF_RealmName][name] then
@@ -1882,7 +1888,7 @@ function GF_UpdateFriendsList()
 				end
 				triedToWhoName = nil
 			end
-			if GF_SavedVariables.friendsToRemove[name] then RemoveFriend(i) GF_PerCharVariables.friendUnknown[name] = time() + 900 counter = counter + 1 end
+			if GF_SavedVariables.friendsToRemove[name] then RemoveFriend(i) GF_PerCharVariables.friendUnknown[name] = time() + 1800 counter = counter + 1 end
 			if counter >= 3 then break end
 		end
 	end
@@ -1917,6 +1923,7 @@ function GF_TurnOffAnnounce(messageText)
 	GF_AnnounceToLFGButton:SetText(GF_ANNOUNCE_ANNOUNCE_GROUP)
 	DEFAULT_CHAT_FRAME:AddMessage("GF: "..messageText,1,1,0.5)
 	GF_OnUpdateFunctions["Announce"] = nil
+	GF_WasPartyLeaderBefore = nil
 end
 function GF_TurnOnAnnounce()
 	if not GF_ChatJoinedChannels[strlower(GF_GroupChannelEditBox:GetText())] then GF_GetJoinedChannels() if not GF_ChatJoinedChannels[strlower(GF_GroupChannelEditBox:GetText())] then GF_TurnOffAnnounce(GF_AUTO_ANNOUNCE_NOT_IN_CHANNEL) return end end
@@ -2030,7 +2037,7 @@ function GF_CheckForBroadCast()
 		end
 	end
 	if strlen(addonsendstring) > 1 then if sendType == 1 or sendType == 3 then SendAddonMessage("GF", addonsendstring, "GUILD") end if sendType > 1 then SendAddonMessage("GF", addonsendstring, "PARTY") end end
-	
+
 	addonsendstring = "R" -- Send Request Name List
 	for name,_ in pairs(GF_AddonNamesToBeSentAsARequest) do
 		if name then addonsendstring = addonsendstring..":"..name end
@@ -2097,7 +2104,7 @@ function GF_ParseIncomingAddonMessages(msg)
 		--GF_OnUpdateFunctions["Broadcast"] = GF_CheckForBroadCast
 	elseif strsub(msg,1,1) == "R" then -- (To Everyone) The list of names requested(up to 240 characters). Add to 'GF_AddonWhoDataToBeSentBuffer' if I have 'GF_WhoTable'. Then delete the names I was going to request('GF_AddonNamesToBeSentAsARequest').
 		for sentname in gfind(msg, ":(%w+)") do -- This works 100% correctly. 'GF_AddonWhoDataToBeSentBuffer' is removed when sending or receiving a ":" message or a full group message.
-			if GF_WhoTable[GF_RealmName][sentname] and (GF_WhoTable[GF_RealmName][sentname][1] == 60 or GF_WhoTable[GF_RealmName][sentname][4] + 86400 > time()) then
+			if GF_WhoTable[GF_RealmName][sentname] and (GF_WhoTable[GF_RealmName][sentname][1] == 60 or GF_WhoTable[GF_RealmName][sentname][4] + 43200 > time()) then
 				GF_AddonWhoDataToBeSentBuffer[sentname] = GF_WhoTable[GF_RealmName][sentname]
 			end
 			GF_AddonNamesToBeSentAsARequest[sentname] = nil
@@ -2326,7 +2333,7 @@ function GF_Frame:PLAYER_ENTERING_WORLD() -- When logging in in a group, PLAYER_
 		getglobal("ChatFrame"..i).AddMessage = function(self,msg,...) if msg then self:oldAddMessage(msg,...) end end
 	end
 	UIErrorsFrame:SetScript('OnEvent', function(self,event,...) if not GF_SavedVariables.systemfilter or not GF_Error_Messages[arg1] then old_UIErrorsFrame_OnEvent(self,event,...) end end)
-	if IsAddOnLoaded("LFG") and LFGMain and LFGRoleCheckRoleTank and LFGRoleCheckAcceptRole then LFGRoleCheck:SetScript("OnShow", GF_LFGRoleCheck_OnShow) LFGGroupReady:SetScript("OnShow", GF_LFGGroupReady_OnShow) findGroupButton:SetScript("OnClick", GF_findGroupButton_OnClick) findMoreButton:SetScript("OnClick", GF_findMoreButton_OnClick) leaveQueueButton:SetScript("OnClick", GF_leaveQueueButton_OnClick) end 
+	if IsAddOnLoaded("LFG") and LFGMain and LFGRoleCheckRoleTank and LFGRoleCheckAcceptRole then LFGRoleCheck:SetScript("OnShow", GF_LFGRoleCheck_OnShow) LFGGroupReady:SetScript("OnShow", GF_LFGGroupReady_OnShow) findGroupButton:SetScript("OnClick", GF_findGroupButton_OnClick) findMoreButton:SetScript("OnClick", GF_findMoreButton_OnClick) leaveQueueButton:SetScript("OnClick", GF_leaveQueueButton_OnClick) end
 end
 function GF_Frame:PLAYER_LEAVING_WORLD()
 	GF_PerCharVariables.searchtext = GF_GroupsFrameDescriptionEditBox:GetText()
@@ -2807,7 +2814,7 @@ function GF_CheckForSystem(arg1)
 			if not GF_WhoTable[GF_RealmName][wordString] then
 				for i=1,GetNumGuildMembers() do
 					local name,_,_,level,class,_,_,_,online = GetGuildRosterInfo(i)
-					if name then 
+					if name then
 						if online then GF_Guildies[name] = true else GF_Guildies[name] = nil end
 						if GF_Classes[class] then GF_WhoTable[GF_RealmName][name] = { level, GF_Classes[class], GetGuildInfo("player"), time() } end
 					end
@@ -2906,7 +2913,7 @@ function GF_GetTypes(arg1,showanyway)
 	languageName = "en"
 
 	--wordString = string.sub(arg1,1,2) if wordString == "C " then fixedType = 5 arg1 = strsub(arg1,3) elseif wordString == "T " then fixedType = 9 arg1 = strsub(arg1,3) elseif wordString == "G " then fixedType = 8 arg1 = strsub(arg1,3) end
-	
+
 	arg1 = " "..gsub(gsub(strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")),"[\"#\$\%&\*,，\.@\\\^_`~|—“”]"," "),"['´’]","").." "
 
 	if strfind(arg1, "%d+p[%p%s]") then foundLFM = 2 if showanyway == true then print("##p lfm 2") end end -- "10p heal" messages from chinese
@@ -3491,7 +3498,7 @@ function GF_GetTypes(arg1,showanyway)
 					elseif GF_GROUP_IDS[wordTable[i-1]] then
 						table.insert(lfmPosition, {i-1,i+j,GF_WORD_LFM[wordString] + .75,true}) if not firstLFMLFG then foundTradesExclusion = foundTradesExclusion + 1.5 foundGuildExclusion = foundGuildExclusion + .1 firstLFMLFG = {i-1,i-1} elseif firstLFMLFG[1] ~= i-1 and firstLFMLFG[2] ~= i-1 then foundTradesExclusion = foundTradesExclusion + .5 end
 					else
-						table.insert(lfmPosition, {i,i+j,GF_WORD_LFM[wordString],true}) 
+						table.insert(lfmPosition, {i,i+j,GF_WORD_LFM[wordString],true})
 					end
 					if GF_QUEST_ONLY_AFTER_LFM[wordTable[i+j+1]] then if not foundQuest[1] or GF_QUEST_ONLY_AFTER_LFM[wordTable[i+j+1]] > foundQuest[1] then foundQuest[1] = GF_QUEST_ONLY_AFTER_LFM[wordTable[i+j+1]] lfmPosition[1][2] = lfmPosition[1][2] + 1 lfmPosition[1][3] = lfmPosition[1][3] + .75 if showanyway == true then print(wordTable[i+j+1].." only after lfm") end end end
 					numGroupWords = numGroupWords + 1 + j
@@ -3707,7 +3714,7 @@ function GF_GetTypes(arg1,showanyway)
 	end
 	if foundLFM > foundLFG then foundLFG = 0 end
 	if #lfmlfgName == 1 and groupName[1] and not foundDungeon and not foundRaid and (not foundQuest[1] or (foundQuest[1] == 0 and GF_LFM_BYPASS[groupName[1]])) and (not foundPvP or foundPvP == 0) then lfs = 0 lfe = 0 for i=1,#groupName do if strfind(lfmlfgName[1],groupName[i]) then lfs = lfs + 1 end if GF_LFM_BYPASS[groupName[i]] or GF_WORD_CLASSES[groupName[i]] then lfe = lfe + 1 end end if lfs == #groupName then foundLFM = 0 foundLFG = 0 if showanyway == true then print("groupname is in lfmname") end elseif tempVal > 4 and lfe == #groupName and foundLFM < 2.5 and foundLFG < 2.5 then foundLFM = 0 foundLFG = 0 if showanyway == true then print("GF_LFM_BYPASS didn't reach 2.5") end end end
-	
+
 	if foundGuild < 100 and strfind(arg1, "[<~][a-zA-Z0-9%&%-/ ]+[>~]") then foundGuild = foundGuild + 2 foundTradesExclusion = foundTradesExclusion + 1 if showanyway == true then print("<words> guild 2 .. tradesex 1") end end
 	while foundGuild > 100 do foundGuild = foundGuild - 100 end
 	foundGuild = foundGuild - foundGuildExclusion
@@ -3786,7 +3793,7 @@ function GF_CheckForSpam(arg1,arg2,foundInGroup)
 	if not GF_PlayerMessages[arg2] then
 		GF_PlayerMessages[arg2] = { [1] = { time(),time(),time() }, [2] = { arg1, "ZZZzzz123654", "ZZZzzz123654" } }
 	elseif not GF_PlayersCurrentlyInGroup[arg2] and not GF_Friends[arg2] and not GF_Guildies[arg2] then
-		if GF_WhoTable[GF_RealmName][arg2] and GF_WhoTable[GF_RealmName][arg2][1] ~= 0 and GF_WhoTable[GF_RealmName][arg2][1] < GF_SavedVariables.blockmessagebelowlevel and GF_WhoTable[GF_RealmName][arg2][4] + 86400 > time() then return 11 end  -- Block lowlevel
+		if GF_WhoTable[GF_RealmName][arg2] and GF_WhoTable[GF_RealmName][arg2][1] > 0 and GF_WhoTable[GF_RealmName][arg2][1] < GF_SavedVariables.blockmessagebelowlevel and GF_WhoTable[GF_RealmName][arg2][4] + 43200 > time() then return 11 end  -- Block lowlevel
 		if GF_SavedVariables.spamfilter then
 			if GF_PlayerMessages[arg2][1][1] > time() then return 7 end -- Returns spam for the duration of the spam filter
 			local snipa = math.random(ceil(strlen(GF_PlayerMessages[arg2][2][1])/4))
@@ -3795,7 +3802,7 @@ function GF_CheckForSpam(arg1,arg2,foundInGroup)
 			or (GF_PlayerMessages[arg2][1][1] + 120 > time() and arg1 == GF_PlayerMessages[arg2][2][1]) and (GF_PlayerMessages[arg2][1][2] + 120 > time() and arg1 == GF_PlayerMessages[arg2][2][2]) then		-- Found Spammer
 				if GF_SavedVariables.autoblacklist and not GF_BlackList[GF_RealmName][arg2] and strlen(arg1) > 120 and arg1 == GF_PlayerMessages[arg2][2][1] and arg1 == GF_PlayerMessages[arg2][2][2] and
 				((GF_SavedVariables.blacklisttrades and foundTrades > 2.9) or (GF_SavedVariables.blacklistguild and foundGuild > 2.9) or (GF_SavedVariables.blacklistchat and foundGuild < 3 and foundTrades < 3) or (GF_SavedVariables.blacklistforeign and languageName ~= "en")) then
-					if GF_WhoTable[GF_RealmName][arg2] and GF_WhoTable[GF_RealmName][arg2][4] + 86400 > time() then -- Data must be less than a day old to autoblacklist or block lowlevel
+					if GF_WhoTable[GF_RealmName][arg2] and GF_WhoTable[GF_RealmName][arg2][4] + 43200 > time() then -- Data must be less than a day old to autoblacklist or block lowlevel
 						if GF_WhoTable[GF_RealmName][arg2][1] > 0 and GF_WhoTable[GF_RealmName][arg2][1] <= GF_SavedVariables.autoblacklistminlevel then -- Blacklist if below level filter
 							table.insert(GF_BlackList[GF_RealmName], 1, { arg2, "("..GF_WhoTable[GF_RealmName][arg2][1]..") "..arg1 })
 							GF_BlackList[GF_RealmName][arg2] = true
@@ -3803,7 +3810,7 @@ function GF_CheckForSpam(arg1,arg2,foundInGroup)
 							return 10
 						end
 					else
-						if GF_SavedVariables.usewhoongroups and not GF_WhoQueue[name] then GF_WhoTable[GF_RealmName][arg2] = nil GF_AddNameToWhoQueue(arg2,true) end
+						if GF_SavedVariables.usewhoongroups and (not GF_WhoTable[GF_RealmName][arg2] or GF_WhoTable[GF_RealmName][arg2][1] > 0) and not GF_WhoQueue[name] then GF_WhoTable[GF_RealmName][arg2] = nil GF_AddNameToWhoQueue(arg2,true) end
 					end
 				end
 				table.insert(GF_PlayerMessages[arg2][1],1,time() + GF_SavedVariables.spamfilterduration)
@@ -4095,36 +4102,24 @@ function GF_PruneTheClassWhoTable()
 end
 
 function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ignore/blacklist or adds their character information)
--- I'm still periodically having issues where there are no names on the dps meter
--- I'm also having an issue where names get transferred to a new group because it thinks it's the same group
--- A group I ran earlier, I dropped, and it didn't say anything about saving the group, but then at some point later, it saved(or was it after I reloaded?)
-
-	local lastParty,lastPartyOnline = GF_NumPartyMembers,GF_NumPartyMembersOnline
-	GF_NumPartyMembers = GF_GetNumGroupMembers()
 	if GF_CurrentZone ~= GetRealZoneText() then -- If zone changes, this saves TempData to old GF_CurrentZone, then loads new GF_CurrentZone to TempData or creates a blank TempData and GF_CurrentZone
 -- This function saves TempData when changing zone
 		GF_PerCharVariables.CurrentGroup["TempData"][5] = time() -- Save the time I left the zone.
-		if not GF_PerCharVariables.groupfinishtimer or not GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] then -- I am changing zone... Save tempdata to old GF_CurrentZone if there is no timer for the old GF_CurrentZone
-			if not GF_PerCharVariables.CurrentGroup[GF_CurrentZone] then table.insert(GF_PerCharVariables.CurrentGroup,GF_CurrentZone) GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() } end
-			for pos,data in pairs(GF_PerCharVariables.CurrentGroup["TempData"]) do if type(data) == "table" then for tpos,tdata in pairs(data) do GF_PerCharVariables.CurrentGroup[GF_CurrentZone][pos][tpos] = tdata end else GF_PerCharVariables.CurrentGroup[GF_CurrentZone][pos] = data end end
-		end
+		if not GF_PerCharVariables.groupfinishtimer or not GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] then GF_CreateCurrentZoneData() GF_SaveTempData() end -- Create Zonedata is it doesn't exist and save tempdata to it.
 		GF_CurrentZone = GetRealZoneText() -- Changing zone to the new zone
-		GF_GetPlayersCurrentlyInGroup()
 -- This function loads data or creates new data
-		if not GF_PerCharVariables.CurrentGroup[GF_CurrentZone] then -- If no saved zone exists, create it and reset tempdata
-			table.insert(GF_PerCharVariables.CurrentGroup,GF_CurrentZone)
-			GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() }
-			GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{},{},time() }
-		elseif GF_PerCharVariables.groupfinishtimer and GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] then -- If saved zone exists, see if there is a finish timer for the zone, if so, reset tempdata
-			GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{},{},time() }
-		else -- If there is no timer for GF_CurrentZone, reset tempdata activity then load saved data
-			for name,data in pairs(GF_PerCharVariables.CurrentGroup["TempData"][3]) do if GF_PlayersCurrentlyInGroup[name] and not GF_PerCharVariables.CurrentGroup[GF_CurrentZone][3][name] then GF_PerCharVariables.CurrentGroup[GF_CurrentZone][3][name] = {data[1],data[2],0,0,0} end end
-			for pos,data in pairs(GF_PerCharVariables.CurrentGroup[GF_CurrentZone]) do if type(data) == "table" then for tpos,tdata in pairs(data) do GF_PerCharVariables.CurrentGroup["TempData"][pos][tpos] = tdata end else GF_PerCharVariables.CurrentGroup["TempData"][pos] = data end end
+		GF_ResetTempData()
+		if GF_CreateCurrentZoneData() or (GF_PerCharVariables.groupfinishtimer and GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone]) then -- There was no saved data(create data and reset tempdata).. zone is being saved(reset tempdata)
+		else
+			GF_AddNamesToSavedData()
+			GF_LoadSavedData()
 		end
 	else
 		GF_GetPlayersCurrentlyInGroup()
-		if not GF_PerCharVariables.CurrentGroup[GF_CurrentZone] then table.insert(GF_PerCharVariables.CurrentGroup,GF_CurrentZone) GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() } end
 	end
+
+	local lastParty,lastPartyOnline = GF_NumPartyMembers,GF_NumPartyMembersOnline
+	GF_NumPartyMembers = GF_GetNumGroupMembers()
 	if GF_WasPartyLeaderBefore and not UnitIsPartyLeader("player") and GF_NumPartyMembers > 1 then
 		GF_TurnOffAnnounce(GF_JOINED_GROUP_ANNOUNCE_OFF)
 		GF_WasPartyLeaderBefore = nil
@@ -4132,7 +4127,7 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 	elseif GF_AutoAnnounceTimer and GF_NumPartyMembers == 1 then
 		GF_WasPartyLeaderBefore = true
 	end
-	if lastPartyOnline ~= GF_NumPartyMembersOnline or (GF_NumPartyMembers == 1 and lastParty > 1) then
+	if lastPartyOnline ~= GF_NumPartyMembersOnline or (GF_NumPartyMembers == 1 and lastParty ~= 1) then
 		GF_UpdateAndRequestTimer = 0
 		if GF_AutoAnnounceTimer and GF_NumPartyMembers >= GF_BUTTONS_LIST.LFGSize[GF_PerCharVariables.lfgsize][4] then GF_TurnOffAnnounce(GF_NO_MORE_PLAYERS_NEEDED) end
 		if GF_PerCharVariables.lfgauto then GF_FixLFGStrings(true) end
@@ -4144,55 +4139,27 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 				GF_UpdateQueueLFTButton()
 			end
 		end
-		if GF_NumPartyMembers == 1 and lastParty ~= 1 then
-			if not GF_PerCharVariables.groupfinishtimer then -- If I'm in a group by myself and wasn't in a group by myself before, and there is no timer, save tempdata to currentgroup, then make a list of everything to save.
-				for name,pdata in pairs(GF_PerCharVariables.CurrentGroup["TempData"][3]) do -- I'm not in a group and there's no timer. save tempdata if there is activity.
-					if name ~= UnitName("player") and (pdata[5] > 0 or not GF_PerCharVariables.usedpsmeter) then for pos,data in pairs(GF_PerCharVariables.CurrentGroup["TempData"]) do if type(data) == "table" then for tpos,tdata in pairs(data) do GF_PerCharVariables.CurrentGroup[GF_CurrentZone][pos][tpos] = tdata end else GF_PerCharVariables.CurrentGroup[GF_CurrentZone][pos] = data end end break end
-				end
-				local groupstosave = {}
-				for i=1,#GF_PerCharVariables.CurrentGroup do
-					if GF_PerCharVariables.CurrentGroup[i] and GF_PerCharVariables.CurrentGroup[i] ~= "" then
-						local numplayers,withactivity = 0,0
-						for name,data in pairs(GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.CurrentGroup[i]][3]) do
-							if data[5] >= 30 or not GF_PerCharVariables.usedpsmeter then withactivity = withactivity + 1 end
-							numplayers = numplayers + 1
-						end
-						if withactivity > 1 then
-							table.insert(groupstosave,GF_PerCharVariables.CurrentGroup[i]) groupstosave[GF_PerCharVariables.CurrentGroup[i]] = true
-						elseif numplayers > 1 and GF_PerCharVariables.CurrentGroup[i] ~= GF_CurrentZone then
-							GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.CurrentGroup[i]] = nil
-							table.remove(GF_PerCharVariables.CurrentGroup,i)
-							i = i - 1
-						end
-					end
-				end
-				if groupstosave[1] then
-					GF_PerCharVariables.groupfinishtimer = { GetTime() + 120,groupstosave }
-					local wordString = ""
-					for i=1,#groupstosave do if GF_PerCharVariables.CurrentGroup[groupstosave[i]][2] + 600 < time() then wordString = wordString..groupstosave[i]..", " end end
-					if wordString ~= "" then DEFAULT_CHAT_FRAME:AddMessage(GF_NOT_IN_GROUP_SAVING..strsub(wordString,1,-3)..GF_IN_TWO_MINUTES,1,1,0.5) end
-				end
-			end
-			if lastParty ~= 0 then -- If I left a group. Reset TempData if there is activity
+		if GF_NumPartyMembers == 1 and lastParty ~= 1 then -- I left group or just logged in.
+			GF_StartSaveGroupData() -- This will always save tempdata to currentzone and reset tempdata if there is no timer.
+			if lastParty ~= 0 then -- I left group. Reset TempData if there is activity
 				if GF_PerCharVariables.groupfinishtimer then
-					GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() }
-					GF_GetPlayersCurrentlyInGroup()
+					GF_ResetTempData()
 				else -- I left a group and there is no activity, reload old save.
-					for pos,data in pairs(GF_PerCharVariables.CurrentGroup[GF_CurrentZone]) do if type(data) == "table" then for tpos,tdata in pairs(data) do GF_PerCharVariables.CurrentGroup["TempData"][pos][tpos] = tdata end else GF_PerCharVariables.CurrentGroup["TempData"][pos] = data end end
+					GF_LoadSavedData()
 				end
-			else -- If I just logged in. Reset Data if there are other players in it.
-				for name,data in pairs(GF_PerCharVariables.CurrentGroup["TempData"][3]) do if name ~= UnitName("player") then GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() } GF_GetPlayersCurrentlyInGroup() break end end
+			elseif not GF_PerCharVariables.groupfinishtimer or not GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] then -- If I just logged in. Reset Data if there are other players in it.
+				GF_LoadSavedData()
 			end
 		elseif lastParty == 1 and GF_NumPartyMembers > 1 then -- I just joined a group, reset my tempdata. If there was a finishtimer, check for the same group and load currentgroup
 			if GF_PerCharVariables.groupfinishtimer then -- If timer, reload data to tempdata if it is the same group and disable the timer... If no timer, clear all data
-				GF_PerCharVariables.CurrentGroup["TempData"][3][UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 }
+				GF_ResetTempData()
 				for i=1,#GF_PerCharVariables.CurrentGroup do
-					if GF_PerCharVariables.CurrentGroup[i] ~= "" and GF_PerCharVariables.CurrentGroup[i] ~= "TempData" then
+					if GF_PerCharVariables.CurrentGroup[i] ~= "" then
 						local totalgroupsize,namesincommon = 0,0
 						for name,data in pairs(GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.CurrentGroup[i]][3]) do totalgroupsize = totalgroupsize + 1 if GF_PlayersCurrentlyInGroup[name] then namesincommon = namesincommon + 1 end end
 						if namesincommon / totalgroupsize > .5 then
-							for name,data in pairs(GF_PerCharVariables.CurrentGroup["TempData"][3]) do if GF_PlayersCurrentlyInGroup[name] and not GF_PerCharVariables.CurrentGroup[GF_CurrentZone][3][name] then GF_PerCharVariables.CurrentGroup[GF_CurrentZone][3][name] = {data[1],data[2],0,0,0} end end
-							for pos,data in pairs(GF_PerCharVariables.CurrentGroup[GF_CurrentZone]) do if type(data) == "table" then for tpos,tdata in pairs(data) do GF_PerCharVariables.CurrentGroup["TempData"][pos][tpos] = tdata end else GF_PerCharVariables.CurrentGroup["TempData"][pos] = data end end
+							GF_AddNamesToSavedData()
+							GF_LoadSavedData()
 							GF_PerCharVariables.groupfinishtimer = nil
 							DEFAULT_CHAT_FRAME:AddMessage(GF_REJOINED_GROUP,1,1,0.5)
 							break
@@ -4200,11 +4167,10 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 					end
 				end
 			else -- Joined a group with no timer... save tempdata and create new tempdata
-				for pos,data in pairs(GF_PerCharVariables.CurrentGroup["TempData"]) do if type(data) == "table" then for tpos,tdata in pairs(data) do GF_PerCharVariables.CurrentGroup[GF_CurrentZone][pos][tpos] = tdata end else GF_PerCharVariables.CurrentGroup[GF_CurrentZone][pos] = data end end
-				GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{},{},time() }
-				GF_GetPlayersCurrentlyInGroup()
+				GF_SaveTempData()
+				GF_ResetTempData()
 				for i=1,#GF_PerCharVariables.CurrentGroup do
-					if GF_PerCharVariables.CurrentGroup[i] and GF_PerCharVariables.CurrentGroup[i] ~= "TempData" and GF_PerCharVariables.CurrentGroup[i] ~= GF_CurrentZone then
+					if GF_PerCharVariables.CurrentGroup[i] and GF_PerCharVariables.CurrentGroup[i] ~= GF_CurrentZone then
 						GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.CurrentGroup[i]] = nil
 						table.remove(GF_PerCharVariables.CurrentGroup,i)
 						i = i - 1
@@ -4255,7 +4221,7 @@ function GF_UpdateGuildiesList()
 	GF_Guildies = {}
 	for i=1,GetNumGuildMembers() do
 		local name,_,_,level,class,_,_,_,online = GetGuildRosterInfo(i)
-		if name then 
+		if name then
 			if online then GF_Guildies[name] = true else GF_Guildies[name] = nil end
 			if GF_Classes[class] then GF_WhoTable[GF_RealmName][name] = { level, GF_Classes[class], GetGuildInfo("player"), time() } end
 		end
@@ -4266,6 +4232,70 @@ function GF_IsGuildieOrPartyMemberUsingAddon()
 		if GF_Guildies[name] and GF_PlayersCurrentlyInGroup[name] then return 3
 		elseif GF_Guildies[name] then return 1
 		elseif GF_PlayersCurrentlyInGroup[name] then return 2 end
+	end
+end
+
+function GF_CreateBlankGroupData()
+	GF_PerCharVariables.CurrentGroup = { ["TempData"] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() },[GF_CurrentZone] = { GF_CurrentZone,time(),{ [UnitName("player")] = { UnitLevel("player"),({UnitClass("player")})[2],0,0,0 } },{},time() } }
+	table.insert(GF_PerCharVariables.CurrentGroup,GF_CurrentZone)
+end
+function GF_CreateCurrentZoneData()
+	if not GF_PerCharVariables.CurrentGroup[GF_CurrentZone] then
+		table.insert(GF_PerCharVariables.CurrentGroup,GF_CurrentZone)
+		GF_PerCharVariables.CurrentGroup[GF_CurrentZone] = { GF_CurrentZone,time(),{},{},time() }
+		return true
+	end
+end
+function GF_SaveTempData()
+	for pos,data in pairs(GF_PerCharVariables.CurrentGroup["TempData"]) do if type(data) == "table" then for tpos,tdata in pairs(data) do GF_PerCharVariables.CurrentGroup[GF_CurrentZone][pos][tpos] = tdata end else GF_PerCharVariables.CurrentGroup[GF_CurrentZone][pos] = data end end
+end
+function GF_ClearTempData()
+	GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{},{},time() }
+end
+function GF_ResetTempData()
+	GF_PerCharVariables.CurrentGroup["TempData"] = { GF_CurrentZone,time(),{},{},time() }
+	GF_GetPlayersCurrentlyInGroup()
+end
+function GF_LoadSavedData()
+	for pos,data in pairs(GF_PerCharVariables.CurrentGroup[GF_CurrentZone]) do if type(data) == "table" then for tpos,tdata in pairs(data) do GF_PerCharVariables.CurrentGroup["TempData"][pos][tpos] = tdata end else GF_PerCharVariables.CurrentGroup["TempData"][pos] = data end end
+end
+function GF_AddNamesToSavedData()
+	for name,data in pairs(GF_PerCharVariables.CurrentGroup["TempData"][3]) do if not GF_PerCharVariables.CurrentGroup[GF_CurrentZone][3][name] then GF_PerCharVariables.CurrentGroup[GF_CurrentZone][3][name] = {data[1],data[2],0,0,0} end end
+end
+
+function GF_StartSaveGroupData(immediate)
+-- Save TempData to GF_CurrentZone
+	if not GF_PerCharVariables.groupfinishtimer or not GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] then -- Only save tempdata to GF_CurrentZone if no groupfinishtimer and there is at least one person in the group other than me with activity.
+		for name,pdata in pairs(GF_PerCharVariables.CurrentGroup["TempData"][3]) do
+			if name ~= UnitName("player") and (pdata[5] > 0 or not GF_PerCharVariables.usedpsmeter) then GF_SaveTempData() break end
+		end
+		GF_ResetTempData()
+	end
+-- Make list of groups to save.
+	local groupstosave = {}
+	for i=1, getn(GF_PerCharVariables.CurrentGroup) do
+		if GF_PerCharVariables.CurrentGroup[i] and GF_PerCharVariables.CurrentGroup[i] ~= "" then -- At this point, tempdata is saved to GF_CurrentZone and tempdata has been cleared... find all groups with activity and add to groupstosave, delete other groups.
+			local numplayers,withactivity,fullactivity = 0,0,0
+			for name,data in pairs(GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.CurrentGroup[i]][3]) do
+				if data[5] >= 30 or not GF_PerCharVariables.usedpsmeter then withactivity = withactivity + 1 if data[5] >= 300 then fullactivity = fullactivity + 1 end end
+				numplayers = numplayers + 1
+			end
+-- Delete group if less than 30 seconds of activity and there there are at least two players... Flag for save if the group has lasted 10 minutes and there are at least two people with 5 minutes of activity... Keep group in buffer for two minutes otherwise.
+			if withactivity > 1 then -- Save groups with activity
+				table.insert(groupstosave,GF_PerCharVariables.CurrentGroup[i]) groupstosave[GF_PerCharVariables.CurrentGroup[i]] = fullactivity
+			elseif numplayers > 1 then -- Delete groups where I'm not alone.
+				GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.CurrentGroup[i]] = nil
+				table.remove(GF_PerCharVariables.CurrentGroup,i)
+				i = i - 1
+			end
+		end
+	end
+	if groupstosave[1] then
+		GF_PerCharVariables.groupfinishtimer = { immediate and GetTime() or GetTime() + 120,groupstosave }
+		local wordString = ""
+		for i=1, getn(groupstosave) do if GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]][2] + 600 < time() and (groupstosave[groupstosave[i]] > 1 or not GF_PerCharVariables.usedpsmeter) then wordString = wordString..groupstosave[i]..", " end end
+		if not immediate then if wordString ~= "" then DEFAULT_CHAT_FRAME:AddMessage(GF_NOT_IN_GROUP_SAVING..strsub(wordString,1,-3)..GF_IN_TWO_MINUTES,1,1,0.5) end else GF_GroupFinishedAddToGroupHistoryList() GF_PerCharVariables.groupfinishtimer = nil end
+		return true
 	end
 end
 
@@ -4285,7 +4315,7 @@ function GF_ApplyFiltersToGroupList(override) -- GroupsFrame functions
 				i = i - 1
 			end
 		end
-	end	
+	end
 	if floor(GF_ResultsListOffset/GF_ResultsListOffsetSize) > floor(#GF_FilteredResultsList/GF_ResultsListOffsetSize) then GF_ResultsListOffset = GF_ResultsListOffset - GF_ResultsListOffsetSize end
 	GF_UpdateResults()
 	if searchButtonHasValues or GF_PerCharVariables.searchbuttonstext[GF_BUTTONS_LIST["SearchList"][#GF_BUTTONS_LIST["SearchList"]][4]] then GF_SearchListDropdown:LockHighlight() GF_SearchListClearButton:Show() else GF_SearchListDropdown:UnlockHighlight() GF_SearchListClearButton:Hide() end
@@ -4329,7 +4359,7 @@ function GF_UpdateResults()
 				getglobal("GF_NewItem"..i):Show()
 				if (GF_SavedVariables.mainframestatus == 0 or GF_MainFrameShowBoth and GF_SavedVariables.mainframelogisopen) and GF_FilteredResultsList[i+GF_ResultsListOffset].op ~= UnitName("player") then
 					if not GF_SavedVariables.usewhoongroups and not GF_UrgentWhoRequest[GF_FilteredResultsList[i+GF_ResultsListOffset].op] and not GF_SavedVariables.friendsToRemove[GF_FilteredResultsList[i+GF_ResultsListOffset].op] and
-					(not GF_WhoTable[GF_RealmName][GF_FilteredResultsList[i+GF_ResultsListOffset].op] or (GF_WhoTable[GF_RealmName][GF_FilteredResultsList[i+GF_ResultsListOffset].op][1] < 60 and GF_WhoTable[GF_RealmName][GF_FilteredResultsList[i+GF_ResultsListOffset].op][4] + 86400 < time())) then
+					(not GF_WhoTable[GF_RealmName][GF_FilteredResultsList[i+GF_ResultsListOffset].op] or (GF_WhoTable[GF_RealmName][GF_FilteredResultsList[i+GF_ResultsListOffset].op][1] < 60 and GF_WhoTable[GF_RealmName][GF_FilteredResultsList[i+GF_ResultsListOffset].op][4] + 43200 < time())) then
 						getglobal("GF_NewItem"..i.."GroupWhoButton"):Show()
 					else
 						getglobal("GF_NewItem"..i.."GroupWhoButton"):Hide()
@@ -4473,7 +4503,7 @@ function GF_CreateDropDownMenu()
 		info.text = PARTY_INVITE
 		info.func = function() InviteUnit(GF_DropDownMenu.name) end
 		info.value = nil
-		UIDropDownMenu_AddButton(info, 1)	
+		UIDropDownMenu_AddButton(info, 1)
 
 		info = {}
 		info.isTitle = nil
@@ -4483,7 +4513,7 @@ function GF_CreateDropDownMenu()
 		info.text = GF_EDIT_NOTE
 		info.func = function() GF_EditPlayerNote(GF_DropDownMenu.name) end
 		info.value = nil
-		UIDropDownMenu_AddButton(info, 1)	
+		UIDropDownMenu_AddButton(info, 1)
 
 		info = {}
 		info.isTitle = nil
@@ -4539,7 +4569,7 @@ function GF_CreateDropDownMenu()
 	info.text = CANCEL
 	info.func = function() CloseDropDownMenus(1) end
 	info.value = nil
-	UIDropDownMenu_AddButton(info, 1)	
+	UIDropDownMenu_AddButton(info, 1)
 end
 function GF_OnHyperlinkShowTooltip(link)
 	if strsub(link,1,6) == "player" then
@@ -4563,7 +4593,7 @@ function GF_ListItemAuxLeft_ShowTooltip(frame,id,showall)
 	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMLEFT")
 	GameTooltip:ClearAllPoints()
 	GameTooltip:SetPoint("BOTTOMLEFT", frame:GetName(), "TOPLEFT", 0, 8)
-	
+
 	GameTooltip:AddLine(GF_FilteredResultsList[GF_ResultsListOffset+id].message, 0.9,0.9,1.0,1)
 	if showall and GF_PlayerMessages[GF_FilteredResultsList[GF_ResultsListOffset+id].op] then
 		if GF_PlayerMessages[GF_FilteredResultsList[GF_ResultsListOffset+id].op][2][1] and GF_PlayerMessages[GF_FilteredResultsList[GF_ResultsListOffset+id].op][2][1] ~= GF_FilteredResultsList[GF_ResultsListOffset+id].message then
@@ -4660,7 +4690,7 @@ function GF_WhisperHistoryButtonPressed(id,override,nolog) -- Whisper/Guild Hist
 	getglobal("GF_WhisperHistoryButton"..id):LockHighlight()
 	if GF_WhisperLogCurrentButtonID > 1 then getglobal("GF_WhisperHistoryButtonCheckButton"..GF_WhisperLogCurrentButtonID):Hide() end
 	if id > 1 then getglobal("GF_WhisperHistoryButtonCheckButton"..id):Show() end
-	
+
 	GF_WhisperLogCurrentButtonID = id
 	GF_WhisperLogLastWhisperLog = GF_SavedVariables.showwhisperlogs
 	GF_WhisperLogCurrentButtonName = getglobal("GF_WhisperHistoryButton"..id):GetText()
@@ -4690,35 +4720,37 @@ function GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event,delayed)
 	table.insert(GF_LogHistory[GF_RealmName],1,{arg1,4,event})
 	if #GF_LogHistory[GF_RealmName] > 500 then table.remove(GF_LogHistory[GF_RealmName],501) end
 	if GF_WhisperLogCurrentButtonID == 0 or GF_WhisperLogLastWhisperLog == 1 and (GF_WhisperLogCurrentButtonID == 1 or arg2 == getglobal("GF_WhisperHistoryButton"..GF_WhisperLogCurrentButtonID):GetText()) then
+		local info = ChatTypeInfo[event]
 		if GF_ConvertMessagesToLinks then
 			local _,_,startString,endString = strfind(arg1, "(.-%].-|Hplayer.-|h|r:? )(.*)")
 			if startString then
 				endString = gsub(gsub(gsub(gsub(endString, "|[cC]%x+|%w+:%w+:[%w:]+|[h]", ""), "|[cC]%x+%p+%w+:(.-)|h.-|h|r", "%1"), "|[cC]%x+", ""), "|[hHrR]?", "")
-				GF_Log:AddMessage(startString.."|cffccccff|Hurl:"..endString.."|h"..endString.."|h|r", GF_TextColors[event][1], GF_TextColors[event][2], GF_TextColors[event][3])
+				GF_Log:AddMessage(startString.."|cffccccff|Hurl:"..endString.."|h"..endString.."|h|r",info.r,info.g,info.b)
 			else
-				GF_Log:AddMessage(arg1, GF_TextColors[event][1], GF_TextColors[event][2], GF_TextColors[event][3])
+				GF_Log:AddMessage(arg1,info.r,info.g,info.b)
 			end
 		else
-			GF_Log:AddMessage(arg1, GF_TextColors[event][1], GF_TextColors[event][2], GF_TextColors[event][3])
+			GF_Log:AddMessage(arg1,info.r,info.g,info.b)
 		end
 	end
 end
 function GF_GroupFinishedAddToGroupHistoryList()
-	for i=1,#GF_PerCharVariables.groupfinishtimer[2] do
+-- GF_PerCharVariables.groupfinishtimer structure... [1] = timer... [2] is a table with zonename = fullactivity
+	for i=1, getn(GF_PerCharVariables.groupfinishtimer[2]) do
 		if GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]] and GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]][2] + 600 < time() then
 			local numNames = 0
 			for name,_ in pairs(GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]][3]) do if GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]][3][name][5] >= 300 or not GF_PerCharVariables.usedpsmeter then numNames = numNames + 1 if not GF_GroupHistory[GF_RealmName]["PLAYERS"][name] then GF_GroupHistory[GF_RealmName]["PLAYERS"][name] = 1 else GF_GroupHistory[GF_RealmName]["PLAYERS"][name] = GF_GroupHistory[GF_RealmName]["PLAYERS"][name] + 1 end end end
 			if numNames > 1 then
 				table.insert(GF_GroupHistory[GF_RealmName]["Groups"],1,{GF_PerCharVariables.groupfinishtimer[2][i],time(),GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]][3],GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]][4]})
-				if #GF_GroupHistory[GF_RealmName]["Groups"] > 20 then table.remove(GF_LogHistory[GF_RealmName],21) end
+				if getn(GF_GroupHistory[GF_RealmName]["Groups"]) > 20 then table.remove(GF_LogHistory[GF_RealmName],21) end
 				if not GF_GroupHistory[GF_RealmName][strsub(GF_PerCharVariables.groupfinishtimer[2][i],1,12)] then GF_GroupHistory[GF_RealmName][strsub(GF_PerCharVariables.groupfinishtimer[2][i],1,12)] = {} end
 				table.insert(GF_GroupHistory[GF_RealmName][strsub(GF_PerCharVariables.groupfinishtimer[2][i],1,12)],1,{GF_PerCharVariables.groupfinishtimer[2][i],time(),GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]][3],GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]][4]})
-				if #GF_GroupHistory[GF_RealmName][strsub(GF_PerCharVariables.groupfinishtimer[2][i],1,12)] > 20 then table.remove(GF_LogHistory[GF_RealmName],21) end
+				if getn(GF_GroupHistory[GF_RealmName][strsub(GF_PerCharVariables.groupfinishtimer[2][i],1,12)]) > 20 then table.remove(GF_LogHistory[GF_RealmName],21) end
 				if GF_SavedVariables.showwhisperlogs == 2 then GF_GroupHistoryUpdateFrame(strsub(GF_PerCharVariables.groupfinishtimer[2][i],1,12)) else GF_GroupHistoryUpdateFrame(strsub(GF_PerCharVariables.groupfinishtimer[2][i],1,12),true) end
 				DEFAULT_CHAT_FRAME:AddMessage(GF_SAVED..GF_PerCharVariables.groupfinishtimer[2][i],1,1,0.5)
 			end
 		end
-		for j=1, #GF_PerCharVariables.CurrentGroup do if GF_PerCharVariables.CurrentGroup[j] == GF_PerCharVariables.groupfinishtimer[2][i] then table.remove(GF_PerCharVariables.CurrentGroup,j) GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]] = nil break end end
+		for j=1, getn(GF_PerCharVariables.CurrentGroup) do if GF_PerCharVariables.CurrentGroup[j] == GF_PerCharVariables.groupfinishtimer[2][i] then table.remove(GF_PerCharVariables.CurrentGroup,j) GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.groupfinishtimer[2][i]] = nil break end end
 	end
 	GF_PerCharVariables.groupfinishtimer = nil
 	if GF_WhisperLogLastWhisperLog == 2 and GF_WhisperLogCurrentButtonID == 1 then GF_UpdateTicker = GetTime() + .1 GF_OnUpdateFunctions["GroupLog"] = GF_UpdateGroupLog end
@@ -4835,24 +4867,30 @@ function GF_GroupHistoryUpdateFrame(name,insertonly)
 end
 function GF_WhisperHistoryDisplayLog(name)
 	GF_ConvertLogMessagesToURL:Show()
+	GF_SaveCurrentGroupButton:Hide()
+	GF_ResetCurrentGroupButton:Hide()
 	GF_Log:SetMaxLines(128)
 	if GF_ConvertMessagesToLinks then
 		for i=#GF_WhisperLogData[GF_RealmName][name], 1, -1 do
 			local _,_,startString,endString = strfind(GF_WhisperLogData[GF_RealmName][name][i][1], "(.-%].-|Hplayer.-|h|r:? )(.*)")
+			local info = ChatTypeInfo[GF_WhisperLogData[GF_RealmName][name][i][2]]
 			if startString then
 				endString = gsub(gsub(gsub(gsub(endString, "|[cC]%x+|%w+:%w+:[%w:]+|[h]", ""), "|[cC]%x+%p+%w+:(.-)|h.-|h|r", "%1"), "|[cC]%x+", ""), "|[hHrR]?", "")
-				GF_Log:AddMessage(startString.."|cffccccff|Hurl:"..endString.."|h"..endString.."|h|r", GF_TextColors[GF_WhisperLogData[GF_RealmName][name][i][2]][1], GF_TextColors[GF_WhisperLogData[GF_RealmName][name][i][2]][2], GF_TextColors[GF_WhisperLogData[GF_RealmName][name][i][2]][3])
+				GF_Log:AddMessage(startString.."|cffccccff|Hurl:"..endString.."|h"..endString.."|h|r",info.r,info.g,info.b)
 			else
-				GF_Log:AddMessage(GF_WhisperLogData[GF_RealmName][name][i][1],GF_TextColors[GF_WhisperLogData[GF_RealmName][name][i][2]][1], GF_TextColors[GF_WhisperLogData[GF_RealmName][name][i][2]][2], GF_TextColors[GF_WhisperLogData[GF_RealmName][name][i][2]][3])
+				GF_Log:AddMessage(GF_WhisperLogData[GF_RealmName][name][i][1],info.r,info.g,info.b)
 			end
 		end
 	else
 		for i=#GF_WhisperLogData[GF_RealmName][name], 1, -1 do
-			GF_Log:AddMessage(GF_WhisperLogData[GF_RealmName][name][i][1],GF_TextColors[GF_WhisperLogData[GF_RealmName][name][i][2]][1], GF_TextColors[GF_WhisperLogData[GF_RealmName][name][i][2]][2], GF_TextColors[GF_WhisperLogData[GF_RealmName][name][i][2]][3])
+			local info = ChatTypeInfo[GF_WhisperLogData[GF_RealmName][name][i][2]]
+			GF_Log:AddMessage(GF_WhisperLogData[GF_RealmName][name][i][1],info.r,info.g,info.b)
 		end
 	end
 end
 function GF_GroupHistoryDisplayLog(name) -- TODO: Add a feature to search by playername.
+	GF_SaveCurrentGroupButton:Show()
+	GF_ResetCurrentGroupButton:Show()
 	GF_ConvertLogMessagesToURL:Hide()
 	GF_Log:SetMaxLines(128)
 	for i=#GF_GroupHistory[GF_RealmName][name], 1, -1 do
@@ -4996,7 +5034,7 @@ function GF_UpdateBlackListItems() -- Blacklist functions
 	GF_BlackListFramePageLabel:Show()
 	for i=1,20 do
 		if getglobal("GF_BlackListItem"..i) then
-			if i+GF_BlackListOffset <= #GF_BlackList[GF_RealmName] then 
+			if i+GF_BlackListOffset <= #GF_BlackList[GF_RealmName] then
 				getglobal("GF_BlackListItem"..i.."NameLabel"):SetText(GF_BlackList[GF_RealmName][GF_BlackListOffset+i][1])
 				getglobal("GF_BlackListItem"..i.."NoteLabel"):SetTextColor(1, 1, 1)
 				getglobal("GF_BlackListItem"..i.."NoteLabel"):SetText(GF_BlackList[GF_RealmName][GF_BlackListOffset+i][2])
@@ -5011,7 +5049,7 @@ function GF_ShowBlackListFrame()
 	GF_SettingsFrame:Hide()
 	GF_LogFrame:Hide()
 	GF_BlackListFrame:Show()
-	GF_UpdateBlackListItems()	
+	GF_UpdateBlackListItems()
 end
 function GF_EditBlackListItem(name)
 	local tablePosition = GF_BlackListOffset + string.gsub(name, "GF_BlackListItem(%d+)", "%1")
@@ -5032,7 +5070,7 @@ function GF_BlacklistAddPlayerDialogOKButton_OnCLick()
 	end
 	GF_AddPlayerFrame:Hide()
 	GF_AddPlayerFrameEditBox:SetText("")
-	GF_UpdateBlackListItems()	
+	GF_UpdateBlackListItems()
 end
 function GF_BlackListItemSaveChanges()
 	for i=1,#GF_BlackList[GF_RealmName] do
@@ -5043,7 +5081,7 @@ function GF_BlackListItemSaveChanges()
 		end
 	end
 	GF_BlackListItemEditFrame:Hide()
-	GF_UpdateBlackListItems()	
+	GF_UpdateBlackListItems()
 end
 function GF_DeletePlayer(id)
 	GF_BlackList[GF_RealmName][GF_BlackList[GF_RealmName][GF_BlackListOffset+id][1]] = nil
@@ -5133,7 +5171,7 @@ function GF_GetWhoSendWhisperToAvailablePlayer()
 	elseif strlen(whispermessage) < 5 then
 		DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_WHISPER_TEXT_TOO_SHORT,1,1,0.5)
 	else
-		if GF_Hardcore and not GF_PerCharVariables.disablehardcore and GF_PerCharVariables.hardcore ~= 3 then whispermessage = whispermessage..GF_HARDCORE_WHISPER_SUFFIX end	
+		if GF_Hardcore and not GF_PerCharVariables.disablehardcore and GF_PerCharVariables.hardcore ~= 3 then whispermessage = whispermessage..GF_HARDCORE_WHISPER_SUFFIX end
 		SendChatMessage(whispermessage,"WHISPER",nil,GF_GetWhoName)
 		if GF_ClassWhoTable[GF_GetWhoName] then GF_ClassWhoTable[GF_GetWhoName][4] = time() + GF_GetWhoResetTimer end
 		GF_ClassWhoMatchingResults = GF_ClassWhoMatchingResults - 1
@@ -5201,7 +5239,7 @@ function GF_CreateGetWhoDropDownMenu()
 	info.text = PARTY_INVITE
 	info.func = function() InviteUnit(GF_GetWhoDropDownMenu.name) end
 	info.value = nil
-	UIDropDownMenu_AddButton(info, 1)	
+	UIDropDownMenu_AddButton(info, 1)
 
 	info = {}
 	info.isTitle = nil
@@ -5214,7 +5252,7 @@ function GF_CreateGetWhoDropDownMenu()
 		SendWho("n-"..GF_GetWhoDropDownMenu.name)
 	end
 	info.value = nil
-	UIDropDownMenu_AddButton(info, 1)	
+	UIDropDownMenu_AddButton(info, 1)
 
 	info = {}
 	info.isTitle = nil
@@ -5224,7 +5262,7 @@ function GF_CreateGetWhoDropDownMenu()
 	info.text = CANCEL
 	info.func = function() CloseDropDownMenus(1) end
 	info.value = nil
-	UIDropDownMenu_AddButton(info, 1)	
+	UIDropDownMenu_AddButton(info, 1)
 end
 function GF_CreateGetWhoNameLink(name)
 	return "|cff"..(GF_ClassColors[GF_ClassWhoTable[name][2]] or "ffffff").."|Hplayer:"..name.."|h["..name..", "..GF_ClassWhoTable[name][1].."]|h|r"
@@ -5384,7 +5422,7 @@ function GF_GetDropDownButtons(fName,maxSize,showAll,MatchLFG) -- Create dropdow
 	getglobal("GF_"..fName):SetHeight(12 + ceil(#buttons/ceil(#buttons/maxSize)) * 18)
 	getglobal("GF_"..fName):SetWidth((width + 45) * ceil(#buttons/maxSize))
 	getglobal("GF_"..fName):ClearAllPoints()
-	if #buttons/maxSize > 1 then 
+	if #buttons/maxSize > 1 then
 		getglobal("GF_"..fName):SetPoint("TOPLEFT", getglobal("GF_"..fName.."Dropdown"), "BOTTOMLEFT", (-1*(width + 45)*math.floor((#buttons-1)/maxSize))/2 - width/1.5, 4)
 	else
 		getglobal("GF_"..fName):SetPoint("TOPLEFT", getglobal("GF_"..fName.."Dropdown"), "BOTTOMLEFT", -1*(width + 45)*math.floor((#buttons-1)/maxSize), 4)
@@ -5474,7 +5512,7 @@ end
 function GF_GetWhoLevelAddRemove(entryName,entryID,add)
 	GF_PerCharVariables.getwhowhisperlevel = GF_BUTTONS_LIST["GetWhoLevel"][entryID][4]
 	GF_PerCharVariables.wholevelrange = GF_BUTTONS_LIST["GetWhoLevel"][entryID][5]
-	if GF_PerCharVariables.getwhowhisperlevel == 0 then GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." "..UnitLevel("player").."±") elseif GF_PerCharVariables.getwhowhisperlevel > 60 then GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." 60±") else GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." "..GF_PerCharVariables.getwhowhisperlevel.."±") end					
+	if GF_PerCharVariables.getwhowhisperlevel == 0 then GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." "..UnitLevel("player").."±") elseif GF_PerCharVariables.getwhowhisperlevel > 60 then GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." 60±") else GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." "..GF_PerCharVariables.getwhowhisperlevel.."±") end
 	GF_GetWhoLevel:Hide()
 end
 function GF_AlwaysShowAddRemove(entryName,entryID,add)
@@ -5524,7 +5562,7 @@ function GF_LFGHardCoreAddRemove(entryName,entryID,add)
 			GF_BUTTONS_LIST.LFGHardCore[3] = {GF_SHOW_NORMAL,1,60,nil,true,nil}
 			if GF_PerCharVariables.hardcore < 3 and entryID == 3 then DEFAULT_CHAT_FRAME:AddMessage(GF_WORLD_NOW_SENDING,1,1,0.5) elseif GF_PerCharVariables.hardcore == 3 and entryID < 3 then DEFAULT_CHAT_FRAME:AddMessage(GF_HARDCORE_NOW_SENDING,1,1,0.5) end
 		end
-	end	
+	end
 	GF_PerCharVariables.hardcore = entryID
 	if GF_BUTTONS_LIST.LFGHardCore[GF_PerCharVariables.hardcore][4] then GF_WorldAnnounceMessageTextLabel:SetText(GF_HARDCORE_SEND_TEXT) else GF_WorldAnnounceMessageTextLabel:SetText(GF_WORLD_SEND_TEXT.." "..GF_SavedVariables.groupchannelname.." "..GF_LOG_CHANNEL) end
 	GF_LFGHardCoreDropdownTextLabel:SetText(GF_BUTTONS_LIST.LFGHardCore[entryID][1])
@@ -5617,6 +5655,27 @@ function GF_SetAlwaysShowTextLabel()
 		if not EventIDAlias[name] and GetChannelName(name) ~= 0 then wordString = wordString.."["..GetChannelName(name).."] " count = count + 1 end
 	end
 	GF_AlwaysShowTextLabel:SetText(wordString)
+end
+
+function GF_ConfirmationDialogFunctions(fName) -- Functions for Confirmation Dialog
+	getglobal(fName)()
+end
+function GF_ResetAllSettingsDialogOkButtonSent()
+	GF_SavedVariables = {}
+	GF_PerCharVariables = {}
+	GF_LoadVariables()
+	GF_LoadSettings()
+	DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_YOUR_SETTINGS_RESET, 1, 1, 0.5)
+end
+function GF_SaveCurrentGroupDialogOkButtonSent()
+	if GF_StartSaveGroupData(true) then DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_LOG_GROUP_IS_SAVED,1,1,0.5) else DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_LOG_GROUP_IS_RESET,1,1,0.5) end
+	GF_CreateBlankGroupData()
+	GF_GetPlayersCurrentlyInGroup()
+end
+function GF_ResetCurrentGroupDialogOkButtonSent()
+	DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_LOG_GROUP_IS_RESET,1,1,0.5)
+	GF_CreateBlankGroupData()
+	GF_GetPlayersCurrentlyInGroup()
 end
 
 function GF_ClickQueueLFT() -- TODO: Does this work properly when in a group as leader?
@@ -6483,7 +6542,7 @@ function CompileFixedQuestZones(continue) -- /script CompileFixedQuestZones() /s
 			if not GF_SavedVariables.questconversion[wordString] or GF_SavedVariables.questconversion[wordString][2] < wtable[2] then
 				GF_SavedVariables.questconversion[wordString] = { wtable[1],wtable[2], zone or 0}
 				if wordTable[#wordTable] == "x" then print(entryname) end
-				if wordTable[1] == "wanted" then 
+				if wordTable[1] == "wanted" then
 					wordString = ""
 					for i=2, #wordTable do if wordTable[i] then wordString = wordString..wordTable[i] end end
 					if not GF_SavedVariables.questconversion[wordString] or GF_SavedVariables.questconversion[wordString][2] < wtable[2] then GF_SavedVariables.questconversion[wordString] = { wtable[1],wtable[2], zone or 0} end
@@ -6540,7 +6599,7 @@ function GF_ConvertQuests(continue) -- /script GF_ConvertQuests(true) /script GF
 			local startZone, endZone
 			if pfDB["quests"]["data-turtle"][id] then
 				if pfDB["quests"]["data-turtle"][id]["start"] then
-					if pfDB["quests"]["data-turtle"][id]["start"]["U"] then 
+					if pfDB["quests"]["data-turtle"][id]["start"]["U"] then
 						if pfDB["units"]["data-turtle"][pfDB["quests"]["data-turtle"][id]["start"]["U"][1]] and pfDB["units"]["data-turtle"][pfDB["quests"]["data-turtle"][id]["start"]["U"][1]]["coords"] and pfDB["units"]["data-turtle"][pfDB["quests"]["data-turtle"][id]["start"]["U"][1]]["coords"][1] then
 							startZone = pfDB["units"]["data-turtle"][pfDB["quests"]["data-turtle"][id]["start"]["U"][1]]["coords"][1][3]
 						elseif pfDB["units"]["data"][pfDB["quests"]["data"][id]["start"]["U"][1]] and pfDB["units"]["data"][pfDB["quests"]["data"][id]["start"]["U"][1]]["coords"] and pfDB["units"]["data"][pfDB["quests"]["data"][id]["start"]["U"][1]]["coords"][1] then
@@ -6555,7 +6614,7 @@ function GF_ConvertQuests(continue) -- /script GF_ConvertQuests(true) /script GF
 					end
 				end
 				if pfDB["quests"]["data-turtle"][id]["end"] then
-					if pfDB["quests"]["data-turtle"][id]["end"]["U"] then 
+					if pfDB["quests"]["data-turtle"][id]["end"]["U"] then
 						if pfDB["units"]["data-turtle"][pfDB["quests"]["data-turtle"][id]["end"]["U"][1]] and pfDB["units"]["data-turtle"][pfDB["quests"]["data-turtle"][id]["end"]["U"][1]]["coords"] and pfDB["units"]["data-turtle"][pfDB["quests"]["data-turtle"][id]["end"]["U"][1]]["coords"][1] then
 							endZone = pfDB["units"]["data-turtle"][pfDB["quests"]["data-turtle"][id]["end"]["U"][1]]["coords"][1][3]
 						elseif pfDB["units"]["data"][pfDB["quests"]["data"][id]["end"]["U"][1]] and pfDB["units"]["data"][pfDB["quests"]["data"][id]["end"]["U"][1]]["coords"] and pfDB["units"]["data"][pfDB["quests"]["data"][id]["end"]["U"][1]]["coords"][1] then
@@ -6594,7 +6653,7 @@ function GF_SearchQuestID(id) -- /script GF_SearchQuestID(6)
 					if zone > 0 then
 						maps["start"][zone] = zone
 					end
-				end				
+				end
 			end
 		elseif pfDB["quests"]["data"][id]["start"]["O"] then -- Object
 			for _,objectid in pairs(pfDB["quests"]["data"][id]["start"]["O"]) do
@@ -6603,7 +6662,7 @@ function GF_SearchQuestID(id) -- /script GF_SearchQuestID(6)
 					if zone > 0 then
 						maps["start"][zone] = zone
 					end
-				end				
+				end
 			end
 		end
 	end
@@ -6698,14 +6757,14 @@ function GF_SearchQuestID(id) -- /script GF_SearchQuestID(6)
 -- Show prequest name(save prequest id)
 
 -- If NO OBJECTIVE, show base header/start/end zone if not undefined(0). If undefined, show starting and ending zone... Show Start/End X/Y coords.
--- If AREA TRIGGER, show base header/start/end zone if not undefined(0). If undefined, show base header and objective zone. 
+-- If AREA TRIGGER, show base header/start/end zone if not undefined(0). If undefined, show base header and objective zone.
 -- If OBJECTIVE...
 -- If KILL QUEST, find all spawns, save per spawn type and group nearby spawns, average their location coords. Show up to four spawns. Priority is per type,
--- If INTERACT WITH OBJECT, 
+-- If INTERACT WITH OBJECT,
 -- If QUEST ITEM... If vendor item, say vendor, don't show obective.
 -- If ITEM FROM OBJECT,
 -- If ITEM FROM UNIT,
--- 
+--
 
 -- Mapping
 -- GetCurrentMapContinent() returns map continent... 1(Kalimdor) or 2(Eastern Kingdoms)... returns 0 if no continent(zoomed all the way out or map closed).
@@ -6725,7 +6784,7 @@ local questinfo = {}
 --Add ZoneID for start/objectives if different than Category... Add ZoneID for end if different than start
 --Ex: ["aboveandbeyond"]={{5263,5251},60,2017,{50,50,139},{50,50},{50,50}}... Objectives have same Zone as Category. Start/End have same Zone.
 --Ex: ["wantedhogger"]={{176},11,12,{50,50},{50,50},{50,50}}... Objectives/Start/End all have same zone as Category.
---Ex: 
+--Ex:
 --Quest Start can be a Unit(U), Object(O), or an item(I)
 --Quest End can only be a Unit(U), or an Object(O).
 --

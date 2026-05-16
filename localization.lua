@@ -107,6 +107,12 @@ GF_LOG_GUILDWHISPERS = "Guild+Whisper"
 GF_LOG_GROUPLOG = "Group Log"
 GF_LOG_CONVERT_URL = "Convert to links"
 
+GF_LOG_SAVE_GROUP = "Save Group"
+GF_LOG_RESET_GROUP = "Reset Group"
+
+GF_LOG_GROUP_IS_SAVED = "Group Data is saved"
+GF_LOG_GROUP_IS_RESET = "Group Data is reset"
+
 -- Group-related buttons and texts
 GF_KEYWORDS_DROPDOWN_DESCR = "Keywords:" -- Label to the left of the GF_GroupsFrameDescriptionEditBox on group frame
 GF_AUTO_FILTER = "Auto Filter"
@@ -155,6 +161,9 @@ GF_ADD_TO_BLOCK_LIST = "Add words to the block list"
 GF_BLOCK_LIST = "Block list"
 GF_ADDING_TO_BLOCK_LIST = "Adding '%s' to block list."
 GF_ADJUST_FILTER_LEVEL = "Group Filtering" -- Label for Filter slider on Settings tab
+GF_ARE_YOU_SURE_SAVE_GROUP = "Are you sure you want to save the current group?" -- Label for Save Group
+GF_ARE_YOU_SURE_RESET_GROUP = "Are you sure you want to reset the current group?" -- Label for Reset Group
+
 GF_FilterLevelNotes = {}
 GF_FilterLevelNotes[1] = "Not Strict"
 GF_FilterLevelNotes[2] = "Strict"
