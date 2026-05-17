@@ -2825,7 +2825,11 @@ function GF_CheckForSystem(arg1)
 				end
 			end
 			if GF_WhoTable[GF_RealmName][wordString] then
-				GF_PreviousMessage["SYSTEM"] = {true,strsub(arg1,1,lfs).."cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][wordString][2]] or "ffffff").."|Hplayer:"..wordString.."|h["..wordString..", "..GF_WhoTable[GF_RealmName][wordString][1].."]|h|r"..strsub(arg1,lfe)}
+				if GF_WhoTable[GF_RealmName][arg2][1] == 0 then
+					GF_PreviousMessage["SYSTEM"] = {true,strsub(arg1,1,lfs).."cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][wordString][2]] or "ffffff").."|Hplayer:"..wordString.."|h["..wordString.."]|h|r"..strsub(arg1,lfe)}
+				else
+					GF_PreviousMessage["SYSTEM"] = {true,strsub(arg1,1,lfs).."cff"..(GF_ClassColors[GF_WhoTable[GF_RealmName][wordString][2]] or "ffffff").."|Hplayer:"..wordString.."|h["..wordString..", "..GF_WhoTable[GF_RealmName][wordString][1].."]|h|r"..strsub(arg1,lfe)}
+				end
 				return
 			end
 		end
@@ -4102,6 +4106,8 @@ function GF_PruneTheClassWhoTable()
 end
 
 function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ignore/blacklist or adds their character information)
+	local lastParty,lastPartyOnline = GF_NumPartyMembers,GF_NumPartyMembersOnline
+	GF_NumPartyMembers = GF_GetNumGroupMembers()
 	if GF_CurrentZone ~= GetRealZoneText() then -- If zone changes, this saves TempData to old GF_CurrentZone, then loads new GF_CurrentZone to TempData or creates a blank TempData and GF_CurrentZone
 -- This function saves TempData when changing zone
 		GF_PerCharVariables.CurrentGroup["TempData"][5] = time() -- Save the time I left the zone.
@@ -4112,14 +4118,11 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 		if GF_CreateCurrentZoneData() or (GF_PerCharVariables.groupfinishtimer and GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone]) then -- There was no saved data(create data and reset tempdata).. zone is being saved(reset tempdata)
 		else
 			GF_AddNamesToSavedData()
-			GF_LoadSavedData()
+			if not GF_CreateCurrentZoneData() then GF_LoadSavedData() end
 		end
 	else
 		GF_GetPlayersCurrentlyInGroup()
 	end
-
-	local lastParty,lastPartyOnline = GF_NumPartyMembers,GF_NumPartyMembersOnline
-	GF_NumPartyMembers = GF_GetNumGroupMembers()
 	if GF_WasPartyLeaderBefore and not UnitIsPartyLeader("player") and GF_NumPartyMembers > 1 then
 		GF_TurnOffAnnounce(GF_JOINED_GROUP_ANNOUNCE_OFF)
 		GF_WasPartyLeaderBefore = nil
@@ -4135,7 +4138,7 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 			LFT_Update()
 			if GetNumRaidMembers() > 1 then
 				if GF_QueuetoLFTButton:IsVisible() then GF_QueuetoLFTButton:Hide() GF_QueuetoLFTButton:SetText(GF_QUEUE_IN_LFT) end
-			else
+			elseif GF_NumPartyMembers ~= lastParty then
 				GF_UpdateQueueLFTButton()
 			end
 		end
@@ -4147,8 +4150,8 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 				else -- I left a group and there is no activity, reload old save.
 					GF_LoadSavedData()
 				end
-			elseif not GF_PerCharVariables.groupfinishtimer or not GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] then -- If I just logged in. Reset Data if there are other players in it.
-				GF_LoadSavedData()
+			elseif not GF_PerCharVariables.groupfinishtimer or not GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] then
+				if not GF_CreateCurrentZoneData() then GF_LoadSavedData() end
 			end
 		elseif lastParty == 1 and GF_NumPartyMembers > 1 then -- I just joined a group, reset my tempdata. If there was a finishtimer, check for the same group and load currentgroup
 			if GF_PerCharVariables.groupfinishtimer then -- If timer, reload data to tempdata if it is the same group and disable the timer... If no timer, clear all data
@@ -4159,7 +4162,7 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 						for name,data in pairs(GF_PerCharVariables.CurrentGroup[GF_PerCharVariables.CurrentGroup[i]][3]) do totalgroupsize = totalgroupsize + 1 if GF_PlayersCurrentlyInGroup[name] then namesincommon = namesincommon + 1 end end
 						if namesincommon / totalgroupsize > .5 then
 							GF_AddNamesToSavedData()
-							GF_LoadSavedData()
+							if not GF_CreateCurrentZoneData() then GF_LoadSavedData() end
 							GF_PerCharVariables.groupfinishtimer = nil
 							DEFAULT_CHAT_FRAME:AddMessage(GF_REJOINED_GROUP,1,1,0.5)
 							break
@@ -5661,21 +5664,23 @@ function GF_ConfirmationDialogFunctions(fName) -- Functions for Confirmation Dia
 	getglobal(fName)()
 end
 function GF_ResetAllSettingsDialogOkButtonSent()
+	DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_YOUR_SETTINGS_RESET, 1, 1, 0.5)
 	GF_SavedVariables = {}
 	GF_PerCharVariables = {}
 	GF_LoadVariables()
 	GF_LoadSettings()
-	DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_YOUR_SETTINGS_RESET, 1, 1, 0.5)
 end
 function GF_SaveCurrentGroupDialogOkButtonSent()
 	if GF_StartSaveGroupData(true) then DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_LOG_GROUP_IS_SAVED,1,1,0.5) else DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_LOG_GROUP_IS_RESET,1,1,0.5) end
 	GF_CreateBlankGroupData()
 	GF_GetPlayersCurrentlyInGroup()
+	GF_UpdateDPSMeter()
 end
 function GF_ResetCurrentGroupDialogOkButtonSent()
 	DEFAULT_CHAT_FRAME:AddMessage("GF: "..GF_LOG_GROUP_IS_RESET,1,1,0.5)
 	GF_CreateBlankGroupData()
 	GF_GetPlayersCurrentlyInGroup()
+	GF_UpdateDPSMeter()
 end
 
 function GF_ClickQueueLFT() -- TODO: Does this work properly when in a group as leader?
