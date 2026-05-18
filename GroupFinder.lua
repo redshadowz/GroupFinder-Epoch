@@ -113,7 +113,7 @@ GF_MenusToHide								= {}
 local GF_DifficultyColors = { ["RED"] = "ff0000",["ORANGE"] = "ff8040",["YELLOW"] = "ffff00",["GREEN"] = "1eff00",["GREY"] = "808080", }
 local GF_TankClasses = { ["DRUID"]=true,["WARRIOR"]=true,["PALADIN"]=true,["SHAMAN"]=true }
 local GF_HealingClasses = { ["PRIEST"]=true,["DRUID"]=true,["PALADIN"]=true,["SHAMAN"]=true }
-local languageName,foundIgnore,foundGuild,foundGuildExclusion,foundLFM,foundLFG,foundClass,foundDungeon,foundRaid,foundTrades,foundTradesExclusion,numGroupWords,foundPvP,foundHC,foundNotHC,foundBlockList,dontCheckSpam,fixedType,searchButtonHasValues
+local languageName,foundIgnore,foundGuild,foundGuildExclusion,foundLFM,foundLFG,foundClass,foundDungeon,foundRaid,foundTrades,foundTradesExclusion,numGroupWords,foundPvP,foundHC,foundNotHC,foundBlockList,dontCheckSpam,fixedType,searchButtonHasValues,GF_ERR_GUILD_LEAVE_S
 local lfmlfgName,groupName,foundQuest,foundDFlags,foundPFlags,foundCFlags,lfmPosition,groupPosition,LFTGroups,displayWhoMessageName = {},{},{},{},{},{},{},{},{},{}
 GF_HELP_TEXT_SIMPLE = HELP_TEXT_SIMPLE
 local strataEnum = {"WORLD","BACKGROUND","LOW","MEDIUM","HIGH","DIALOG","FULLSCREEN","FULLSCREEN_DIALOG","TOOLTIP",["WORLD"]=1,["BACKGROUND"]=2,["LOW"]=3,["MEDIUM"]=4,["HIGH"]=5,["DIALOG"]=6,["FULLSCREEN"]=7,["FULLSCREEN_DIALOG"]=8,["TOOLTIP"]=9}
@@ -326,6 +326,7 @@ function GF_LoadVariables()
 		lfs = 1 while true do lfs,lfe = strfind(GF_Parser[i],"%s",lfs,true) if lfs then if lfs == 1 then GF_Parser[i] = "(.+)"..strsub(GF_Parser[i],lfe+1) else GF_Parser[i] = strsub(GF_Parser[i],1,lfs-1).."(.+)"..strsub(GF_Parser[i],lfe+1) end lfs = lfe + 6 else break end end
 		lfs = 1 while true do lfs,lfe = strfind(GF_Parser[i],"%d",lfs,true) if lfs then if lfs == 1 then GF_Parser[i] = "(%d+)"..strsub(GF_Parser[i],lfe+1) else GF_Parser[i] = strsub(GF_Parser[i],1,lfs-1).."(%d+)"..strsub(GF_Parser[i],lfe+1) end lfs = lfe + 4 else break end end
 	end
+	lfs,lfe = strfind(" "..ERR_GUILD_LEAVE_S,"%s",1,true) if lfs then GF_ERR_GUILD_LEAVE_S = strsub(ERR_GUILD_LEAVE_S,1,lfs-2).."(%a+)"..strsub(ERR_GUILD_LEAVE_S,lfe) else GF_ERR_GUILD_LEAVE_S = ERR_GUILD_LEAVE_S end
 	if GF_SavedVariables.systemfilter then HELP_TEXT_SIMPLE = nil else HELP_TEXT_SIMPLE = GF_HELP_TEXT_SIMPLE end
 
 	GF_CurrentZone = GetRealZoneText()
@@ -2833,6 +2834,8 @@ function GF_CheckForSystem(arg1)
 				return
 			end
 		end
+	elseif strfind(arg1, GF_ERR_GUILD_LEAVE_S) or strfind(arg1, ERR_GUILD_LEAVE_RESULT) then
+		GF_UpdateGuildiesList()
 	else
 		for i=1,#GF_HardcoreMessages do
 			local lfs,lfe,wordString,tempString,tempVal = strfind(arg1, GF_HardcoreMessages[i])
@@ -3509,7 +3512,11 @@ function GF_GetTypes(arg1,showanyway)
 					if GF_WORD_DUNGEON[GF_WORD_GROUP_BYPASS[wordTable[i-1]]] then GF_CheckForDungeon(GF_WORD_GROUP_BYPASS[wordTable[i-1]],i-1,i-1) numGroupWords = numGroupWords + 1
 					elseif GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i-1]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i-1]],i-1,i-1) numGroupWords = numGroupWords + 1
 					elseif GF_WORD_DUNGEON[GF_WORD_GROUP_BYPASS[wordTable[i+j+1]]] then GF_CheckForDungeon(GF_WORD_GROUP_BYPASS[wordTable[i+j+1]],i+j+1,i+j+1) numGroupWords = numGroupWords + 1
-					elseif GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i+j+1]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i+j+1]],i+j+1,i+j+1) numGroupWords = numGroupWords + 1 end
+					elseif GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+1]] and GF_WORD_DUNGEON[GF_WORD_GROUP_BYPASS[wordTable[i+j+2]]] then GF_CheckForDungeon(GF_WORD_GROUP_BYPASS[wordTable[i+j+2]],i+j+2,i+j+2) numGroupWords = numGroupWords + 1
+					elseif GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+1]] and GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+2]] and GF_WORD_DUNGEON[GF_WORD_GROUP_BYPASS[wordTable[i+j+3]]] then GF_CheckForDungeon(GF_WORD_GROUP_BYPASS[wordTable[i+j+3]],i+j+3,i+j+3) numGroupWords = numGroupWords + 1
+					elseif GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i+j+1]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i+j+1]],i+j+1,i+j+1) numGroupWords = numGroupWords + 1
+					elseif GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+1]] and GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i+j+2]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i+j+2]],i+j+2,i+j+2) numGroupWords = numGroupWords + 1
+					elseif GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+1]] and GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+2]] and GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i+j+3]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i+j+3]],i+j+3,i+j+3) numGroupWords = numGroupWords + 1 end
 				elseif GF_WORD_LFG[wordString] then
 					table.insert(lfmlfgName,wordString)
 					if showanyway == true then print(wordString.." lfg "..GF_WORD_LFG[wordString]) end
@@ -3533,7 +3540,11 @@ function GF_GetTypes(arg1,showanyway)
 					if GF_WORD_DUNGEON[GF_WORD_GROUP_BYPASS[wordTable[i-1]]] then GF_CheckForDungeon(GF_WORD_GROUP_BYPASS[wordTable[i-1]],i-1,i-1) numGroupWords = numGroupWords + 1
 					elseif GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i-1]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i-1]],i-1,i-1) numGroupWords = numGroupWords + 1
 					elseif GF_WORD_DUNGEON[GF_WORD_GROUP_BYPASS[wordTable[i+j+1]]] then GF_CheckForDungeon(GF_WORD_GROUP_BYPASS[wordTable[i+j+1]],i+j+1,i+j+1) numGroupWords = numGroupWords + 1
-					elseif GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i+j+1]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i+j+1]],i+j+1,i+j+1) numGroupWords = numGroupWords + 1 end
+					elseif GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+1]] and GF_WORD_DUNGEON[GF_WORD_GROUP_BYPASS[wordTable[i+j+2]]] then GF_CheckForDungeon(GF_WORD_GROUP_BYPASS[wordTable[i+j+2]],i+j+2,i+j+2) numGroupWords = numGroupWords + 1
+					elseif GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+1]] and GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+2]] and GF_WORD_DUNGEON[GF_WORD_GROUP_BYPASS[wordTable[i+j+3]]] then GF_CheckForDungeon(GF_WORD_GROUP_BYPASS[wordTable[i+j+3]],i+j+3,i+j+3) numGroupWords = numGroupWords + 1
+					elseif GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i+j+1]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i+j+1]],i+j+1,i+j+1) numGroupWords = numGroupWords + 1
+					elseif GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+1]] and GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i+j+2]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i+j+2]],i+j+2,i+j+2) numGroupWords = numGroupWords + 1
+					elseif GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+1]] and GF_LFM_CONNECT_WORDS_BEFORE[wordTable[i+j+2]] and GF_WORD_RAID[GF_WORD_GROUP_BYPASS[wordTable[i+j+3]]] then GF_CheckForRaid(GF_WORD_GROUP_BYPASS[wordTable[i+j+3]],i+j+3,i+j+3) numGroupWords = numGroupWords + 1 end
 				end
 				if GF_WORD_CLASSES[wordString] then foundClass = GF_WORD_CLASSES[wordString] table.insert(groupName,wordString) groupName[wordString] = true numGroupWords = numGroupWords + 1 + j if GF_WORD_ROLES[wordString] then foundCFlags[GF_WORD_ROLES[wordString]] = true end
 				elseif GF_WORD_DUNGEON[wordString] then
@@ -3544,14 +3555,14 @@ function GF_GetTypes(arg1,showanyway)
 					if GF_RAID_BEFORE[wordTable[i-1]] and (GF_RAID_BEFORE[wordTable[i-1]][wordTable[i+j+1]] or (wordTable[i+j+2] and GF_RAID_BEFORE[wordTable[i-1]][wordTable[i+j+1]..wordTable[i+j+2]])) then foundGuildExclusion = foundGuildExclusion + 1 if foundLFM < 3 then foundLFM = 3 if showanyway == true then print("1 word before/1-2 words after raid") end end end
 					if GF_RAID_AFTER[wordTable[i+j+1]] or (wordTable[i+j+2] and GF_RAID_AFTER[wordTable[i+j+1]..wordTable[i+j+2]]) or (wordTable[i+j+3] and GF_RAID_AFTER[wordTable[i+j+1]..wordTable[i+j+2]..wordTable[i+j+3]]) then foundGuildExclusion = foundGuildExclusion + 1 if foundLFM < 3 then foundLFM = 3 if showanyway == true then print("1-3 words after raid") end end end
 					numGroupWords = numGroupWords + 1 + j
-				elseif GF_WORD_PVP[wordString] then
+				elseif GF_WORD_PVP[wordString] and (not GF_PVP_TRIGGER[wordString] or GF_PVP_PREFIX[wordTable[i+j+1]] or GF_PVP_PREFIX[wordTable[i-1]]) then
 					if showanyway == true then print(wordString.." pvp") end
 					if not foundPvP or GF_WORD_PVP[wordString] > foundPvP then foundPvP = GF_WORD_PVP[wordString] table.insert(foundPFlags,1,wordString) else table.insert(foundPFlags, wordString) end table.insert(groupPosition,{i,i+j,wordString})
 					if foundPvP == 0 then for num,word in gfind(arg1, "[%p%s](%d+)%s?(%a+)[%p%s]") do if (GF_WORD_PVP[word] or GF_PVP_DETECTION[word]) and tonumber(num) > foundPvP and tonumber(num) > 8 and tonumber(num) < 61 then foundPvP = tonumber(num) break end end end
 					if foundPvP == 0 then for word,num in gfind(arg1, "[%p%s](%a+)%s?(%d+)[%p%s]") do if (GF_WORD_PVP[word] or GF_PVP_DETECTION[word]) and tonumber(num) > foundPvP and tonumber(num) > 8 and tonumber(num) < 61 then foundPvP = tonumber(num) break end end end
 					if foundPvP == 0 then table.insert(groupName,wordString) groupName[wordString] = true end
 					if not GF_WORD_PVP_BYPASS[wordString] then foundTradesExclusion = foundTradesExclusion + .5 foundGuildExclusion = foundGuildExclusion + .3 else foundTradesExclusion = foundTradesExclusion + .3 foundGuildExclusion = foundGuildExclusion + .1 end
-					numGroupWords = numGroupWords + 1 + j
+					if GF_PVP_TRIGGER[wordString] then numGroupWords = numGroupWords + 2 + j else numGroupWords = numGroupWords + 1 + j end
 				end
 				if GF_WORD_LEVEL_ZONE[wordString] and (wordTable[i-1] == GF_PORTAL_LOCALIZED or wordTable[i+1] == GF_PORTAL_LOCALIZED) then foundTrades = foundTrades + 1 if showanyway == true then print("portalzone trade 1") end end
 -- Score Trades separately
@@ -4148,9 +4159,9 @@ function GF_UpdateGroup() -- Get Group/Friends/Guildies information(turns off ig
 				if GF_PerCharVariables.groupfinishtimer then
 					GF_ResetTempData()
 				else -- I left a group and there is no activity, reload old save.
-					GF_LoadSavedData()
+					if not GF_CreateCurrentZoneData() then GF_LoadSavedData() end
 				end
-			elseif not GF_PerCharVariables.groupfinishtimer or not GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] then
+			elseif not GF_PerCharVariables.groupfinishtimer or not GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] or lastParty == 0 then
 				if not GF_CreateCurrentZoneData() then GF_LoadSavedData() end
 			end
 		elseif lastParty == 1 and GF_NumPartyMembers > 1 then -- I just joined a group, reset my tempdata. If there was a finishtimer, check for the same group and load currentgroup
@@ -4270,9 +4281,8 @@ function GF_StartSaveGroupData(immediate)
 -- Save TempData to GF_CurrentZone
 	if not GF_PerCharVariables.groupfinishtimer or not GF_PerCharVariables.groupfinishtimer[2][GF_CurrentZone] then -- Only save tempdata to GF_CurrentZone if no groupfinishtimer and there is at least one person in the group other than me with activity.
 		for name,pdata in pairs(GF_PerCharVariables.CurrentGroup["TempData"][3]) do
-			if name ~= UnitName("player") and (pdata[5] > 0 or not GF_PerCharVariables.usedpsmeter) then GF_SaveTempData() break end
+			if name ~= UnitName("player") and (pdata[5] > 0 or not GF_PerCharVariables.usedpsmeter) then GF_SaveTempData() GF_ResetTempData() break end
 		end
-		GF_ResetTempData()
 	end
 -- Make list of groups to save.
 	local groupstosave = {}
