@@ -483,7 +483,7 @@ function GF_SetStringSize()
 	GF_UIScaleSliderLabel:SetText("")
 end
 function GF_FormatBlockListWords(arg1,display)
-	arg1 = " "..gsub(gsub(strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")),"[\"#\$\%&\*,\.@\\\^_`~|—“”]"," "),"['´’]","").." "
+	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")).." "
 	local lfs,lfe,wordString,tempString,tempVal
 	local wordTable = {}
 
@@ -500,7 +500,10 @@ function GF_FormatBlockListWords(arg1,display)
 		lfe = strbyte(arg1,tempVal+1)
 		if not lfe then break end
 		if lfs >= 194 then
-			if GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
+			if lfs == 226 and GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)] then
+				table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)])
+				tempVal=tempVal+2
+			elseif GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
 				if lfs == strbyte(arg1,tempVal+2) and lfe == strbyte(arg1,tempVal+3) then
 					table.insert(wordTable,GF_WORD_ACCENT_ASCII_FIX[lfs][lfe]) tempVal=tempVal+1 for j=1,250,2 do if lfs ~= strbyte(arg1,tempVal+j) and lfe ~= strbyte(arg1,tempVal+j+1) or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)] or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)][strbyte(arg1,tempVal+j+1)] then tempVal=tempVal+j-1 break end end
 				else
@@ -529,6 +532,8 @@ function GF_FormatBlockListWords(arg1,display)
 			else
 				table.insert(wordTable,strchar(lfs))
 			end
+		elseif GF_WORD_PUNCTUATION_SKIP[lfs] then
+			table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[lfs])
 		elseif lfs == strbyte(arg1,tempVal+2) and lfs == strbyte(arg1,tempVal+4) and lfs ~= 32 and lfs ~= 46 then
 			if lfe == strbyte(arg1,tempVal+3) then
 				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2))) table.insert(wordTable,strchar(strbyte(arg1,tempVal+3))) tempVal=tempVal+3 for j=2,250 do if strbyte(arg1,tempVal+j) ~= strbyte(arg1,tempVal+j-2) then tempVal=tempVal+j-1 break end end
@@ -1466,7 +1471,7 @@ function GF_AddChannelMessage(arg1,arg2,arg8,arg9,delayed) -- Message Handlers
 end
 function GF_AddChatMessage(arg1,arg2,event,delayed)
 	if arg2 ~= "SYSTEM" and GF_SavedVariables.friendsToRemove[arg2] and not delayed then table.insert(GF_LogHistory[GF_RealmName]["Delay"], {"Chat",time()+20,arg1,arg2,event}) return end
-	arg1 = (EventIDAlias[event] or "["..strsub(event,1,1).."] ")..(UnitName("player") == arg2 and "" or GF_Friends[arg2] and GF_LOGGED_FILTERED or GF_Guildies[arg2] and GF_LOGGED_GROUPS or "")..GF_MakeBasicChatString(arg1,arg2,event)
+	arg1 = (EventIDAlias[event] or "["..strsub(event,1,1).."] ")..GF_MakeBasicChatString(arg1,arg2,event)
 	local info = ChatTypeInfo[event]
 	if event == "HARDCORE" and TW_HARDCORE_CHAT1 then
 		for i=1,NUM_CHAT_WINDOWS do
@@ -2930,7 +2935,7 @@ function GF_GetTypes(arg1,showanyway)
 	if showanyway == true then print(arg1) end
 
 	local lfs,lfe,wordString,tempString,tempVal,possibleGold,firstLFMLFG,breakAfter
-	local wordTable,wordTableTrade,wordTableGuild,TradeFixNames = {},{},{},{}
+	local wordTable,wordTableTrade,wordTableGuild,TradeFixNames,languageID = {},{},{},{},{}
 	foundIgnore,foundGuild,foundGuildExclusion,foundLFM,foundLFG,foundTrades,foundTradesExclusion,numGroupWords = 0,0,0,0,0,0,0,0
 	foundClass,foundDungeon,foundRaid,foundPvP,foundHC,foundNotHC,foundBlockList = nil,nil,nil,nil,nil,nil,nil
 	lfmlfgName,groupName,foundQuest,foundDFlags,foundPFlags,foundCFlags,lfmPosition,groupPosition = {},{},{},{},{},{},{},{}
@@ -2938,7 +2943,7 @@ function GF_GetTypes(arg1,showanyway)
 
 	--wordString = string.sub(arg1,1,2) if wordString == "C " then fixedType = 5 arg1 = strsub(arg1,3) elseif wordString == "T " then fixedType = 9 arg1 = strsub(arg1,3) elseif wordString == "G " then fixedType = 8 arg1 = strsub(arg1,3) end
 
-	arg1 = " "..gsub(gsub(strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")),"[\"#\$\%&\*,，\.@\\\^_`~|—“”]"," "),"['´’]","").." "
+	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")).." "
 
 	if strfind(arg1, "%d+p[%p%s]") then foundLFM = 2 if showanyway == true then print("##p lfm 2") end end -- "10p heal" messages from chinese
 	lfs = 1 -- To detect space/lf##m/letter(eg "lf15mbwl" = lfm bwl)
@@ -3006,7 +3011,10 @@ function GF_GetTypes(arg1,showanyway)
 		lfe = strbyte(arg1,tempVal+1)
 		if not lfe then break end
 		if lfs >= 194 then
-			if GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
+			if lfs == 226 and GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)] then
+				table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)])
+				tempVal=tempVal+2
+			elseif GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
 				if lfs == strbyte(arg1,tempVal+2) and lfe == strbyte(arg1,tempVal+3) then
 					table.insert(wordTable,GF_WORD_ACCENT_ASCII_FIX[lfs][lfe]) tempVal=tempVal+1 for j=1,250,2 do if lfs ~= strbyte(arg1,tempVal+j) and lfe ~= strbyte(arg1,tempVal+j+1) or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)] or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)][strbyte(arg1,tempVal+j+1)] then tempVal=tempVal+j-1 break end end
 				else
@@ -3035,6 +3043,8 @@ function GF_GetTypes(arg1,showanyway)
 			else
 				table.insert(wordTable,strchar(lfs))
 			end
+		elseif GF_WORD_PUNCTUATION_SKIP[lfs] then
+			table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[lfs])
 		elseif lfs == strbyte(arg1,tempVal+2) and lfs == strbyte(arg1,tempVal+4) and lfs ~= 32 and lfs ~= 46 then
 			if lfe == strbyte(arg1,tempVal+3) then
 				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2))) table.insert(wordTable,strchar(strbyte(arg1,tempVal+3))) tempVal=tempVal+3 for j=2,250 do if strbyte(arg1,tempVal+j) ~= strbyte(arg1,tempVal+j-2) then tempVal=tempVal+j-1 break end end
@@ -3048,6 +3058,53 @@ function GF_GetTypes(arg1,showanyway)
 	end
 	arg1 = table.concat(wordTable)
 	if strsub(arg1,-1) ~= " " then arg1 = arg1.." " end
+	wordTable = {}
+
+	lfs = 1 _,lfe,wordString = string.find(arg1, "([%s%p%d]+)",lfs) table.insert(wordTable,wordString) lfs = lfe+1 -- Add all words to the wordTable
+	while true do
+		lfs,lfe,wordString,tempString = strfind(arg1, "(.-)([%s%p%d]+)",lfs)
+		if wordString then
+			table.insert(wordTable,wordString)
+			table.insert(wordTable,tempString)
+			if GF_LANGUAGE_DETECT[wordString] then
+				for lang,_ in pairs(GF_LANGUAGE_DETECT[wordString]) do
+					if not languageID[lang] then
+						languageID[lang] = 1
+					else
+						languageID[lang] = languageID[lang] + 1
+					end
+				end
+			end
+			lfs = lfe+1
+		else
+			break
+		end
+	end
+	tempVal = 0 for langID,totalLang in pairs(languageID) do if showanyway == true then print(langID) print(totalLang) end if langID == "en" then totalLang = totalLang * .6 end if totalLang > tempVal then tempVal = totalLang languageName = langID end end -- find language
+	if languageName ~= "en" then
+		tempVal = #wordTable
+		for j=2,6,2 do
+			lfs = 2
+			while lfs+j <= tempVal do
+				wordString = wordTable[lfs]
+				for k=2, j, 2 do wordString = wordString..wordTable[lfs+k] end
+				if GF_LANGUAGE_SINGLE_WORDS[languageName][wordString] then
+					wordTable[lfs] = GF_LANGUAGE_SINGLE_WORDS[languageName][wordString]
+					for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
+				end
+				lfs = lfs + 2
+			end
+		end
+		lfs = 2
+		while lfs <= tempVal do
+			wordString = wordTable[lfs]
+			if GF_LANGUAGE_SINGLE_WORDS[languageName][wordString] then
+				wordTable[lfs] = GF_LANGUAGE_SINGLE_WORDS[languageName][wordString]
+			end
+			lfs = lfs + 2
+		end
+	end
+	arg1 = table.concat(wordTable)
 	wordTable = {}
 
 	lfs = 1 -- To detect "faces"(eg ":d",":p")
@@ -3107,8 +3164,8 @@ function GF_GetTypes(arg1,showanyway)
 		end
 	end
 	lfs = 2 -- To fix single words
-	while true do lfs,lfe,wordString,tempString = strfind(arg1, "(.-)([%s%p%d]+)",lfs) if not wordString then break elseif GF_WORD_FIX_SINGLE_WORD[wordString] then arg1 = strsub(arg1,1,lfs-1)..GF_WORD_FIX_SINGLE_WORD[wordString]..tempString..strsub(arg1,lfe+1) lfs = lfs + strlen(GF_WORD_FIX_SINGLE_WORD[wordString]..tempString)-1 else lfs = lfe+1 end end
-
+	while true do lfs,lfe,wordString,tempString = strfind(arg1, "(.-)([%s%p%d]+)",lfs) if wordString then if GF_WORD_FIX_SINGLE_WORD[wordString] then arg1 = strsub(arg1,1,lfs-1)..GF_WORD_FIX_SINGLE_WORD[wordString]..tempString..strsub(arg1,lfe+1) lfs = lfs + strlen(GF_WORD_FIX_SINGLE_WORD[wordString]..tempString)-1 else lfs = lfe+1 end else break end end
+	
 	lfs = 1 -- To detect space/letter/number/letter/space combinations(eg "g2g " = gtg)
 	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s](%a+%s?%d+%s?%a+)[%p%s]",lfs) if wordString then wordString = gsub(wordString," ","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[wordString]) + 1 else lfs = lfe end else break end end
 	lfs = 1 -- To detect space/word/number+/space combinations(eg "k10" = lowerkarazhan)
@@ -3506,7 +3563,7 @@ function GF_GetTypes(arg1,showanyway)
 				elseif GF_WORD_NOT_HC[wordString] then foundNotHC = true
 				elseif GF_GUILD_WORD_EXCLUSION[wordString] then foundGuildExclusion = foundGuildExclusion + GF_GUILD_WORD_EXCLUSION[wordString] if showanyway == true then print(wordString.." guildex") end end
 				if GF_TRADE_WORD_EXCLUSION[wordString] then foundTradesExclusion = foundTradesExclusion + GF_TRADE_WORD_EXCLUSION[wordString] if showanyway == true then print(wordString.." tradesex") end end
-				if GF_WORD_LFM[wordString] and (not GF_LFM_TRIGGER[wordString] or GF_WORD_LEVEL_ZONE[wordTable[i+j+1]] or GF_GROUP_IDS[wordTable[i+j+1]] or GF_GROUP_IDS[wordTable[i-1]] or GF_WORD_LEVEL_ZONE[wordTable[i-1]]) then
+				if GF_WORD_LFM[wordString] and (not GF_LFM_TRIGGER[wordString] or GF_WORD_LEVEL_ZONE[wordTable[i+j+1]] or GF_GROUP_IDS[wordTable[i+j+1]] or GF_GROUP_IDS[wordTable[i-1]] or GF_WORD_LEVEL_ZONE[wordTable[i-1]] or (wordTable[i+j+2] and GF_WORD_LEVEL_ZONE[wordTable[i+j+1]..wordTable[i+j+2]]) or (wordTable[i+j+2] and GF_GROUP_IDS[wordTable[i+j+1]..wordTable[i+j+2]])) then
 					table.insert(lfmlfgName,wordString)
 					if showanyway == true then print(wordString.." lfm "..GF_WORD_LFM[wordString]) end
 					if GF_WORD_LEVEL_ZONE[wordTable[i+j+1]] then
@@ -5869,7 +5926,7 @@ end
 function GF_GetDungeonsFromText(arg1)
 	if GF_PerCharVariables.searchbuttonstext[GF_BUTTONS_LIST["SearchList"][#GF_BUTTONS_LIST["SearchList"]][4]] then for name,_ in pairs(LFTGroups) do GF_PerCharVariables.searchbuttonstext[GF_GROUP_IDS[name]] = nil end end
 
-	arg1 = " "..gsub(gsub(strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")),"[\"#\$\%&\*,\.@\\\^_`~|—“”]"," "),"['´’]","").." "
+	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")).." "
 	local lfs,lfe,wordString,tempString,tempVal
 	local wordTable = {}
 	foundDFlags,LFTGroups = {},{}
@@ -5887,7 +5944,10 @@ function GF_GetDungeonsFromText(arg1)
 		lfe = strbyte(arg1,tempVal+1)
 		if not lfe then break end
 		if lfs >= 194 then
-			if GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
+			if lfs == 226 and GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)] then
+				table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)])
+				tempVal=tempVal+2
+			elseif GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
 				if lfs == strbyte(arg1,tempVal+2) and lfe == strbyte(arg1,tempVal+3) then
 					table.insert(wordTable,GF_WORD_ACCENT_ASCII_FIX[lfs][lfe]) tempVal=tempVal+1 for j=1,250,2 do if lfs ~= strbyte(arg1,tempVal+j) and lfe ~= strbyte(arg1,tempVal+j+1) or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)] or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)][strbyte(arg1,tempVal+j+1)] then tempVal=tempVal+j-1 break end end
 				else
@@ -5916,6 +5976,8 @@ function GF_GetDungeonsFromText(arg1)
 			else
 				table.insert(wordTable,strchar(lfs))
 			end
+		elseif GF_WORD_PUNCTUATION_SKIP[lfs] then
+			table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[lfs])
 		elseif lfs == strbyte(arg1,tempVal+2) and lfs == strbyte(arg1,tempVal+4) and lfs ~= 32 and lfs ~= 46 then
 			if lfe == strbyte(arg1,tempVal+3) then
 				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2))) table.insert(wordTable,strchar(strbyte(arg1,tempVal+3))) tempVal=tempVal+3 for j=2,250 do if strbyte(arg1,tempVal+j) ~= strbyte(arg1,tempVal+j-2) then tempVal=tempVal+j-1 break end end
@@ -6278,7 +6340,7 @@ end
 function GetModifiedQuestName(arg1)
 	local wordTable = {}
 	local lfs,lfe,wordString,tempString,tempVal
-	arg1 = " "..strlower(gsub(gsub(arg1,"[\"#\$\%&\*,\.@\\\^_`~|—“”]"," "),"['´’]","")).." "
+	arg1 = " "..arg1.." "
 
 	lfs = 1 -- To detect space/lf##m/letter(eg "lf15mbwl" = lfm bwl)
 	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s]([lk][fv]?%s?%d+m)[%p%s]",lfs) if wordString then arg1 = strsub(arg1,1,lfs)..GF_LFM_LOCALIZED.." "..strsub(arg1,lfs+strlen(wordString)+1) lfs = lfs + 4 else break end end
@@ -6293,7 +6355,10 @@ function GetModifiedQuestName(arg1)
 		lfe = strbyte(arg1,tempVal+1)
 		if not lfe then break end
 		if lfs >= 194 then
-			if GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
+			if lfs == 226 and GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)] then
+				table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)])
+				tempVal=tempVal+2
+			elseif GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
 				if lfs == strbyte(arg1,tempVal+2) and lfe == strbyte(arg1,tempVal+3) then
 					table.insert(wordTable,GF_WORD_ACCENT_ASCII_FIX[lfs][lfe]) tempVal=tempVal+1 for j=1,250,2 do if lfs ~= strbyte(arg1,tempVal+j) and lfe ~= strbyte(arg1,tempVal+j+1) or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)] or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)][strbyte(arg1,tempVal+j+1)] then tempVal=tempVal+j-1 break end end
 				else
@@ -6322,6 +6387,8 @@ function GetModifiedQuestName(arg1)
 			else
 				table.insert(wordTable,strchar(lfs))
 			end
+		elseif GF_WORD_PUNCTUATION_SKIP[lfs] then
+			table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[lfs])
 		elseif lfs == strbyte(arg1,tempVal+2) and lfs == strbyte(arg1,tempVal+4) and lfs ~= 32 and lfs ~= 46 then
 			if lfe == strbyte(arg1,tempVal+3) then
 				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2))) table.insert(wordTable,strchar(strbyte(arg1,tempVal+3))) tempVal=tempVal+3 for j=2,250 do if strbyte(arg1,tempVal+j) ~= strbyte(arg1,tempVal+j-2) then tempVal=tempVal+j-1 break end end
