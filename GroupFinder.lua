@@ -483,349 +483,7 @@ function GF_SetStringSize()
 	GF_UIScaleSliderLabel:SetText("")
 end
 function GF_FormatBlockListWords(arg1,display)
-	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")).." "
-	local lfs,lfe,wordString,tempString,tempVal
-	local wordTable = {}
-
-	lfs = 1 -- To detect space/lf##m/letter(eg "lf15mbwl" = lfm bwl)
-	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s]([lk][fv]?%s?%d+m)[%p%s]",lfs) if wordString then arg1 = strsub(arg1,1,lfs)..GF_LFM_LOCALIZED.." "..strsub(arg1,lfs+strlen(wordString)+1) lfs = lfs + 4 else break end end
-	lfs = 1 -- To detect space/number+/punctuation/number+/space for groups(eg "4v5" or "4/5" = group, "4=5" triggers foundLFM)
-	while true do lfs,lfe,tempString,wordString = strfind(arg1,"[%p%s](%d%d?%s?([=/v:%-to]+)%s?%d%d?)[%p%s]",lfs) if wordString then tempString = gsub(tempString," ","") if wordString == "-" then if strlen(tempString) == 5 and strsub(tempString,-1) == "9" and GF_WORD_SPECIAL_COMBINATION[tempString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[tempString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[tempString]) + 1 else lfs = lfe end elseif wordString == ":" then if strlen(tempString) == 5 and strsub(tempString,-1) == "0" then _,_,tempString = strfind(arg1,"^(%a+)",lfe+1) if GF_WORD_FIX_TIME[tempString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_FIX_TIME[tempString]..strsub(arg1,lfs+strlen(GF_WORD_FIX_TIME[tempString])+1) lfs = lfs + strlen(GF_WORD_FIX_TIME[tempString]) + 1 else lfs = lfe end else lfs = lfe end elseif GF_WORD_SPECIAL_COMBINATION[tempString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[tempString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[tempString]) + 1 elseif wordString == "v" then arg1 = strsub(arg1,1,lfs)..GF_GROUP_OPEN_LOCALIZED..strsub(arg1,lfe) lfs = lfs + strlen(GF_GROUP_OPEN_LOCALIZED) + 1 else lfs = lfe end else break end end
-	lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%d?%d?%s?\-?([-\+±]))\-?%s?%d?%d?[%p%s]")
-	if wordString then if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfs+strlen(wordString)) end end
-
-	tempVal = 1
-	while true do -- Block letter repeats
-		lfs = strbyte(arg1,tempVal)
-		lfe = strbyte(arg1,tempVal+1)
-		if not lfe then break end
-		if lfs >= 194 then
-			if lfs == 226 and GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)] then
-				table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)])
-				tempVal=tempVal+2
-			elseif GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
-				if lfs == strbyte(arg1,tempVal+2) and lfe == strbyte(arg1,tempVal+3) then
-					table.insert(wordTable,GF_WORD_ACCENT_ASCII_FIX[lfs][lfe]) tempVal=tempVal+1 for j=1,250,2 do if lfs ~= strbyte(arg1,tempVal+j) and lfe ~= strbyte(arg1,tempVal+j+1) or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)] or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)][strbyte(arg1,tempVal+j+1)] then tempVal=tempVal+j-1 break end end
-				else
-					table.insert(wordTable,GF_WORD_ACCENT_ASCII_FIX[lfs][lfe])
-					tempVal = tempVal + 1
-				end
-			elseif GF_WORD_ASIAN_LANGUAGES[lfs] then -- Chinese characters are always 227-239 first byte, and then two more bytes that are 128-190ish
-				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2)))
-				tempVal=tempVal+2
-			else
-				table.insert(wordTable,strchar(lfs))
-			end
-		elseif lfs == lfe then
-			if GF_WORD_ALLOW_TWO_CHARACTERS[lfs] then
-				if lfs == strbyte(arg1,tempVal+2) then
-					table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) if lfs == 105 then table.insert(wordTable,"i") end tempVal=tempVal+2 for j=1,250 do if lfs ~= strbyte(arg1,tempVal+j) then tempVal=tempVal+j-1 break end end
-				else
-					table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) tempVal=tempVal+1
-				end
-			else
-				table.insert(wordTable,strchar(lfs)) tempVal=tempVal+1 for j=1,250 do if lfs ~= strbyte(arg1,tempVal+j) then tempVal=tempVal+j-1 break end end
-			end
-		elseif GF_WORD_PUNCTUATION_FIX[lfe] then -- Space or Period
-			if GF_WORD_PUNCTUATION_FIX[strbyte(arg1,tempVal-1)] and GF_WORD_PUNCTUATION_FIX[strbyte(arg1,tempVal+3)] and not GF_WORD_PUNCTUATION_FIX[strbyte(arg1,tempVal+2)] then
-				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2))) tempVal=tempVal+2 for j=3,250,2 do if not GF_WORD_PUNCTUATION_FIX[strbyte(arg1,tempVal+j)] then tempVal=tempVal+j-3 break else table.insert(wordTable,strchar(strbyte(arg1,tempVal+j-1))) end end
-			else
-				table.insert(wordTable,strchar(lfs))
-			end
-		elseif GF_WORD_PUNCTUATION_SKIP[lfs] then
-			table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[lfs])
-		elseif lfs == strbyte(arg1,tempVal+2) and lfs == strbyte(arg1,tempVal+4) and lfs ~= 32 and lfs ~= 46 then
-			if lfe == strbyte(arg1,tempVal+3) then
-				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2))) table.insert(wordTable,strchar(strbyte(arg1,tempVal+3))) tempVal=tempVal+3 for j=2,250 do if strbyte(arg1,tempVal+j) ~= strbyte(arg1,tempVal+j-2) then tempVal=tempVal+j-1 break end end
-			else
-				table.insert(wordTable,strchar(lfs))
-			end
-		else
-			table.insert(wordTable,strchar(lfs))
-		end
-		tempVal = tempVal + 1
-	end
-	arg1 = table.concat(wordTable)
-	if strsub(arg1,-1) ~= " " then arg1 = arg1.." " end
-	wordTable = {}
-
-	lfs = 1 -- To detect "faces"(eg ":d",":p")
-	while true do lfs,lfe,wordString = strfind(arg1, " (%p%w+)[%[%%%s]",lfs) if wordString then if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[wordString]) + 1 else lfs = lfe end else break end end
-	lfs = 2 -- To detect word/word with no space(eg "lfgscholo" = lfg scholo)
-	while true do
-		lfs,lfe,wordString = strfind(arg1,"(%a%a%a%a+)",lfs)
-		if wordString then
-			if not GF_WORD_REP_RIGHT[wordString] then
-				tempVal = strlen(wordString) - 1
-				if tempVal > 11 then tempVal = 11 end
-				for i=tempVal, 3, -1 do
-					if GF_WORD_REP_LEFT[strsub(wordString,1,i)] then
-						if tempVal-i > 2 and GF_WORD_REP_RIGHT[strsub(wordString,1,i+3)] then
-							arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,i+3).." "..strsub(arg1,lfs+i+3)
-						elseif tempVal-i > 1 and GF_WORD_REP_RIGHT[strsub(wordString,1,i+2)] then
-							arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,i+2).." "..strsub(arg1,lfs+i+2)
-						elseif tempVal-i > 0 and GF_WORD_REP_RIGHT[strsub(wordString,1,i+1)] then
-							arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,i+1).." "..strsub(arg1,lfs+i+1)
-						else
-							arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,i).." "..strsub(arg1,lfs+i)
-						end
-						lfs = lfe + 1
-						break
-					elseif GF_WORD_REP_RIGHT[strsub(wordString,-i)] then -- Right
-						arg1 = strsub(arg1,1,lfe-i).." "..strsub(wordString,-i)..strsub(arg1,lfe+1)
-						lfe = lfs
-						break
-					end
-				end
-				if lfs < lfe then
-					if GF_WORD_REP_LEFT[strsub(wordString,1,2)] then
-						arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,2).." "..strsub(arg1,lfs+2)
-						lfs = lfs + strlen(wordString) + 1
-					elseif GF_WORD_REP_RIGHT[strsub(wordString,-2)] then
-						wordString = strsub(wordString,1,-3)
-						if GF_WORD_FIX_SINGLE_WORD[wordString] then wordString = GF_WORD_FIX_SINGLE_WORD[wordString]
-						elseif GF_WORD_FIX_BEFORE_QUEST[wordString] then wordString = GF_WORD_FIX_BEFORE_QUEST[wordString] end
-						if GF_WORD_QUEST[wordString] then
-							arg1 = strsub(arg1,1,lfs-1)..wordString.." lf"..strsub(arg1,lfe+1)
-						else
-							if GF_WORD_FIX[wordString] then wordString = GF_WORD_FIX[wordString] end
-							if GF_WORD_DUNGEON[wordString] or GF_WORD_RAID[wordString] or GF_WORD_PVP[wordString] or GF_WORD_GROUP_BYPASS[wordString] then
-								arg1 = strsub(arg1,1,lfs-1)..wordString.." lf"..strsub(arg1,lfe+1)
-							end
-						end
-						lfs = lfs + strlen(wordString) + 3
-					else
-						lfs = lfe + 1
-					end
-				end
-			else
-				lfs = lfe + 1
-			end
-		else
-			break
-		end
-	end
-	lfs = 2 -- To fix single words
-	while true do lfs,lfe,wordString,tempString = strfind(arg1, "(.-)([%s%p%d]+)",lfs) if not wordString then break elseif GF_WORD_FIX_SINGLE_WORD[wordString] then arg1 = strsub(arg1,1,lfs-1)..GF_WORD_FIX_SINGLE_WORD[wordString]..tempString..strsub(arg1,lfe+1) lfs = lfs + strlen(GF_WORD_FIX_SINGLE_WORD[wordString]..tempString)-1 else lfs = lfe+1 end end
-
-	lfs = 1 -- To detect space/letter/number/letter/space combinations(eg "g2g " = gtg)
-	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s](%a+%s?%d+%s?%a+)[%p%s]",lfs) if wordString then wordString = gsub(wordString," ","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[wordString]) + 1 else lfs = lfe end else break end end
-	lfs = 1 -- To detect space/word/number+/space combinations(eg "k10" = lowerkarazhan)
-	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s](%a+%s?[:%-]?%s?%d+)s?[%p%s]",lfs) if wordString then wordString = gsub(wordString,"[%s:%-]","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) end lfs = lfs + strlen(wordString) + 1 else break end end
-	lfs = 1 -- To detect words with explanation points "!" (eg "hungry!","lost!")... To help identify quests with short names.
-	while true do lfs,lfe,wordString,tempString = strfind(arg1, "[%p%s](%a+%s?([!%+]))[ %]]",lfs) if wordString then wordString = gsub(wordString," ","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) elseif tempString == "+" and GF_GROUP_IDS[strsub(wordString,1,strlen(wordString)-1)] then arg1 = strsub(arg1,1,lfs)..wordString.." "..GF_PLUS_LOCALIZED..strsub(arg1,lfe) end lfs = lfs + strlen(wordString) + 1 else break end end
-	lfs = 1 -- To detect space/number+/word/space combinations(eg "10th" = tenth, "5g" = 5gold)
-	while true do
-		lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%d+%s?(%a+))[%p%s%d]",lfs)
-		if wordString then
-			wordString = gsub(wordString," ","")
-			if GF_WORD_FIX[tempString] then wordString = strsub(wordString,1,strlen(wordString) - strlen(tempString))..GF_WORD_FIX[tempString] end
-			if GF_WORD_SPECIAL_COMBINATION[wordString] then
-				arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe)
-				lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[wordString])
-			elseif GF_WORD_GOLD[tempString] then
-				arg1 = strsub(arg1,1,lfs)..GF_WORD_GOLD[tempString]..strsub(arg1,lfe)
-				lfs = lfs + strlen(GF_WORD_GOLD[tempString])
-			else
-				lfs = lfe
-			end
-		else
-			break
-		end
-	end
-	lfs = 2 -- To detect words between and next to "[] or ()" (eg "(human only)", "[item] for free").
-	while true do lfs,lfe,wordString = strfind(arg1, "[<%(%[](.-)[%)%]>]",lfs)
-		if wordString then
-			if GF_WORD_FIX[wordString] then wordString = GF_WORD_FIX[wordString] end if GF_GUILD_BRACKET[gsub(wordString," ","")] then foundGuild = foundGuild + GF_GUILD_BRACKET[gsub(wordString," ","")] end
-			if strbyte(arg1,lfs) == 91 and strbyte(arg1,lfe) == 93 then -- "[]"
-				if strbyte(arg1,lfs-1) == 90 then -- From Link
-					if strlen(wordString) < 45 and strsub(arg1,lfs-8,lfs) ~= "hquest Z[" then
-						tempString = ""
-						for word in gfind(wordString, "(%a+)") do if word == "thunderfury" or GF_WORD_FIX_ITEM_NAME[word] == "enchant" then break elseif GF_WORD_FIX_ITEM_NAME[word] then tempString = word end end
-						if tempString ~= "" then arg1 = strsub(arg1,1,lfs)..GF_WORD_FIX_ITEM_NAME[tempString]..strsub(arg1,lfe) end
-					end
-				end
-			end
-			lfs = lfs + 1
-		else
-			break
-		end
-	end
-	lfs = 1 -- To detect word/letter/number combinations(eg "BMx2" = bm x2)
-	while true do lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%a+)(%a%d+)[%p%s]",lfs) if wordString then if GF_WORD_LETTER_NUMBER_BEFORE_AFTER[tempString] and (GF_GROUP_IDS[wordString] or GF_LFMLFG_PREFIX_GUILD[wordString]) then arg1 = strsub(arg1,1,lfs)..wordString.." "..GF_WORD_LETTER_NUMBER_BEFORE_AFTER[tempString].." "..strsub(arg1,lfe) lfs = lfs + strlen(wordString..GF_WORD_LETTER_NUMBER_BEFORE_AFTER[tempString]) + 2 else lfs = lfe end else break end end
-	lfs = 1 -- To detect word/letter/number combinations(eg "2xBM" = bm x2)
-	while true do lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%d+%a)(%a+)[%p%s]",lfs) if wordString then if GF_WORD_LETTER_NUMBER_BEFORE_AFTER[wordString] and (GF_GROUP_IDS[tempString] or GF_WORD_ROLES[tempString]) then arg1 = strsub(arg1,1,lfs)..GF_WORD_LETTER_NUMBER_BEFORE_AFTER[wordString].." "..tempString.." "..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_LETTER_NUMBER_BEFORE_AFTER[wordString]..tempString) + 2 else lfs = lfe end else break end end
-
-	lfs = 1 _,lfe,wordString = string.find(arg1, "([%s%p%d]+)",lfs) lfs = lfe+1 -- Add all words to the wordTable
-	while true do
-		lfs,lfe,wordString = strfind(arg1, "(.-)[%s%p%d]+",lfs)
-		if wordString then
-			if not GF_WORD_BYPASS_TRIGGER[wordString] then
-				table.insert(wordTable, wordString)
-				lfs = lfe+1
-			else
-				if GF_WORD_GROUP_BYPASS[wordString] then
-					if GF_WORD_GROUP_BYPASS[wordTable[#wordTable]] then wordTable[#wordTable] = GF_WORD_GROUP_BYPASS[wordTable[#wordTable]] end
-					wordString = GF_WORD_GROUP_BYPASS[wordString]
-					_,tempVal,tempString = strfind(arg1,"(.-)[%s%p%d]+",lfe+1)
-					if tempString then
-						if GF_WORD_GROUP_BYPASS[tempString] then
-							tempString = GF_WORD_GROUP_BYPASS[tempString]
-							table.insert(wordTable, wordString) table.insert(wordTable, tempString)
-							lfs = tempVal+1
-							while true do
-								_,tempVal,wordString = strfind(arg1,"(.-)[%s%p%d]+",lfs)
-								if wordString then
-									if GF_WORD_GROUP_BYPASS[wordString] then
-										table.insert(wordTable, GF_WORD_GROUP_BYPASS[wordString])
-										lfs = tempVal+1
-									elseif GF_WORD_GROUP_BYPASS_SECOND[tempString..wordString] then
-										lfs = tempVal+1
-										_,tempVal,wordString = strfind(arg1,"(.-)[%s%p%d]+",lfs)
-										if GF_WORD_GROUP_BYPASS[wordString] then table.insert(wordTable, GF_WORD_GROUP_BYPASS[wordString]) lfs = tempVal+1 end
-									else
-										break
-									end
-								else
-									break
-								end
-							end
-						elseif GF_WORD_GROUP_BYPASS_SECOND[wordString..tempString] then
-							_,tempVal,tempString = strfind(arg1,"(.-)[%s%p%d]+",tempVal+1)
-							if GF_WORD_GROUP_BYPASS[tempString] then
-								tempString = GF_WORD_GROUP_BYPASS[tempString]
-								table.insert(wordTable, wordString) table.insert(wordTable, tempString)
-								lfs = tempVal+1
-							else
-								table.insert(wordTable, wordString)
-								lfs = lfe+1
-							end
-						else
-							table.insert(wordTable, wordString)
-							lfs = lfe+1
-						end
-					else
-						table.insert(wordTable, wordString)
-						break
-					end
-				else
-					_,tempVal,tempString = strfind(arg1,"(.-)[%s%p%d]+",lfe+1)
-					if GF_WORD_QUEST_BYPASS[tempString] then
-						table.insert(wordTable, wordString) table.insert(wordTable, tempString)
-						lfs = tempVal+1
-					else
-						lfs = lfe+1
-					end
-				end
-			end
-		else
-			break
-		end
-	end
-	tempVal = #wordTable
-	lfs = 1
-	while lfs <= tempVal do
-		wordString = wordTable[lfs]
-		if GF_WORD_FIX_BEFORE_QUEST[wordString] then
-			wordTable[lfs] = GF_WORD_FIX_BEFORE_QUEST[wordString]
-		end
-		if GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString] then
-			wordTable[lfs] = GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][1]
-			table.insert(wordTable,lfs+1,GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][2])
-			tempVal=tempVal+1
-			lfs = lfs + 1
-		elseif GF_WORD_FIX_QUEST_DUNGEON[wordString] then
-			wordTable[lfs] = GF_WORD_FIX_QUEST_DUNGEON[wordString]
-		end
-		lfs = lfs + 1
-	end
-	for j=1,3 do
-		lfs = 1
-		while lfs+j <= tempVal do
-			wordString = wordTable[lfs]
-			for k=1, j do wordString = wordString..wordTable[lfs+k] end
-			if GF_WORD_FIX_BEFORE_QUEST[wordString] then
-				wordTable[lfs] = GF_WORD_FIX_BEFORE_QUEST[wordString]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				if wordString ~= GF_WORD_FIX_BEFORE_QUEST[wordString] then
-					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
-				elseif lfs > 1 then
-					tempString = wordTable[lfs-1]
-					for k=1, j do if wordTable[lfs-1+k] then tempString = tempString..wordTable[lfs-1+k] end end
-					if GF_WORD_FIX_BEFORE_QUEST[tempString] then
-						wordTable[lfs-1] = GF_WORD_FIX_BEFORE_QUEST[tempString]
-						for k=1, j do if wordTable[lfs] then table.remove(wordTable,lfs) tempVal=tempVal-1 end end
-					end
-				end
-			elseif GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString] then
-				wordTable[lfs] = GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][1]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				table.insert(wordTable,lfs+1,GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][2]) tempVal=tempVal+1
-				if wordString ~= GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][1]..GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][2] then
-					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
-				elseif lfs > 1 then
-					tempString = wordTable[lfs-1]
-					for k=1, j do if wordTable[lfs-1+k] then tempString = tempString..wordTable[lfs-1+k] end end
-					if GF_WORD_FIX_BEFORE_QUEST_SECOND[tempString] then
-						wordTable[lfs-1] = GF_WORD_FIX_BEFORE_QUEST_SECOND[tempString][1]
-						for k=1, j do if wordTable[lfs] then table.remove(wordTable,lfs) tempVal=tempVal-1 end end
-						table.insert(wordTable,lfs,GF_WORD_FIX_BEFORE_QUEST_SECOND[tempString][2]) tempVal=tempVal+1
-					end
-				end
-			elseif GF_WORD_FIX_QUEST_DUNGEON[wordString] then
-				wordTable[lfs] = GF_WORD_FIX_QUEST_DUNGEON[wordString]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				if wordString ~= GF_WORD_FIX_QUEST_DUNGEON[wordString] then
-					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
-				elseif lfs > 1 then
-					tempString = wordTable[lfs-1]
-					for k=1, j do if wordTable[lfs-1+k] then tempString = tempString..wordTable[lfs-1+k] end end
-					if GF_WORD_FIX_QUEST_DUNGEON[tempString] then
-						wordTable[lfs-1] = GF_WORD_FIX_QUEST_DUNGEON[tempString]
-						for k=1, j do if wordTable[lfs] then table.remove(wordTable,lfs) tempVal=tempVal-1 end end
-					end
-				end
-			end
-			lfs = lfs + 1
-		end
-	end
-	for i=1,tempVal do if wordTable[i] == "x" then table.remove(wordTable,i) i = i - 1 tempVal=tempVal-1 end end
-	lfs = 1
-	while lfs <= tempVal do
-		if wordTable[lfs] then
-			wordString = wordTable[lfs]
-			if GF_WORD_FIX[wordString] then
-				wordString = GF_WORD_FIX[wordString] wordTable[lfs] = wordString
-			elseif GF_WORD_FIX_SECOND[wordString] then
-				wordString = GF_WORD_FIX_SECOND[wordString][1] wordTable[lfs] = wordString
-				table.insert(wordTable,lfs+1,GF_WORD_FIX_SECOND[wordString][2])
-				tempVal=tempVal+1
-			end
-		end
-		lfs = lfs + 1
-	end
-	for j=1,3 do -- Fix Words
-		lfs = 1
-		while lfs+j <= tempVal do
-			wordString = wordTable[lfs]
-			for k=1, j do wordString = wordString..wordTable[lfs+k] end
-			if GF_WORD_FIX[wordString] then
-				wordTable[lfs] = GF_WORD_FIX[wordString]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				if wordString ~= GF_WORD_FIX[wordString] then if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end end
-			elseif GF_WORD_FIX_SECOND[wordString] then
-				wordTable[lfs] = GF_WORD_FIX_SECOND[wordString][1]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				table.insert(wordTable,lfs+1,GF_WORD_FIX_SECOND[wordString][2]) tempVal=tempVal+1
-				if wordString ~= GF_WORD_FIX_SECOND[wordString][1]..GF_WORD_FIX_SECOND[wordString][2] then
-					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
-				end
-			end
-			lfs = lfs + 1
-		end
-	end
-	wordString = ""
-	for i=1,tempVal do wordString = wordString..wordTable[i] end
+	local wordString = table.concat(GetModifiedWordList(arg1))
 	if display then DEFAULT_CHAT_FRAME:AddMessage(format(GF_ADDING_TO_BLOCK_LIST,wordString),1,1,0.5) end
 	return wordString
 end
@@ -3080,7 +2738,7 @@ function GF_GetTypes(arg1,showanyway)
 			break
 		end
 	end
-	tempVal = 0 for langID,totalLang in pairs(languageID) do if showanyway == true then print(langID) print(totalLang) end if langID == "en" then totalLang = totalLang * .6 end if totalLang > tempVal then tempVal = totalLang languageName = langID end end -- find language
+	tempVal = 0 for langID,totalLang in pairs(languageID) do if showanyway == true then print(langID) print(totalLang) end if langID == "en" then totalLang = totalLang * .79 end if totalLang > tempVal then tempVal = totalLang languageName = langID end end -- find language
 	if languageName ~= "en" then
 		tempVal = #wordTable
 		for j=2,6,2 do
@@ -3225,7 +2883,7 @@ function GF_GetTypes(arg1,showanyway)
 					end
 					if strlen(wordString) < 45 and strsub(arg1,lfs-8,lfs) ~= "hquest Z[" then
 						tempString = ""
-						for word in gfind(wordString, "(%a+)") do if word == "thunderfury" or GF_WORD_FIX_ITEM_NAME[word] == "enchant" then break elseif GF_WORD_FIX_ITEM_NAME[word] then tempString = word end end
+						for word in gfind(wordString, "(%a+)") do if word == GF_THUNDERFURY_LOCALIZED or GF_WORD_FIX_ITEM_NAME[word] == GF_ENCHANT_LOCALIZED then break elseif GF_WORD_FIX_ITEM_NAME[word] then tempString = word end end
 						if tempString ~= "" then arg1 = strsub(arg1,1,lfs)..GF_WORD_FIX_ITEM_NAME[tempString]..strsub(arg1,lfe) end
 					end
 				end
@@ -3381,7 +3039,6 @@ function GF_GetTypes(arg1,showanyway)
 			lfs = lfs + 1
 		end
 	end
-	for i=1,tempVal do if wordTable[i] == "x" then table.remove(wordTable,i) i = i - 1 tempVal=tempVal-1 end end
 	if tempVal <= 9 then
 		if wordTable[2] then
 			wordString = "" for i=2,tempVal-1 do wordString = wordString..wordTable[i] end
@@ -5925,349 +5582,12 @@ function GF_UpdateQueueLFTButton() -- Updates(gets dungeon list) on login and wh
 end
 function GF_GetDungeonsFromText(arg1)
 	if GF_PerCharVariables.searchbuttonstext[GF_BUTTONS_LIST["SearchList"][#GF_BUTTONS_LIST["SearchList"]][4]] then for name,_ in pairs(LFTGroups) do GF_PerCharVariables.searchbuttonstext[GF_GROUP_IDS[name]] = nil end end
-
-	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")).." "
-	local lfs,lfe,wordString,tempString,tempVal
-	local wordTable = {}
 	foundDFlags,LFTGroups = {},{}
 
-	lfs = 1 -- To detect space/lf##m/letter(eg "lf15mbwl" = lfm bwl)
-	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s]([lk][fv]?%s?%d+m)[%p%s]",lfs) if wordString then arg1 = strsub(arg1,1,lfs)..GF_LFM_LOCALIZED.." "..strsub(arg1,lfs+strlen(wordString)+1) lfs = lfs + 4 else break end end
-	lfs = 1 -- To detect space/number+/punctuation/number+/space for groups(eg "4v5" or "4/5" = group, "4=5" triggers foundLFM)
-	while true do lfs,lfe,tempString,wordString = strfind(arg1,"[%p%s](%d%d?%s?([=/v:%-to]+)%s?%d%d?)[%p%s]",lfs) if wordString then tempString = gsub(tempString," ","") if wordString == "-" then if strlen(tempString) == 5 and strsub(tempString,-1) == "9" and GF_WORD_SPECIAL_COMBINATION[tempString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[tempString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[tempString]) + 1 else lfs = lfe end elseif wordString == ":" then if strlen(tempString) == 5 and strsub(tempString,-1) == "0" then _,_,tempString = strfind(arg1,"^(%a+)",lfe+1) if GF_WORD_FIX_TIME[tempString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_FIX_TIME[tempString]..strsub(arg1,lfs+strlen(GF_WORD_FIX_TIME[tempString])+1) lfs = lfs + strlen(GF_WORD_FIX_TIME[tempString]) + 1 else lfs = lfe end else lfs = lfe end elseif GF_WORD_SPECIAL_COMBINATION[tempString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[tempString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[tempString]) + 1 elseif wordString == "v" then arg1 = strsub(arg1,1,lfs)..GF_GROUP_OPEN_LOCALIZED..strsub(arg1,lfe) lfs = lfs + strlen(GF_GROUP_OPEN_LOCALIZED) + 1 else lfs = lfe end else break end end
-	lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%d?%d?%s?\-?([-\+±]))\-?%s?%d?%d?[%p%s]")
-	if wordString then if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfs+strlen(wordString)) end end
+	local wordString
+	local wordTable = GetModifiedWordList(arg1)
+	local tempVal = #wordTable
 
-	tempVal = 1
-	while true do -- Block letter repeats
-		lfs = strbyte(arg1,tempVal)
-		lfe = strbyte(arg1,tempVal+1)
-		if not lfe then break end
-		if lfs >= 194 then
-			if lfs == 226 and GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)] then
-				table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[226][strbyte(arg1,tempVal+2)])
-				tempVal=tempVal+2
-			elseif GF_WORD_ACCENT_ASCII_FIX[lfs] and GF_WORD_ACCENT_ASCII_FIX[lfs][lfe] then
-				if lfs == strbyte(arg1,tempVal+2) and lfe == strbyte(arg1,tempVal+3) then
-					table.insert(wordTable,GF_WORD_ACCENT_ASCII_FIX[lfs][lfe]) tempVal=tempVal+1 for j=1,250,2 do if lfs ~= strbyte(arg1,tempVal+j) and lfe ~= strbyte(arg1,tempVal+j+1) or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)] or not GF_WORD_ACCENT_ASCII_FIX[strbyte(arg1,tempVal+j)][strbyte(arg1,tempVal+j+1)] then tempVal=tempVal+j-1 break end end
-				else
-					table.insert(wordTable,GF_WORD_ACCENT_ASCII_FIX[lfs][lfe])
-					tempVal = tempVal + 1
-				end
-			elseif GF_WORD_ASIAN_LANGUAGES[lfs] then -- Chinese characters are always 227-239 first byte, and then two more bytes that are 128-190ish
-				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2)))
-				tempVal=tempVal+2
-			else
-				table.insert(wordTable,strchar(lfs))
-			end
-		elseif lfs == lfe then
-			if GF_WORD_ALLOW_TWO_CHARACTERS[lfs] then
-				if lfs == strbyte(arg1,tempVal+2) then
-					table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) if lfs == 105 then table.insert(wordTable,"i") end tempVal=tempVal+2 for j=1,250 do if lfs ~= strbyte(arg1,tempVal+j) then tempVal=tempVal+j-1 break end end
-				else
-					table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) tempVal=tempVal+1
-				end
-			else
-				table.insert(wordTable,strchar(lfs)) tempVal=tempVal+1 for j=1,250 do if lfs ~= strbyte(arg1,tempVal+j) then tempVal=tempVal+j-1 break end end
-			end
-		elseif GF_WORD_PUNCTUATION_FIX[lfe] then -- Space or Period
-			if GF_WORD_PUNCTUATION_FIX[strbyte(arg1,tempVal-1)] and GF_WORD_PUNCTUATION_FIX[strbyte(arg1,tempVal+3)] and not GF_WORD_PUNCTUATION_FIX[strbyte(arg1,tempVal+2)] then
-				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2))) tempVal=tempVal+2 for j=3,250,2 do if not GF_WORD_PUNCTUATION_FIX[strbyte(arg1,tempVal+j)] then tempVal=tempVal+j-3 break else table.insert(wordTable,strchar(strbyte(arg1,tempVal+j-1))) end end
-			else
-				table.insert(wordTable,strchar(lfs))
-			end
-		elseif GF_WORD_PUNCTUATION_SKIP[lfs] then
-			table.insert(wordTable,GF_WORD_PUNCTUATION_SKIP[lfs])
-		elseif lfs == strbyte(arg1,tempVal+2) and lfs == strbyte(arg1,tempVal+4) and lfs ~= 32 and lfs ~= 46 then
-			if lfe == strbyte(arg1,tempVal+3) then
-				table.insert(wordTable,strchar(lfs)) table.insert(wordTable,strchar(lfe)) table.insert(wordTable,strchar(strbyte(arg1,tempVal+2))) table.insert(wordTable,strchar(strbyte(arg1,tempVal+3))) tempVal=tempVal+3 for j=2,250 do if strbyte(arg1,tempVal+j) ~= strbyte(arg1,tempVal+j-2) then tempVal=tempVal+j-1 break end end
-			else
-				table.insert(wordTable,strchar(lfs))
-			end
-		else
-			table.insert(wordTable,strchar(lfs))
-		end
-		tempVal = tempVal + 1
-	end
-	arg1 = table.concat(wordTable)
-	if strsub(arg1,-1) ~= " " then arg1 = arg1.." " end
-	wordTable = {}
-
-	lfs = 1 -- To detect "faces"(eg ":d",":p")
-	while true do lfs,lfe,wordString = strfind(arg1, " (%p%w+)[%[%%%s]",lfs) if wordString then if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[wordString]) + 1 else lfs = lfe end else break end end
-	lfs = 2 -- To detect word/word with no space(eg "lfgscholo" = lfg scholo)
-	while true do
-		lfs,lfe,wordString = strfind(arg1,"(%a%a%a%a+)",lfs)
-		if wordString then
-			if not GF_WORD_REP_RIGHT[wordString] then
-				tempVal = strlen(wordString) - 1
-				if tempVal > 11 then tempVal = 11 end
-				for i=tempVal, 3, -1 do
-					if GF_WORD_REP_LEFT[strsub(wordString,1,i)] then
-						if tempVal-i > 2 and GF_WORD_REP_RIGHT[strsub(wordString,1,i+3)] then
-							arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,i+3).." "..strsub(arg1,lfs+i+3)
-						elseif tempVal-i > 1 and GF_WORD_REP_RIGHT[strsub(wordString,1,i+2)] then
-							arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,i+2).." "..strsub(arg1,lfs+i+2)
-						elseif tempVal-i > 0 and GF_WORD_REP_RIGHT[strsub(wordString,1,i+1)] then
-							arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,i+1).." "..strsub(arg1,lfs+i+1)
-						else
-							arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,i).." "..strsub(arg1,lfs+i)
-						end
-						lfs = lfe + 1
-						break
-					elseif GF_WORD_REP_RIGHT[strsub(wordString,-i)] then -- Right
-						arg1 = strsub(arg1,1,lfe-i).." "..strsub(wordString,-i)..strsub(arg1,lfe+1)
-						lfe = lfs
-						break
-					end
-				end
-				if lfs < lfe then
-					if GF_WORD_REP_LEFT[strsub(wordString,1,2)] then
-						arg1 = strsub(arg1,1,lfs-1)..strsub(wordString,1,2).." "..strsub(arg1,lfs+2)
-						lfs = lfs + strlen(wordString) + 1
-					elseif GF_WORD_REP_RIGHT[strsub(wordString,-2)] then
-						wordString = strsub(wordString,1,-3)
-						if GF_WORD_FIX_SINGLE_WORD[wordString] then wordString = GF_WORD_FIX_SINGLE_WORD[wordString]
-						elseif GF_WORD_FIX_BEFORE_QUEST[wordString] then wordString = GF_WORD_FIX_BEFORE_QUEST[wordString] end
-						if GF_WORD_QUEST[wordString] then
-							arg1 = strsub(arg1,1,lfs-1)..wordString.." lf"..strsub(arg1,lfe+1)
-						else
-							if GF_WORD_FIX[wordString] then wordString = GF_WORD_FIX[wordString] end
-							if GF_WORD_DUNGEON[wordString] or GF_WORD_RAID[wordString] or GF_WORD_PVP[wordString] or GF_WORD_GROUP_BYPASS[wordString] then
-								arg1 = strsub(arg1,1,lfs-1)..wordString.." lf"..strsub(arg1,lfe+1)
-							end
-						end
-						lfs = lfs + strlen(wordString) + 3
-					else
-						lfs = lfe + 1
-					end
-				end
-			else
-				lfs = lfe + 1
-			end
-		else
-			break
-		end
-	end
-	lfs = 2 -- To fix single words
-	while true do lfs,lfe,wordString,tempString = strfind(arg1, "(.-)([%s%p%d]+)",lfs) if not wordString then break elseif GF_WORD_FIX_SINGLE_WORD[wordString] then arg1 = strsub(arg1,1,lfs-1)..GF_WORD_FIX_SINGLE_WORD[wordString]..tempString..strsub(arg1,lfe+1) lfs = lfs + strlen(GF_WORD_FIX_SINGLE_WORD[wordString]..tempString)-1 else lfs = lfe+1 end end
-
-	lfs = 1 -- To detect space/letter/number/letter/space combinations(eg "g2g " = gtg)
-	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s](%a+%s?%d+%s?%a+)[%p%s]",lfs) if wordString then wordString = gsub(wordString," ","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[wordString]) + 1 else lfs = lfe end else break end end
-	lfs = 1 -- To detect space/word/number+/space combinations(eg "k10" = lowerkarazhan)
-	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s](%a+%s?[:%-]?%s?%d+)s?[%p%s]",lfs) if wordString then wordString = gsub(wordString,"[%s:%-]","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) end lfs = lfs + strlen(wordString) + 1 else break end end
-	lfs = 1 -- To detect words with explanation points "!" (eg "hungry!","lost!")... To help identify quests with short names.
-	while true do lfs,lfe,wordString,tempString = strfind(arg1, "[%p%s](%a+%s?([!%+]))[ %]]",lfs) if wordString then wordString = gsub(wordString," ","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) elseif tempString == "+" and GF_GROUP_IDS[strsub(wordString,1,strlen(wordString)-1)] then arg1 = strsub(arg1,1,lfs)..wordString.." "..GF_PLUS_LOCALIZED..strsub(arg1,lfe) end lfs = lfs + strlen(wordString) + 1 else break end end
-	lfs = 1 -- To detect space/number+/word/space combinations(eg "10th" = tenth, "5g" = 5gold)
-	while true do
-		lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%d+%s?(%a+))[%p%s%d]",lfs)
-		if wordString then
-			wordString = gsub(wordString," ","")
-			if GF_WORD_FIX[tempString] then wordString = strsub(wordString,1,strlen(wordString) - strlen(tempString))..GF_WORD_FIX[tempString] end
-			if GF_WORD_SPECIAL_COMBINATION[wordString] then
-				arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe)
-				lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[wordString])
-			elseif GF_WORD_GOLD[tempString] then
-				arg1 = strsub(arg1,1,lfs)..GF_WORD_GOLD[tempString]..strsub(arg1,lfe)
-				lfs = lfs + strlen(GF_WORD_GOLD[tempString])
-			else
-				lfs = lfe
-			end
-		else
-			break
-		end
-	end
-	lfs = 2 -- To detect words between and next to "[] or ()" (eg "(human only)", "[item] for free").
-	while true do lfs,lfe,wordString = strfind(arg1, "[<%(%[](.-)[%)%]>]",lfs)
-		if wordString then
-			if GF_WORD_FIX[wordString] then wordString = GF_WORD_FIX[wordString] end if GF_GUILD_BRACKET[gsub(wordString," ","")] then foundGuild = foundGuild + GF_GUILD_BRACKET[gsub(wordString," ","")] end
-			if strbyte(arg1,lfs) == 91 and strbyte(arg1,lfe) == 93 then -- "[]"
-				if strbyte(arg1,lfs-1) == 90 then -- From Link
-					if strlen(wordString) < 45 and strsub(arg1,lfs-8,lfs) ~= "hquest Z[" then
-						tempString = ""
-						for word in gfind(wordString, "(%a+)") do if word == "thunderfury" or GF_WORD_FIX_ITEM_NAME[word] == "enchant" then break elseif GF_WORD_FIX_ITEM_NAME[word] then tempString = word end end
-						if tempString ~= "" then arg1 = strsub(arg1,1,lfs)..GF_WORD_FIX_ITEM_NAME[tempString]..strsub(arg1,lfe) end
-					end
-				end
-			end
-			lfs = lfs + 1
-		else
-			break
-		end
-	end
-	lfs = 1 -- To detect word/letter/number combinations(eg "BMx2" = bm x2)
-	while true do lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%a+)(%a%d+)[%p%s]",lfs) if wordString then if GF_WORD_LETTER_NUMBER_BEFORE_AFTER[tempString] and (GF_GROUP_IDS[wordString] or GF_LFMLFG_PREFIX_GUILD[wordString]) then arg1 = strsub(arg1,1,lfs)..wordString.." "..GF_WORD_LETTER_NUMBER_BEFORE_AFTER[tempString].." "..strsub(arg1,lfe) lfs = lfs + strlen(wordString..GF_WORD_LETTER_NUMBER_BEFORE_AFTER[tempString]) + 2 else lfs = lfe end else break end end
-	lfs = 1 -- To detect word/letter/number combinations(eg "2xBM" = bm x2)
-	while true do lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%d+%a)(%a+)[%p%s]",lfs) if wordString then if GF_WORD_LETTER_NUMBER_BEFORE_AFTER[wordString] and (GF_GROUP_IDS[tempString] or GF_WORD_ROLES[tempString]) then arg1 = strsub(arg1,1,lfs)..GF_WORD_LETTER_NUMBER_BEFORE_AFTER[wordString].." "..tempString.." "..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_LETTER_NUMBER_BEFORE_AFTER[wordString]..tempString) + 2 else lfs = lfe end else break end end
-
-	lfs = 1 _,lfe,wordString = string.find(arg1, "([%s%p%d]+)",lfs) lfs = lfe+1 -- Add all words to the wordTable
-	while true do
-		lfs,lfe,wordString = strfind(arg1, "(.-)[%s%p%d]+",lfs)
-		if wordString then
-			if not GF_WORD_BYPASS_TRIGGER[wordString] then
-				table.insert(wordTable, wordString)
-				lfs = lfe+1
-			else
-				if GF_WORD_GROUP_BYPASS[wordString] then
-					if GF_WORD_GROUP_BYPASS[wordTable[#wordTable]] then wordTable[#wordTable] = GF_WORD_GROUP_BYPASS[wordTable[#wordTable]] end
-					wordString = GF_WORD_GROUP_BYPASS[wordString]
-					_,tempVal,tempString = strfind(arg1,"(.-)[%s%p%d]+",lfe+1)
-					if tempString then
-						if GF_WORD_GROUP_BYPASS[tempString] then
-							tempString = GF_WORD_GROUP_BYPASS[tempString]
-							table.insert(wordTable, wordString) table.insert(wordTable, tempString)
-							lfs = tempVal+1
-							while true do
-								_,tempVal,wordString = strfind(arg1,"(.-)[%s%p%d]+",lfs)
-								if wordString then
-									if GF_WORD_GROUP_BYPASS[wordString] then
-										table.insert(wordTable, GF_WORD_GROUP_BYPASS[wordString])
-										lfs = tempVal+1
-									elseif GF_WORD_GROUP_BYPASS_SECOND[tempString..wordString] then
-										lfs = tempVal+1
-										_,tempVal,wordString = strfind(arg1,"(.-)[%s%p%d]+",lfs)
-										if GF_WORD_GROUP_BYPASS[wordString] then table.insert(wordTable, GF_WORD_GROUP_BYPASS[wordString]) lfs = tempVal+1 end
-									else
-										break
-									end
-								else
-									break
-								end
-							end
-						elseif GF_WORD_GROUP_BYPASS_SECOND[wordString..tempString] then
-							_,tempVal,tempString = strfind(arg1,"(.-)[%s%p%d]+",tempVal+1)
-							if GF_WORD_GROUP_BYPASS[tempString] then
-								tempString = GF_WORD_GROUP_BYPASS[tempString]
-								table.insert(wordTable, wordString) table.insert(wordTable, tempString)
-								lfs = tempVal+1
-							else
-								table.insert(wordTable, wordString)
-								lfs = lfe+1
-							end
-						else
-							table.insert(wordTable, wordString)
-							lfs = lfe+1
-						end
-					else
-						table.insert(wordTable, wordString)
-						break
-					end
-				else
-					_,tempVal,tempString = strfind(arg1,"(.-)[%s%p%d]+",lfe+1)
-					if GF_WORD_QUEST_BYPASS[tempString] then
-						table.insert(wordTable, wordString) table.insert(wordTable, tempString)
-						lfs = tempVal+1
-					else
-						lfs = lfe+1
-					end
-				end
-			end
-		else
-			break
-		end
-	end
-	tempVal = #wordTable
-	lfs = 1
-	while lfs <= tempVal do
-		wordString = wordTable[lfs]
-		if GF_WORD_FIX_BEFORE_QUEST[wordString] then
-			wordTable[lfs] = GF_WORD_FIX_BEFORE_QUEST[wordString]
-		end
-		if GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString] then
-			wordTable[lfs] = GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][1]
-			table.insert(wordTable,lfs+1,GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][2])
-			tempVal=tempVal+1
-			lfs = lfs + 1
-		elseif GF_WORD_FIX_QUEST_DUNGEON[wordString] then
-			wordTable[lfs] = GF_WORD_FIX_QUEST_DUNGEON[wordString]
-		end
-		lfs = lfs + 1
-	end
-	for j=1,3 do
-		lfs = 1
-		while lfs+j <= tempVal do
-			wordString = wordTable[lfs]
-			for k=1, j do wordString = wordString..wordTable[lfs+k] end
-			if GF_WORD_FIX_BEFORE_QUEST[wordString] then
-				wordTable[lfs] = GF_WORD_FIX_BEFORE_QUEST[wordString]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				if wordString ~= GF_WORD_FIX_BEFORE_QUEST[wordString] then
-					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
-				elseif lfs > 1 then
-					tempString = wordTable[lfs-1]
-					for k=1, j do if wordTable[lfs-1+k] then tempString = tempString..wordTable[lfs-1+k] end end
-					if GF_WORD_FIX_BEFORE_QUEST[tempString] then
-						wordTable[lfs-1] = GF_WORD_FIX_BEFORE_QUEST[tempString]
-						for k=1, j do if wordTable[lfs] then table.remove(wordTable,lfs) tempVal=tempVal-1 end end
-					end
-				end
-			elseif GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString] then
-				wordTable[lfs] = GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][1]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				table.insert(wordTable,lfs+1,GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][2]) tempVal=tempVal+1
-				if wordString ~= GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][1]..GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][2] then
-					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
-				elseif lfs > 1 then
-					tempString = wordTable[lfs-1]
-					for k=1, j do if wordTable[lfs-1+k] then tempString = tempString..wordTable[lfs-1+k] end end
-					if GF_WORD_FIX_BEFORE_QUEST_SECOND[tempString] then
-						wordTable[lfs-1] = GF_WORD_FIX_BEFORE_QUEST_SECOND[tempString][1]
-						for k=1, j do if wordTable[lfs] then table.remove(wordTable,lfs) tempVal=tempVal-1 end end
-						table.insert(wordTable,lfs,GF_WORD_FIX_BEFORE_QUEST_SECOND[tempString][2]) tempVal=tempVal+1
-					end
-				end
-			elseif GF_WORD_FIX_QUEST_DUNGEON[wordString] then
-				wordTable[lfs] = GF_WORD_FIX_QUEST_DUNGEON[wordString]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				if wordString ~= GF_WORD_FIX_QUEST_DUNGEON[wordString] then
-					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
-				elseif lfs > 1 then
-					tempString = wordTable[lfs-1]
-					for k=1, j do if wordTable[lfs-1+k] then tempString = tempString..wordTable[lfs-1+k] end end
-					if GF_WORD_FIX_QUEST_DUNGEON[tempString] then
-						wordTable[lfs-1] = GF_WORD_FIX_QUEST_DUNGEON[tempString]
-						for k=1, j do if wordTable[lfs] then table.remove(wordTable,lfs) tempVal=tempVal-1 end end
-					end
-				end
-			end
-			lfs = lfs + 1
-		end
-	end
-	for i=1,tempVal do if wordTable[i] == "x" then table.remove(wordTable,i) i = i - 1 tempVal=tempVal-1 end end
-	lfs = 1
-	while lfs <= tempVal do
-		if wordTable[lfs] then
-			wordString = wordTable[lfs]
-			if GF_WORD_FIX[wordString] then
-				wordString = GF_WORD_FIX[wordString] wordTable[lfs] = wordString
-			elseif GF_WORD_FIX_SECOND[wordString] then
-				wordString = GF_WORD_FIX_SECOND[wordString][1] wordTable[lfs] = wordString
-				table.insert(wordTable,lfs+1,GF_WORD_FIX_SECOND[wordString][2])
-				tempVal=tempVal+1
-			end
-		end
-		lfs = lfs + 1
-	end
-	for j=1,3 do -- Fix Words
-		lfs = 1
-		while lfs+j <= tempVal do
-			wordString = wordTable[lfs]
-			for k=1, j do wordString = wordString..wordTable[lfs+k] end
-			if GF_WORD_FIX[wordString] then
-				wordTable[lfs] = GF_WORD_FIX[wordString]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				if wordString ~= GF_WORD_FIX[wordString] then if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end end
-			elseif GF_WORD_FIX_SECOND[wordString] then
-				wordTable[lfs] = GF_WORD_FIX_SECOND[wordString][1]
-				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
-				table.insert(wordTable,lfs+1,GF_WORD_FIX_SECOND[wordString][2]) tempVal=tempVal+1
-				if wordString ~= GF_WORD_FIX_SECOND[wordString][1]..GF_WORD_FIX_SECOND[wordString][2] then
-					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
-				end
-			end
-			lfs = lfs + 1
-		end
-	end
 	for j=0,3 do -- Score the wordTable
 		for i=1,tempVal do
 			if i+j <= tempVal then -- if i+j <= tempVal then
@@ -6337,17 +5657,66 @@ function print(msg) -- I added this only temporarily so I could work on the addo
 		DEFAULT_CHAT_FRAME:AddMessage(msg,1,1,0.5)
 	end
 end
-function GetModifiedQuestName(arg1)
+function GetModifiedQuestName(arg1,renamedungeon)
 	local wordTable = {}
 	local lfs,lfe,wordString,tempString,tempVal
-	arg1 = " "..arg1.." "
+
+	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")).." "
 
 	lfs = 1 -- To detect space/lf##m/letter(eg "lf15mbwl" = lfm bwl)
 	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s]([lk][fv]?%s?%d+m)[%p%s]",lfs) if wordString then arg1 = strsub(arg1,1,lfs)..GF_LFM_LOCALIZED.." "..strsub(arg1,lfs+strlen(wordString)+1) lfs = lfs + 4 else break end end
 	lfs = 1 -- To detect space/number+/punctuation/number+/space for groups(eg "4v5" or "4/5" = group, "4=5" triggers foundLFM)
-	while true do lfs,lfe,tempString,wordString = strfind(arg1,"[%p%s](%d%d?%s?([=/v:%-to]+)%s?%d%d?)[%p%s]",lfs) if wordString then tempString = gsub(tempString," ","") if wordString == "-" then if strlen(tempString) == 5 and strsub(tempString,-1) == "9" and GF_WORD_SPECIAL_COMBINATION[tempString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[tempString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[tempString]) + 1 else lfs = lfe end elseif wordString == ":" then if strlen(tempString) == 5 and strsub(tempString,-1) == "0" then _,_,tempString = strfind(arg1,"^(%a+)",lfe+1) if GF_WORD_FIX_TIME[tempString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_FIX_TIME[tempString]..strsub(arg1,lfs+strlen(GF_WORD_FIX_TIME[tempString])+1) lfs = lfs + strlen(GF_WORD_FIX_TIME[tempString]) + 1 else lfs = lfe end else lfs = lfe end elseif GF_WORD_SPECIAL_COMBINATION[tempString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[tempString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[tempString]) + 1 elseif wordString == "v" then arg1 = strsub(arg1,1,lfs)..GF_GROUP_OPEN_LOCALIZED..strsub(arg1,lfe) lfs = lfs + strlen(GF_GROUP_OPEN_LOCALIZED) + 1 else lfs = lfe end else break end end
+	while true do
+		lfs,lfe,tempString,wordString = strfind(arg1,"[%p%s](%d%d?%s?([=/v:%-to ]+)%s?%d%d?)[%p%s]",lfs)
+		if wordString then
+			if wordString == " " then
+				if strlen(tempString) == 5 and strsub(tempString,-1) == "9" and GF_WORD_SPECIAL_COMBINATION[tempString] then
+					arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[tempString]..strsub(arg1,lfe)
+					lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[tempString]) + 1
+				else
+					lfs = lfe
+				end
+			else
+				tempString = gsub(tempString," ","")
+				if wordString == "=" then
+					lfs = lfe
+				elseif wordString == "-" then
+					if strlen(tempString) == 5 and strsub(tempString,-1) == "9" and GF_WORD_SPECIAL_COMBINATION[tempString] then
+						arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[tempString]..strsub(arg1,lfe)
+						lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[tempString]) + 1
+					else
+						lfs = lfe
+					end
+				elseif wordString == ":" then
+					if strlen(tempString) == 5 and strsub(tempString,-1) == "0" then
+						_,_,tempString = strfind(arg1,"^(%a+)",lfe+1)
+						if GF_WORD_FIX_TIME[tempString] then
+							arg1 = strsub(arg1,1,lfs)..GF_WORD_FIX_TIME[tempString]..strsub(arg1,lfs+strlen(GF_WORD_FIX_TIME[tempString])+1)
+							lfs = lfs + strlen(GF_WORD_FIX_TIME[tempString]) + 1
+						else
+							lfs = lfe
+						end
+					else
+						lfs = lfe
+					end
+				elseif GF_WORD_SPECIAL_COMBINATION[tempString] then
+					arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[tempString]..strsub(arg1,lfe)
+					lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[tempString]) + 1
+				elseif wordString == "v" or wordString == "/" then
+					arg1 = strsub(arg1,1,lfs)..GF_GROUP_OPEN_LOCALIZED..strsub(arg1,lfe)
+					lfs = lfs + strlen(GF_GROUP_OPEN_LOCALIZED) + 1
+				else
+					lfs = lfe
+				end
+			end
+		else
+			break
+		end
+	end
 	lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%d?%d?%s?\-?([-\+±]))\-?%s?%d?%d?[%p%s]")
-	if wordString then if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfs+strlen(wordString)) end end
+	if wordString then -- To detect "+- or ±"
+		if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfs+strlen(wordString)) end
+	end
 
 	tempVal = 1
 	while true do -- Block letter repeats
@@ -6461,19 +5830,19 @@ function GetModifiedQuestName(arg1)
 		end
 	end
 	lfs = 2 -- To fix single words
-	while true do lfs,lfe,wordString,tempString = strfind(arg1, "(.-)([%s%p%d]+)",lfs) if not wordString then break elseif GF_WORD_FIX_SINGLE_WORD[wordString] then arg1 = strsub(arg1,1,lfs-1)..GF_WORD_FIX_SINGLE_WORD[wordString]..tempString..strsub(arg1,lfe+1) lfs = lfs + strlen(GF_WORD_FIX_SINGLE_WORD[wordString]..tempString)-1 else lfs = lfe+1 end end
-
+	while true do lfs,lfe,wordString,tempString = strfind(arg1, "(.-)([%s%p%d]+)",lfs) if wordString then if GF_WORD_FIX_SINGLE_WORD[wordString] then arg1 = strsub(arg1,1,lfs-1)..GF_WORD_FIX_SINGLE_WORD[wordString]..tempString..strsub(arg1,lfe+1) lfs = lfs + strlen(GF_WORD_FIX_SINGLE_WORD[wordString]..tempString)-1 else lfs = lfe+1 end else break end end
+	
 	lfs = 1 -- To detect space/letter/number/letter/space combinations(eg "g2g " = gtg)
 	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s](%a+%s?%d+%s?%a+)[%p%s]",lfs) if wordString then wordString = gsub(wordString," ","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) lfs = lfs + strlen(GF_WORD_SPECIAL_COMBINATION[wordString]) + 1 else lfs = lfe end else break end end
 	lfs = 1 -- To detect space/word/number+/space combinations(eg "k10" = lowerkarazhan)
 	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s](%a+%s?[:%-]?%s?%d+)s?[%p%s]",lfs) if wordString then wordString = gsub(wordString,"[%s:%-]","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) end lfs = lfs + strlen(wordString) + 1 else break end end
 	lfs = 1 -- To detect words with explanation points "!" (eg "hungry!","lost!")... To help identify quests with short names.
-	while true do lfs,lfe,wordString,tempString = strfind(arg1, "[%p%s](%a+%s?([!%+]))[ %]]",lfs) if wordString then wordString = gsub(wordString," ","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) elseif tempString == "+" and GF_GROUP_IDS[strsub(wordString,1,strlen(wordString)-1)] then arg1 = strsub(arg1,1,lfs)..wordString.." "..GF_PLUS_LOCALIZED..strsub(arg1,lfe) end lfs = lfs + strlen(wordString) + 1 else break end end
+	while true do lfs,lfe,wordString,tempString = strfind(arg1, "[%p%s](%a+%s?([!%+/]))[ %]]",lfs) if wordString then wordString = gsub(wordString," ","") if GF_WORD_SPECIAL_COMBINATION[wordString] then arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe) elseif tempString == "+" and GF_GROUP_IDS[strsub(wordString,1,strlen(wordString)-1)] then arg1 = strsub(arg1,1,lfs)..wordString.." "..GF_PLUS_LOCALIZED..strsub(arg1,lfe) end lfs = lfs + strlen(wordString) + 1 else break end end
 	lfs = 1 -- To detect space/number+/word/space combinations(eg "10th" = tenth, "5g" = 5gold)
 	while true do
-		lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%d+%s?(%a+))[%p%s%d]",lfs)
+		lfs,lfe,wordString,tempString = strfind(arg1,"[%p%s](%d+%s?/?(%a+))[%p%s%d]",lfs)
 		if wordString then
-			wordString = gsub(wordString," ","")
+			wordString = gsub(wordString,"[ /]","")
 			if GF_WORD_FIX[tempString] then wordString = strsub(wordString,1,strlen(wordString) - strlen(tempString))..GF_WORD_FIX[tempString] end
 			if GF_WORD_SPECIAL_COMBINATION[wordString] then
 				arg1 = strsub(arg1,1,lfs)..GF_WORD_SPECIAL_COMBINATION[wordString]..strsub(arg1,lfe)
@@ -6491,12 +5860,11 @@ function GetModifiedQuestName(arg1)
 	lfs = 2 -- To detect words between and next to "[] or ()" (eg "(human only)", "[item] for free").
 	while true do lfs,lfe,wordString = strfind(arg1, "[<%(%[](.-)[%)%]>]",lfs)
 		if wordString then
-			if GF_WORD_FIX[wordString] then wordString = GF_WORD_FIX[wordString] end if GF_GUILD_BRACKET[gsub(wordString," ","")] then foundGuild = foundGuild + GF_GUILD_BRACKET[gsub(wordString," ","")] end
 			if strbyte(arg1,lfs) == 91 and strbyte(arg1,lfe) == 93 then -- "[]"
 				if strbyte(arg1,lfs-1) == 90 then -- From Link
 					if strlen(wordString) < 45 and strsub(arg1,lfs-8,lfs) ~= "hquest Z[" then
 						tempString = ""
-						for word in gfind(wordString, "(%a+)") do if word == "thunderfury" or GF_WORD_FIX_ITEM_NAME[word] == "enchant" then break elseif GF_WORD_FIX_ITEM_NAME[word] then tempString = word end end
+						for word in gfind(wordString, "(%a+)") do if word == GF_THUNDERFURY_LOCALIZED or GF_WORD_FIX_ITEM_NAME[word] == GF_ENCHANT_LOCALIZED then break elseif GF_WORD_FIX_ITEM_NAME[word] then tempString = word end end
 						if tempString ~= "" then arg1 = strsub(arg1,1,lfs)..GF_WORD_FIX_ITEM_NAME[tempString]..strsub(arg1,lfe) end
 					end
 				end
@@ -6589,6 +5957,8 @@ function GetModifiedQuestName(arg1)
 			table.insert(wordTable,lfs+1,GF_WORD_FIX_BEFORE_QUEST_SECOND[wordString][2])
 			tempVal=tempVal+1
 			lfs = lfs + 1
+		elseif renamedungeon and GF_WORD_FIX_QUEST_DUNGEON[wordString] then
+			wordTable[lfs] = GF_WORD_FIX_QUEST_DUNGEON[wordString]
 		end
 		lfs = lfs + 1
 	end
@@ -6625,12 +5995,67 @@ function GetModifiedQuestName(arg1)
 						table.insert(wordTable,lfs,GF_WORD_FIX_BEFORE_QUEST_SECOND[tempString][2]) tempVal=tempVal+1
 					end
 				end
+			elseif renamedungeon and GF_WORD_FIX_QUEST_DUNGEON[wordString] then
+				wordTable[lfs] = GF_WORD_FIX_QUEST_DUNGEON[wordString]
+				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
+				if wordString ~= GF_WORD_FIX_QUEST_DUNGEON[wordString] then
+					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
+				elseif lfs > 1 then
+					tempString = wordTable[lfs-1]
+					for k=1, j do if wordTable[lfs-1+k] then tempString = tempString..wordTable[lfs-1+k] end end
+					if GF_WORD_FIX_QUEST_DUNGEON[tempString] then
+						wordTable[lfs-1] = GF_WORD_FIX_QUEST_DUNGEON[tempString]
+						for k=1, j do if wordTable[lfs] then table.remove(wordTable,lfs) tempVal=tempVal-1 end end
+					end
+				end
 			end
 			lfs = lfs + 1
 		end
 	end
 	return wordTable
 end
+function GetModifiedWordList(arg1)
+	local wordString
+	local wordTable = GetModifiedQuestName(arg1,true)
+	local tempVal = #wordTable
+
+	local lfs = 1
+	while lfs <= tempVal do
+		if wordTable[lfs] then
+			wordString = wordTable[lfs]
+			if GF_WORD_FIX[wordString] then
+				wordString = GF_WORD_FIX[wordString] wordTable[lfs] = wordString
+			elseif GF_WORD_FIX_SECOND[wordString] then
+				table.insert(wordTable,lfs+1,GF_WORD_FIX_SECOND[wordString][2])
+				wordString = GF_WORD_FIX_SECOND[wordString][1] wordTable[lfs] = wordString
+				tempVal=tempVal+1
+			end
+		end
+		lfs = lfs + 1
+	end
+	for j=1,3 do -- Fix Words
+		lfs = 1
+		while lfs+j <= tempVal do
+			wordString = wordTable[lfs]
+			for k=1, j do wordString = wordString..wordTable[lfs+k] end
+			if GF_WORD_FIX[wordString] then
+				wordTable[lfs] = GF_WORD_FIX[wordString]
+				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
+				if wordString ~= GF_WORD_FIX[wordString] then if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end end
+			elseif GF_WORD_FIX_SECOND[wordString] then
+				wordTable[lfs] = GF_WORD_FIX_SECOND[wordString][1]
+				for k=1, j do table.remove(wordTable,lfs+1) tempVal=tempVal-1 end
+				table.insert(wordTable,lfs+1,GF_WORD_FIX_SECOND[wordString][2]) tempVal=tempVal+1
+				if wordString ~= GF_WORD_FIX_SECOND[wordString][1]..GF_WORD_FIX_SECOND[wordString][2] then
+					if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end
+				end
+			end
+			lfs = lfs + 1
+		end
+	end
+	return wordTable
+end
+
 function CompileFixedQuestZones(continue) -- /script CompileFixedQuestZones() /script CompileFixedQuestZones(true)
 -- Import only 500 at a time so it doesn't lock up the parsing, and need to make sure I only have the highest-level quest
 	if not continue then GF_SavedVariables.questconversion = {} end

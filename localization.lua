@@ -300,6 +300,8 @@ GF_ELITE_LOCALIZED = "elite"
 GF_BOSS_LOCALIZED = "boss"
 GF_SERVERTIME_ABBREV_LOCALIZED = "st"
 GF_SERVERTIME_LOCALIZED = "servertime"
+GF_THUNDERFURY_LOCALIZED = "thunderfury"
+GF_ENCHANT_LOCALIZED = "enchant"
 
 --if GetLocale() == "zhCN" then
 --elseif GetLocale() == "zhTW" then
