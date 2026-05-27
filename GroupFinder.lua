@@ -1797,7 +1797,7 @@ function GF_ParseIncomingAddonMessages(msg)
 		end
 	elseif strlen(msg) > 2 then -- (To Everyone) Add group information to your 'GF_MessageList' and delete from 'GF_AddonAllNamesForResponseToLogin', 'GF_AddonNamesToBeSentAsARequest', 'GF_AddonWhoDataToBeSentBuffer', 'GF_AddonGroupDataToBeSentBuffer'.
 		for senttime,sentname,message in gfind(msg, "(%d+)([a-zA-Z]+):(.+)") do -- This works 100% correctly.
-			GF_GetTypes(gsub(gsub(gsub(gsub(gsub(strlower(gsub(gsub(gsub(gsub(" "..message.." ", " |+h%[([%w%s%p]+)%]|+h|+r", " %1 "), "|c%x+|+(%w+)[%d:]+|+h", " %1 "), "|+h|+r", " "),"([a-z ][a-z])([A-Z])","%1 %2")),".gg/%w+", ""),"([%p%s])(%w%w+)([%p%s])","%1 %2 %3"),"[%s%.%[](%a)[%s%.](%a)[%s%.]","%1%2"),"%s%s+", " "),"[']", ""))
+			GF_GetTypes(gsub(gsub(gsub(gsub(gsub(strlower(gsub(gsub(gsub(gsub(" "..message.." ", " |+h%[([%w%s%p]+)%]|+h|+r", " %1 "), "|c%x+|+(%w+)[%d:]+|+h", " %1 "), "|+h|+r", " "),"([a-z ][a-z])([A-Z][a-z%s%p])","%1 %2")),".gg/%w+", ""),"([%p%s])(%w%w+)([%p%s])","%1 %2 %3"),"[%s%.%[](%a)[%s%.](%a)[%s%.]","%1%2"),"%s%s+", " "),"[']", ""))
 			for i=1,#GF_MessageList[GF_RealmName] do
 				if GF_MessageList[GF_RealmName][i] and GF_MessageList[GF_RealmName][i].op and GF_MessageList[GF_RealmName][i].op == sentname then
 					table.remove(GF_MessageList[GF_RealmName], i)
@@ -2601,7 +2601,7 @@ function GF_GetTypes(arg1,showanyway)
 
 	--wordString = string.sub(arg1,1,2) if wordString == "C " then fixedType = 5 arg1 = strsub(arg1,3) elseif wordString == "T " then fixedType = 9 arg1 = strsub(arg1,3) elseif wordString == "G " then fixedType = 8 arg1 = strsub(arg1,3) end
 
-	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")).." "
+	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z][a-z%s%p])","%1 %2")).." "
 
 	if strfind(arg1, "%d+p[%p%s]") then foundLFM = 2 if showanyway == true then print("##p lfm 2") end end -- "10p heal" messages from chinese
 	lfs = 1 -- To detect space/lf##m/letter(eg "lf15mbwl" = lfm bwl)
@@ -2738,7 +2738,7 @@ function GF_GetTypes(arg1,showanyway)
 			break
 		end
 	end
-	tempVal = 0 for langID,totalLang in pairs(languageID) do if showanyway == true then print(langID) print(totalLang) end if langID == "en" then totalLang = totalLang * .79 end if totalLang > tempVal then tempVal = totalLang languageName = langID end end -- find language
+	tempVal = 0 for langID,totalLang in pairs(languageID) do if showanyway == true then print(langID) print(totalLang) end if langID == "en" then totalLang = totalLang * .79 end if totalLang > 1 and totalLang > tempVal then tempVal = totalLang languageName = langID end end -- find language
 	if languageName ~= "en" then
 		tempVal = #wordTable
 		for j=2,6,2 do
@@ -3121,12 +3121,12 @@ function GF_GetTypes(arg1,showanyway)
 			for k=1, j do wordString = wordString..wordTable[lfs+k] end
 			if GF_WORD_FIX[wordString] then
 				wordTable[lfs] = GF_WORD_FIX[wordString] if strbyte(wordTableTrade[lfs]) >= 97 then wordTableTrade[lfs] = GF_WORD_FIX[wordString] end if strbyte(wordTableTrade[lfs]) >= 97 then wordTableGuild[lfs] = GF_WORD_FIX[wordString] end
-				for k=1, j do table.remove(wordTable,lfs+1) table.remove(wordTableTrade,lfs+1) table.remove(wordTableGuild,lfs+1) tempVal=tempVal-1 for l=1,#groupPosition do if groupPosition[l][1] == lfs then groupPosition[l][2] = groupPosition[l][2]-1 elseif groupPosition[l][1] > lfs then groupPosition[l][1] = groupPosition[l][1]-1 groupPosition[l][2] = groupPosition[l][2]-1 end end end
+				for k=1, j do table.remove(wordTable,lfs+1) table.remove(wordTableTrade,lfs+1) table.remove(wordTableGuild,lfs+1) tempVal=tempVal-1 for l=1,#groupPosition do if groupPosition[l][1] == lfs then groupPosition[l][2] = groupPosition[l][2]-1 elseif groupPosition[l][1] > lfs then groupPosition[l][1] = groupPosition[l][1]-1 groupPosition[l][2] = groupPosition[l][2]-1 elseif groupPosition[l][2] > lfs then groupPosition[l][2] = groupPosition[l][2]-1 end end end
 				if wordString ~= GF_WORD_FIX[wordString] then if GF_WORD_FIX_TRADE[wordTableTrade[lfs]] and not TradeFixNames[wordTableTrade[lfs]] and not GF_TRADE_TRIGGER[wordTableTrade[lfs]] then wordTableTrade[lfs] = GF_WORD_FIX_TRADE[wordTableTrade[lfs]][1] possibleGold = nil end if GF_WORD_FIX_GUILD[wordTableGuild[lfs]] then wordTableGuild[lfs] = GF_WORD_FIX_GUILD[wordTableGuild[lfs]][1] end if lfs > 1 then lfs = lfs - 2 else lfs = lfs - 1 end end
 			elseif GF_WORD_FIX_SECOND[wordString] then
 				wordTable[lfs] = GF_WORD_FIX_SECOND[wordString][1] if strbyte(wordTableTrade[lfs]) >= 97 then wordTableTrade[lfs] = GF_WORD_FIX_SECOND[wordString][1] end if strbyte(wordTableTrade[lfs]) >= 97 then wordTableGuild[lfs] = GF_WORD_FIX_SECOND[wordString][1] end
-				for k=1, j do table.remove(wordTable,lfs+1) table.remove(wordTableTrade,lfs+1) table.remove(wordTableGuild,lfs+1) tempVal=tempVal-1 for l=1,#groupPosition do if groupPosition[l][1] == lfs then groupPosition[l][2] = groupPosition[l][2]-1 elseif groupPosition[l][1] > lfs then groupPosition[l][1] = groupPosition[l][1]-1 groupPosition[l][2] = groupPosition[l][2]-1 end end end
-				table.insert(wordTable,lfs+1,GF_WORD_FIX_SECOND[wordString][2]) table.insert(wordTableTrade,lfs+1,GF_WORD_FIX_SECOND[wordString][2]) table.insert(wordTableGuild,lfs+1,GF_WORD_FIX_SECOND[wordString][2]) tempVal=tempVal+1 for l=1,#groupPosition do if groupPosition[l][1] == lfs then groupPosition[l][2] = groupPosition[l][2]+1 elseif groupPosition[l][1] > lfs then groupPosition[l][1] = groupPosition[l][1]+1 groupPosition[l][2] = groupPosition[l][2]+1 end end
+				for k=1, j do table.remove(wordTable,lfs+1) table.remove(wordTableTrade,lfs+1) table.remove(wordTableGuild,lfs+1) tempVal=tempVal-1 for l=1,#groupPosition do if groupPosition[l][1] == lfs then groupPosition[l][2] = groupPosition[l][2]-1 elseif groupPosition[l][1] > lfs then groupPosition[l][1] = groupPosition[l][1]-1 groupPosition[l][2] = groupPosition[l][2]-1 elseif groupPosition[l][2] > lfs then groupPosition[l][2] = groupPosition[l][2]-1 end end end
+				table.insert(wordTable,lfs+1,GF_WORD_FIX_SECOND[wordString][2]) table.insert(wordTableTrade,lfs+1,GF_WORD_FIX_SECOND[wordString][2]) table.insert(wordTableGuild,lfs+1,GF_WORD_FIX_SECOND[wordString][2]) tempVal=tempVal+1 for l=1,#groupPosition do if groupPosition[l][1] == lfs then groupPosition[l][2] = groupPosition[l][2]+1 elseif groupPosition[l][1] > lfs then groupPosition[l][1] = groupPosition[l][1]+1 groupPosition[l][2] = groupPosition[l][2]+1 elseif groupPosition[l][2] > lfs then groupPosition[l][2] = groupPosition[l][2]+1 end end
 				if wordString ~= GF_WORD_FIX_SECOND[wordString][1]..GF_WORD_FIX_SECOND[wordString][2] then
 					if GF_WORD_FIX_TRADE[wordTableTrade[lfs]] and not TradeFixNames[wordTableTrade[lfs]] and not GF_TRADE_TRIGGER[wordTableTrade[lfs]] then wordTableTrade[lfs] = GF_WORD_FIX_TRADE[wordTableTrade[lfs]][1] possibleGold = nil end
 					if GF_WORD_FIX_TRADE[wordTableTrade[lfs+1]] and not TradeFixNames[wordTableTrade[lfs+1]] and not GF_TRADE_TRIGGER[wordTableTrade[lfs+1]] then wordTableTrade[lfs+1] = GF_WORD_FIX_TRADE[wordTableTrade[lfs+1]][1] possibleGold = nil end
@@ -3542,9 +3542,7 @@ function GF_CheckForSpam(arg1,arg2,foundInGroup)
 		if GF_WhoTable[GF_RealmName][arg2] and GF_WhoTable[GF_RealmName][arg2][1] > 0 and GF_WhoTable[GF_RealmName][arg2][1] < GF_SavedVariables.blockmessagebelowlevel and GF_WhoTable[GF_RealmName][arg2][4] + 43200 > time() then return 11 end  -- Block lowlevel
 		if GF_SavedVariables.spamfilter then
 			if GF_PlayerMessages[arg2][1][1] > time() then return 7 end -- Returns spam for the duration of the spam filter
-			local snipa = math.random(ceil(strlen(GF_PlayerMessages[arg2][1][2])/4))
-			local snipb = math.random(ceil(strlen(GF_PlayerMessages[arg2][1][2])/4))*-1
-			if (strlen(arg1) > 30 and ((GF_PlayerMessages[arg2][1][1] + 120 > time() and strfind(arg1,strsub(GF_PlayerMessages[arg2][1][2],snipa,snipb),1,true)) or (GF_PlayerMessages[arg2][2][1] + 120 > time() and strfind(arg1,strsub(GF_PlayerMessages[arg2][2][2],snipa,snipb),1,true)) or (GF_PlayerMessages[arg2][3][1] + 120 > time() and strfind(arg1,strsub(GF_PlayerMessages[arg2][3][2],snipa,snipb),1,true))))
+			if (strlen(arg1) > 30 and ((GF_PlayerMessages[arg2][1][1] + 120 > time() and strfind(arg1,strsub(GF_PlayerMessages[arg2][1][2],math.random(ceil(strlen(GF_PlayerMessages[arg2][1][2])/4)),math.random(ceil(strlen(GF_PlayerMessages[arg2][1][2])/4))*-1),1,true)) or (GF_PlayerMessages[arg2][2][1] + 120 > time() and strfind(arg1,strsub(GF_PlayerMessages[arg2][2][2],math.random(ceil(strlen(GF_PlayerMessages[arg2][2][2])/4)),math.random(ceil(strlen(GF_PlayerMessages[arg2][2][2])/4))*-1),1,true)) or (GF_PlayerMessages[arg2][3][1] + 120 > time() and strfind(arg1,strsub(GF_PlayerMessages[arg2][3][2],math.random(ceil(strlen(GF_PlayerMessages[arg2][3][2])/4)),math.random(ceil(strlen(GF_PlayerMessages[arg2][3][2])/4))*-1),1,true))))
 			or (GF_PlayerMessages[arg2][1][1] + 120 > time() and arg1 == GF_PlayerMessages[arg2][1][2]) and (GF_PlayerMessages[arg2][2][1] + 120 > time() and arg1 == GF_PlayerMessages[arg2][2][2]) then		-- Found Spammer
 				if GF_SavedVariables.autoblacklist and not GF_BlackList[GF_RealmName][arg2] and strlen(arg1) > 120 and arg1 == GF_PlayerMessages[arg2][1][2] and arg1 == GF_PlayerMessages[arg2][2][2] and
 				((GF_SavedVariables.blacklisttrades and foundTrades > 2.9) or (GF_SavedVariables.blacklistguild and foundGuild > 2.9) or (GF_SavedVariables.blacklistchat and foundGuild < 3 and foundTrades < 3) or (GF_SavedVariables.blacklistforeign and languageName ~= "en")) then
@@ -3565,7 +3563,7 @@ function GF_CheckForSpam(arg1,arg2,foundInGroup)
 			end
 			table.insert(GF_PlayerMessages[arg2],1,{ time(), arg1 })
 			table.remove(GF_PlayerMessages[arg2],4)
-			if strlen(arg1) > 40 and strfind(arg1,strsub(arg1,1,20),21, true) then return 7 end -- Repeating text in the same message
+			if strlen(arg1) > 40 and strfind(arg1,strsub(arg1,2,20),21,true) then return 7 end -- Repeating text in the same message
 		end
 	end
 end
@@ -5661,7 +5659,7 @@ function GetModifiedQuestName(arg1,renamedungeon)
 	local wordTable = {}
 	local lfs,lfe,wordString,tempString,tempVal
 
-	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z])","%1 %2")).." "
+	arg1 = " "..strlower(gsub(gsub(gsub(arg1, "|+[%x%p]+(H%a+).-|h%[%[?%[?(.-)%]?%]?%]|+h|+r"," %1 >zqz[%2]"),"%.[gG][gG]/%S+", ""),"([a-z ][a-z])([A-Z][a-z%s%p])","%1 %2")).." "
 
 	lfs = 1 -- To detect space/lf##m/letter(eg "lf15mbwl" = lfm bwl)
 	while true do lfs,lfe,wordString = strfind(arg1,"[%p%s]([lk][fv]?%s?%d+m)[%p%s]",lfs) if wordString then arg1 = strsub(arg1,1,lfs)..GF_LFM_LOCALIZED.." "..strsub(arg1,lfs+strlen(wordString)+1) lfs = lfs + 4 else break end end
