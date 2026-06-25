@@ -300,8 +300,12 @@ GF_ELITE_LOCALIZED = "elite"
 GF_BOSS_LOCALIZED = "boss"
 GF_SERVERTIME_ABBREV_LOCALIZED = "st"
 GF_SERVERTIME_LOCALIZED = "servertime"
-GF_THUNDERFURY_LOCALIZED = "thunderfury"
-GF_ENCHANT_LOCALIZED = "enchant"
+
+GF_TRANSLATE = "Translate"
+GF_TRANSLATE_CHAT = "Translate Chat"
+GF_TRANSLATE_UNTRANSLATED = "Show Both"
+GF_TRANSLATE_INCLUDE_GROUPS = "Show Groups"
+GF_TRANSLATE_BLOCK_FOREIGN = "Block Foreign"
 
 --if GetLocale() == "zhCN" then
 --elseif GetLocale() == "zhTW" then
@@ -528,6 +532,19 @@ GF_HideMainFrameToggleBoth = {
 GF_LogShowWhisperHistoryCheckButton = {
 	tooltip1 = "Toggles the Guild/Whisper History Window",
 	tooltip2 = "This shows a list of recent whisper and guild activity." },
+
+GF_TranslateChatCheckButton = {
+	tooltip1 = "Translate Chat",
+	tooltip2 = "Will attempt to Translate chat messages." },
+GF_TranslateShowUntranslatedCheckButton = {
+	tooltip1 = "Show Both",
+	tooltip2 = "Show both the original and translated messages in chat." },
+GF_TranslateGroupsCheckButton = {
+	tooltip1 = "Show Groups",
+	tooltip2 = "Include Translated groups in group listings." },
+GF_TranslateBlockForeignCheckButton = {
+	tooltip1 = "Block Foreign",
+	tooltip2 = "Block all foreign messages from chat and group listings." },
 
 GF_ShowGroupLogEntryFrameReportButton = {
 	tooltip1 = "Report Damage Meter",
