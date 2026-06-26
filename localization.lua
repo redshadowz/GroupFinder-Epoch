@@ -45,14 +45,13 @@ GF_40_MAN	= "40-man"
 
 -- Binding Names
 BINDING_HEADER_GF_MAIN_HEADER	= "Group Finder" -- Main window title
-BINDING_NAME_GF_SHOW_FRAME= "Toggle Main Window" -- Bindings Name
-BINDING_NAME_GF_SHOW_LOG= "Toggle Log Window"
-BINDING_NAME_GF_SHOW_GROUP= "Toggle Group Window"
+BINDING_NAME_GF_SHOW_FRAME		= "Toggle Main Window" -- Bindings Name
+BINDING_NAME_GF_SHOW_LOG		= "Toggle Log Window"
+BINDING_NAME_GF_SHOW_GROUP		= "Toggle Group Window"
 
 -- Main window common buttons and texts
 GF_MAIN_HEADER = "Group Finder" -- Main window title
-GF_GROUP_LISTINGS = "Groups listings" -- Label for Groupfinder tab
-GF_MORE_FEATURES = "More" -- Label for "More" frame(Settings/Log/Blacklist)
+GF_GROUP_LISTINGS = "Group Listings" -- Label for Groupfinder tab
 GF_CHAT_FILTERS = "Chat Filters"
 GF_GROUP_FILTERS = "Group Filters"
 GF_SHOW_GROUPS_IN = "Show groups in"
@@ -65,17 +64,12 @@ GF_NEW_ONLY = "New only"
 GF_SHOW = "Show"
 GF_ADD = "Add"
 GF_EDIT_NOTE = "Edit Note"
-GF_EDIT_NOTE = "Edit Note"
 GF_PLAYER_NOTE = "Player Note: "
 GF_GROUP_NOTE = "Groups Seen: "
 GF_TRADES = "Trades"
 GF_LOOTS = "Loot"
 GF_GUILDS = "Guild"
 GF_PLAY_SOUND = "Play sound" -- Label for GF_PlaySoundOnResultsCheckButton
-GF_CHAT_ON = "Chat on"
-GF_CHAT_OFF = "Chat off"
-GF_CHAT_GROUP_ON = "Groups in chat, on"
-GF_CHAT_GROUP_OFF = "Groups in chat, off"
 
 -- Log Filters
 GF_LOG_AND_MONITOR = "Chat Log" -- Label at top of Log frame
@@ -143,10 +137,6 @@ GF_DISPLAY_SETTINGS = "Display settings" -- Label for filter section of Settings
 GF_GROUP_SETTINGS = "Group settings" -- Label for minimap section of Settings tab
 GF_MINIMAP_SETTINGS = "Minimap settings" -- Label for minimap section of Settings tab
 GF_OTHER_SETTINGS = "Other settings" -- Label for minimap section of Settings tab
-GF_MINIMAP_ICON_ANGLE = "Minimap icon angle" -- Label for Minimap adjust icon adjust/radius
-GF_MINIMAP_ICON_RADIUS = "Minimap icon radius" -- Label for Minimap adjust icon adjust/radius
-GF_MINIMAP_TEXT_ANGLE = "Minimap text angle" -- Label for Minimap adjust icon text adjust/radius
-GF_MINIMAP_TEXT_RADIUS = "Minimap text radius" -- Label for Minimap adjust icon text adjust/radius
 GF_ADJUST_TRANSPARENCY = "Window transparency" -- Label for adjust transparency on Settings tab
 GF_ADJUST_UISCALE = "Adjust window scale" -- Label for adjust transparency on Settings tab
 GF_UISCALE_UPDATE = "Update" -- Label for update UIScale
@@ -227,12 +217,9 @@ GF_SENDING_GET_WHO = "Sending Get Who request in "
 GF_SENDING_WHO_FOR = "Sending who request for: "
 GF_WHO_ON_COOLDOWN = "/Who is on cooldown for: "
 
-GF_NO_WHISPER_DUNGEON = "There are no dungeons in the input boxes. I need a dungeon name to know what levels to look for."
 GF_NO_WHISPER_TEXT = "No valid text to send."
 GF_NO_PLAYERS_TO_WHISPER = "No players in whisper queue"
 GF_WHISPER_TEXT_TOO_SHORT = "Whisper text must be at least 5 characters."
-
-GF_FRIEND_MSG_SYSTEM = "|Hplayer ?:(%a+)|h.-|h(.*)"
 
 -- Blacklist buttons and texts
 GF_OK = "Ok" -- Popup Dialog Button
@@ -289,12 +276,8 @@ GF_IN_TWO_MINUTES = " in 120 seconds."
 GF_SAVED = "Saved "
 GF_REJOINED_GROUP = "Rejoined the same group. Save cancelled."
 
-GF_LFM_LOCALIZED = "lfm"
-GF_GROUP_LOCALIZED = "group"
 GF_GROUP_OPEN_LOCALIZED = "group open"
 GF_PORTAL_LOCALIZED = "portal"
-GF_YOU_LOCALIZED = "you"
-GF_YOUR_LOCALIZED = "your"
 GF_PLUS_LOCALIZED = "plus"
 GF_ELITE_LOCALIZED = "elite"
 GF_BOSS_LOCALIZED = "boss"
