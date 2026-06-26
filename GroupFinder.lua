@@ -2610,7 +2610,7 @@ end
 function GF_GetTypes(arg1,arg2,showanyway)
 	if showanyway == true then print(arg1) end
 
-	local strPos,tPos,pVal,tVal,bCap,charType,wasNumber,stringA,stringB,stringC,stringD,possibleGold,firstLFMLFG,breakAfter = 1,1
+	local strPos,tPos,pVal,tVal,bCap,charType,stringA,stringB,stringC,stringD,possibleGold,firstLFMLFG,breakAfter = 1,1
 	local TableA,languageID,TradeFixNames,TableB,TableC = {},{},{}
 	foundIgnore,foundGuild,foundGuildExclusion,foundLFM,foundLFG,foundTrades,foundTradesExclusion,numGroupWords = 0,0,0,0,0,0,0,0
 	foundClass,foundDungeon,foundRaid,foundPvP,foundHC,foundNotHC,foundBlockList = nil,nil,nil,nil,nil,nil,nil
@@ -2735,12 +2735,21 @@ function GF_GetTypes(arg1,arg2,showanyway)
 							tVal = TableC[1]
 							bCap = TableC[2]
 							if bCap ~= pVal then
-								if charType ~= 1 then
-									if TableB[1] then table.insert(TableA[pos], {table.concat(TableB),table.concat(TableB)}) table.insert(TableA[pos], "") TableB = {} end
-									strPos = tPos
+								if GF_NORMAL_LETTERS[tVal] then
+									if charType ~= 1 then
+										if TableB[1] then table.insert(TableA[pos], {table.concat(TableB),table.concat(TableB)}) table.insert(TableA[pos], "") TableB = {} end
+										strPos = tPos
+									end
+									table.insert(TableB, tVal)
+									charType = 1
+								else
+									if charType then
+										if TableB[1] then table.insert(TableA[pos], {table.concat(TableB),table.concat(TableB)}) table.insert(TableA[pos], "") TableB = {} end
+										strPos = tPos
+									end
+									table.insert(TableB, tVal)
+									charType = nil
 								end
-								table.insert(TableB, tVal)
-								charType = 1
 							elseif GF_ALLOW_TWO_CHARACTERS[bCap] then
 								table.insert(TableB, tVal)
 								if GF_ACCENT_ASCII_LETTERS[strbyte(stringB,tPos+2)] then
@@ -2952,23 +2961,23 @@ function GF_GetTypes(arg1,arg2,showanyway)
 						tVal = tVal - 2	
 					elseif TableA[tPos][pos+2] then
 						if GF_WORD_FIX_SINGLE_WORD[TableA[tPos][pos+2]] then TableA[tPos][pos+2] = GF_WORD_FIX_SINGLE_WORD[TableA[tPos][pos+2]] end
-						stringC = GF_WORD_FIX[TableA[tPos][pos+2]] and GF_WORD_FIX[TableA[tPos][pos+2]] or TableA[tPos][pos+2] 
-						stringD = GF_WORD_FIX[TableA[tPos][pos-2]] and GF_WORD_FIX[TableA[tPos][pos-2]] or TableA[tPos][pos-2] -- stringD is previous word and already "fixed"
-						stringB = stringA..stringC -- PL >> "10x", "3rd, "10+"
+						stringC = GF_WORD_FIX[TableA[tPos][pos-2]] and GF_WORD_FIX[TableA[tPos][pos-2]] or TableA[tPos][pos-2] -- stringC is previous word and already "fixed"
+						stringD = GF_WORD_FIX[TableA[tPos][pos+2]] and GF_WORD_FIX[TableA[tPos][pos+2]] or TableA[tPos][pos+2] 
+						stringB = stringA..stringD -- PL >> "10x", "3rd, "10+"
 						if GF_WORD_SPECIAL_COMBINATION[stringB] then -- Check current plus next... If match, replace word at pos then delete pos+1 and pos+2... Pos proceeds forward.
 							TableA[tPos][pos] = GF_WORD_SPECIAL_COMBINATION[stringB]
 							table.remove(TableA[tPos],pos+1) table.remove(TableA[tPos],pos+1)
 							tVal = tVal - 2
 							if TableA[tPos][pos-1] == "" then TableA[tPos][pos-1] = " " end -- #/letter replaced with letter... so need space before not after.
-						elseif stringD then
-							stringB = stringD..stringB -- LPL >> "g2g"
+						elseif stringC then
+							stringB = stringC..stringB -- LPL >> "g2g"
 							if GF_WORD_SPECIAL_COMBINATION[stringB] then -- Check previous, current, and next... If match, replace word at pos-2, delete pos-1,pos,pos+1,pos+2, leave pos in same position.
 								TableA[tPos][pos-2] = GF_WORD_SPECIAL_COMBINATION[stringB]
 								table.remove(TableA[tPos],pos) table.remove(TableA[tPos],pos) table.remove(TableA[tPos],pos) table.remove(TableA[tPos],pos-1)
 								pos = pos - 2
 								tVal = tVal - 4
 							else -- Not PL or LPL.. But have both pos-2 and pos+2.. Check LP
-								stringB = stringD..stringA -- LP >> "k10", "sum1", "an1"
+								stringB = stringC..stringA -- LP >> "k10", "sum1", "an1"
 								if GF_WORD_SPECIAL_COMBINATION[stringB] then -- Check previous and current... If match, replace word at pos, delete pos-1,pos, leave pos in same position.
 									TableA[tPos][pos-2] = GF_WORD_SPECIAL_COMBINATION[stringB]
 									table.remove(TableA[tPos],pos) table.remove(TableA[tPos],pos-1)
@@ -2976,31 +2985,41 @@ function GF_GetTypes(arg1,arg2,showanyway)
 									tVal = tVal - 2
 									if TableA[tPos][pos+1] == "" then TableA[tPos][pos+1] = " " end
 								elseif tonumber(stringA) then -- "10g" = "xgold"... "2xBM" = "2x BM"
-									if GF_WORD_NUMBER_NAMES[stringC] then -- This is a number. Check for gold-related words after... If match, replace word at pos, delete pos+1,pos+2, leave pos in same position.
-										if stringC ~= "bh" then possibleGold = true end
-										TableA[tPos][pos+2] = GF_WORD_NUMBER_NAMES[stringC]
+									if GF_WORD_NUMBER_NAMES[stringD] then -- This is a number. Check for gold-related words after... If match, replace word at pos, delete pos+1,pos+2, leave pos in same position.
+										if stringD ~= "bh" then possibleGold = true end
+										TableA[tPos][pos+2] = GF_WORD_NUMBER_NAMES[stringD]
 										pos = pos + 2
-									elseif strbyte(stringC,1) == 120 then -- "2xBM" = "2x BM"
-										stringC = strsub(stringC,2)
-										if GF_WORD_FIX_SINGLE_WORD[stringC] then stringC = GF_WORD_FIX_SINGLE_WORD[stringC] elseif GF_WORD_FIX_BEFORE_QUEST[stringC] then stringC = GF_WORD_FIX_BEFORE_QUEST[stringC] elseif GF_WORD_FIX[stringC] then stringC = GF_WORD_FIX[stringC] end
-										if GF_GROUP_IDS[stringC] and GF_WORD_LETTER_NUMBER_BEFORE_AFTER[stringA.."x"] then
+									elseif strbyte(stringD,1) == 120 then -- "2xBM" = "2x BM"
+										stringD = strsub(stringD,2)
+										if GF_WORD_FIX_SINGLE_WORD[stringD] then stringD = GF_WORD_FIX_SINGLE_WORD[stringD] elseif GF_WORD_FIX_BEFORE_QUEST[stringD] then stringD = GF_WORD_FIX_BEFORE_QUEST[stringD] elseif GF_WORD_FIX[stringD] then stringD = GF_WORD_FIX[stringD] end
+										if GF_GROUP_IDS[stringD] and GF_WORD_LETTER_NUMBER_BEFORE_AFTER[stringA.."x"] then
 											TableA[tPos][pos] = GF_WORD_LETTER_NUMBER_BEFORE_AFTER[stringA.."x"]
-											TableA[tPos][pos+2] = stringC
+											TableA[tPos][pos+2] = stringD
 											if TableA[tPos][pos+1] == "" then TableA[tPos][pos+1] = " " end
 										end
-									elseif strbyte(stringD,-1) == 120 then -- "BMx2" = "BM x2"
-										stringD = strsub(stringD,1,-2)
-										if GF_WORD_FIX_SINGLE_WORD[stringD] then stringD = GF_WORD_FIX_SINGLE_WORD[stringD] elseif GF_WORD_FIX_BEFORE_QUEST[stringD] then stringD = GF_WORD_FIX_BEFORE_QUEST[stringD] elseif GF_WORD_FIX[stringD] then stringD = GF_WORD_FIX[stringD] end
-										if GF_GROUP_IDS[stringD] and GF_WORD_LETTER_NUMBER_BEFORE_AFTER["x"..stringA] then
+									elseif strbyte(stringC,-1) == 120 then -- "BMx2" = "BM x2"
+										stringC = strsub(stringC,1,-2)
+										if GF_WORD_FIX_BEFORE_QUEST[stringC] then stringC = GF_WORD_FIX_BEFORE_QUEST[stringC] elseif GF_WORD_FIX[stringC] then stringC = GF_WORD_FIX[stringC] end
+										if GF_GROUP_IDS[stringC] and GF_WORD_LETTER_NUMBER_BEFORE_AFTER["x"..stringA] then
 											TableA[tPos][pos] = GF_WORD_LETTER_NUMBER_BEFORE_AFTER["x"..stringA]
-											TableA[tPos][pos-2] = stringD
+											TableA[tPos][pos-2] = stringC
 											if TableA[tPos][pos-1] == "" then TableA[tPos][pos-1] = " " end
+										end
+									elseif stringC == "+" and GF_WORD_LETTER_NUMBER_BEFORE_AFTER["+"..stringA] then -- "+2 deadmines" = "invite deadmines"
+										if GF_WORD_FIX_SINGLE_WORD[stringD] then stringD = GF_WORD_FIX_SINGLE_WORD[stringD] elseif GF_WORD_FIX_BEFORE_QUEST[stringD] then stringD = GF_WORD_FIX_BEFORE_QUEST[stringD] elseif GF_WORD_FIX[stringD] then stringD = GF_WORD_FIX[stringD] end
+										if GF_GROUP_IDS[stringD] then
+											TableA[tPos][pos-2] = GF_WORD_LETTER_NUMBER_BEFORE_AFTER["+"..stringA]
+											TableA[tPos][pos+2] = stringD
+											table.remove(TableA[tPos],pos) table.remove(TableA[tPos],pos-1)
+											pos = pos - 2
+											tVal = tVal - 2
+											if TableA[tPos][pos-3] == "" then TableA[tPos][pos-3] = " " end
 										end
 									end
 								elseif stringA == "+-" or stringA == "-+" then -- This is for hardcore trade detection which is restricted to level ranges.
-									if tonumber(stringD) or tonumber(stringC) then foundTrades = foundTrades + 1 if showanyway == true then print("+-d% trade 1") end end
+									if tonumber(stringC) or tonumber(stringD) then foundTrades = foundTrades + 1 if showanyway == true then print("+-d% trade 1") end end
 								elseif stringA == ":" or stringA == "-" then -- "k:10"
-									stringB = stringD..stringC
+									stringB = stringC..stringD
 									if GF_WORD_SPECIAL_COMBINATION[stringB] then -- Check previous and next... If match, replace word at pos-2, delete pos-1,pos,pos+1,pos+2, leave pos in same position.
 										TableA[tPos][pos-2] = GF_WORD_SPECIAL_COMBINATION[stringB]
 										table.remove(TableA[tPos],pos) table.remove(TableA[tPos],pos) table.remove(TableA[tPos],pos) table.remove(TableA[tPos],pos-1)
@@ -3008,7 +3027,7 @@ function GF_GetTypes(arg1,arg2,showanyway)
 										tVal = tVal - 4
 									end
 								elseif stringA == "+" then -- "deadmines+"
-									if GF_GROUP_IDS[stringD] then
+									if GF_GROUP_IDS[stringC] then
 										TableA[tPos][pos] = GF_PLUS_LOCALIZED
 										if TableA[tPos][pos+1] == "" then TableA[tPos][pos+1] = " " end if TableA[tPos][pos-1] == "" then TableA[tPos][pos-1] = " " end
 									end
@@ -3016,26 +3035,26 @@ function GF_GetTypes(arg1,arg2,showanyway)
 							end
 						else -- nothing before, so only check after
 							if tonumber(stringA) then -- "10g" = "xgold"... "2xBM" = "2x BM"
-								if GF_WORD_NUMBER_NAMES[stringC] then -- This is a number. Check for gold-related words after... If match, replace word at pos, delete pos+1,pos+2, leave pos in same position.
-									if stringC ~= "bh" then possibleGold = true end
-									TableA[tPos][pos+2] = GF_WORD_NUMBER_NAMES[stringC]
+								if GF_WORD_NUMBER_NAMES[stringD] then -- This is a number. Check for gold-related words after... If match, replace word at pos, delete pos+1,pos+2, leave pos in same position.
+									if stringD ~= "bh" then possibleGold = true end
+									TableA[tPos][pos+2] = GF_WORD_NUMBER_NAMES[stringD]
 									pos = pos + 2
-								elseif strbyte(stringC,1) == 120 then -- "2xBM" = "2x BM"
-									stringC = strsub(stringC,2)
-									if GF_WORD_FIX_SINGLE_WORD[stringC] then stringC = GF_WORD_FIX_SINGLE_WORD[stringC] elseif GF_WORD_FIX_BEFORE_QUEST[stringC] then stringC = GF_WORD_FIX_BEFORE_QUEST[stringC] elseif GF_WORD_FIX[stringC] then stringC = GF_WORD_FIX[stringC] end
-									if GF_GROUP_IDS[stringC] and GF_WORD_LETTER_NUMBER_BEFORE_AFTER[stringA.."x"] then
+								elseif strbyte(stringD,1) == 120 then -- "2xBM" = "2x BM"
+									stringD = strsub(stringD,2)
+									if GF_WORD_FIX_SINGLE_WORD[stringD] then stringD = GF_WORD_FIX_SINGLE_WORD[stringD] elseif GF_WORD_FIX_BEFORE_QUEST[stringD] then stringD = GF_WORD_FIX_BEFORE_QUEST[stringD] elseif GF_WORD_FIX[stringD] then stringD = GF_WORD_FIX[stringD] end
+									if GF_GROUP_IDS[stringD] and GF_WORD_LETTER_NUMBER_BEFORE_AFTER[stringA.."x"] then
 										TableA[tPos][pos] = GF_WORD_LETTER_NUMBER_BEFORE_AFTER[stringA.."x"]
-										TableA[tPos][pos+2] = stringC
+										TableA[tPos][pos+2] = stringD
 										if TableA[tPos][pos+1] == "" then TableA[tPos][pos+1] = " " end
 									end
 								end
 							elseif stringA == "+-" or stringA == "-+" then -- This is for hardcore trade detection which is restricted to level ranges.
-								if tonumber(stringC) then foundTrades = foundTrades + 1 if showanyway == true then print("+-d% trade 1") end end
+								if tonumber(stringD) then foundTrades = foundTrades + 1 if showanyway == true then print("+-d% trade 1") end end
 							end							
 						end
 					elseif TableA[tPos][pos-2] then -- Nothing after, so only check before.
-						stringD = GF_WORD_FIX[TableA[tPos][pos-2]] and GF_WORD_FIX[TableA[tPos][pos-2]] or TableA[tPos][pos-2]
-						stringB = stringD..stringA -- LP >> "k10", "sum1", "an1"
+						stringC = GF_WORD_FIX[TableA[tPos][pos-2]] and GF_WORD_FIX[TableA[tPos][pos-2]] or TableA[tPos][pos-2]
+						stringB = stringC..stringA -- LP >> "k10", "sum1", "an1"
 						if GF_WORD_SPECIAL_COMBINATION[stringB] then -- Check previous and current... If match, replace word at pos, delete pos-1,pos, leave pos in same position.
 							TableA[tPos][pos-2] = GF_WORD_SPECIAL_COMBINATION[stringB]
 							table.remove(TableA[tPos],pos) table.remove(TableA[tPos],pos-1)
@@ -3043,19 +3062,19 @@ function GF_GetTypes(arg1,arg2,showanyway)
 							tVal = tVal - 2
 							if TableA[tPos][pos+1] == "" then TableA[tPos][pos+1] = " " end
 						elseif tonumber(stringA) then -- "10g" = "xgold"... "2xBM" = "2x BM"
-							if strbyte(stringD,-1) == 120 then -- "BMx2" = "BM x2"
-								stringD = strsub(stringD,1,-2)
-								if GF_WORD_FIX_SINGLE_WORD[stringD] then stringD = GF_WORD_FIX_SINGLE_WORD[stringD] elseif GF_WORD_FIX_BEFORE_QUEST[stringD] then stringD = GF_WORD_FIX_BEFORE_QUEST[stringD] elseif GF_WORD_FIX[stringD] then stringD = GF_WORD_FIX[stringD] end
-								if GF_GROUP_IDS[stringD] and GF_WORD_LETTER_NUMBER_BEFORE_AFTER["x"..stringA] then
+							if strbyte(stringC,-1) == 120 then -- "BMx2" = "BM x2"
+								stringC = strsub(stringC,1,-2)
+								if GF_WORD_FIX_SINGLE_WORD[stringC] then stringC = GF_WORD_FIX_SINGLE_WORD[stringC] elseif GF_WORD_FIX_BEFORE_QUEST[stringC] then stringC = GF_WORD_FIX_BEFORE_QUEST[stringC] elseif GF_WORD_FIX[stringC] then stringC = GF_WORD_FIX[stringC] end
+								if GF_GROUP_IDS[stringC] and GF_WORD_LETTER_NUMBER_BEFORE_AFTER["x"..stringA] then
 									TableA[tPos][pos] = GF_WORD_LETTER_NUMBER_BEFORE_AFTER["x"..stringA]
-									TableA[tPos][pos-2] = stringD
+									TableA[tPos][pos-2] = stringC
 									if TableA[tPos][pos-1] == "" then TableA[tPos][pos-1] = " " end
 								end
 							end
 						elseif stringA == "+-" or stringA == "-+" then -- This is for hardcore trade detection which is restricted to level ranges.
-							if tonumber(stringD) then foundTrades = foundTrades + 1 if showanyway == true then print("+-d% trade 1") end end
+							if tonumber(stringC) then foundTrades = foundTrades + 1 if showanyway == true then print("+-d% trade 1") end end
 						elseif stringA == "+" then -- "deadmines+"
-							if GF_GROUP_IDS[stringD] then
+							if GF_GROUP_IDS[stringC] then
 								TableA[tPos][pos] = GF_PLUS_LOCALIZED
 								if TableA[tPos][pos+1] == "" then TableA[tPos][pos+1] = " " end if TableA[tPos][pos-1] == "" then TableA[tPos][pos-1] = " " end
 							end
@@ -3146,7 +3165,7 @@ function GF_GetTypes(arg1,arg2,showanyway)
 		end
 		tPos = tPos + 1
 	end
-	arg1 = " "..table.concat(TableA).." "
+	arg1 = " "..gsub(table.concat(TableA),"%.gg/%S+", "").." "
 	TableA,TableB,TableC = {},{},{}
 
 	strPos = 1 -- To detect space/number+/punctuation/number+/space for groups(eg "4v5" or "4/5" = group, "4=5" triggers foundLFM)
@@ -3530,7 +3549,8 @@ function GF_GetTypes(arg1,arg2,showanyway)
 				if foundLFM == 0 and foundLFG == 0 then
 					if GF_LFM_AFTER[TableA[tLen-1]..TableA[tLen]] then foundLFM = 2 table.insert(lfmlfgName, TableA[tLen-1]..TableA[tLen]) if showanyway == true then print("word lfmafter lfm 2") end end
 					if GF_GROUP_FIRST_LAST[TableA[1]] and GF_GROUP_FIRST_LAST[TableA[1]][TableA[tLen]] then foundLFM = 2 if showanyway == true then print("firstlast lfm 2") end end
-					if GF_GROUP_FIRST_TWO_SHORT[TableA[1]..TableA[2]] then if GF_GROUP_FIRST_TWO_SHORT[TableA[1]..TableA[2]] > foundLFM then foundLFM = GF_GROUP_FIRST_TWO_SHORT[TableA[1]..TableA[2]] table.insert(lfmPosition, {1,2,GF_GROUP_FIRST_TWO_SHORT[TableA[1]..TableA[2]],true}) if showanyway == true then print(TableA[1]..TableA[2].." lfm "..GF_GROUP_FIRST_TWO_SHORT[TableA[1]..TableA[2]]) end end end
+					if GF_GROUP_FIRST_WORD_SKIP[TableA[1]] and tLen > 2 then stringA = TableA[2]..TableA[3] else stringA = TableA[1]..TableA[2] end -- Skip Yes/No for GF_GROUP_FIRST_TWO_SHORT
+					if GF_GROUP_FIRST_TWO_SHORT[stringA] then if GF_GROUP_FIRST_TWO_SHORT[stringA] > foundLFM then foundLFM = GF_GROUP_FIRST_TWO_SHORT[stringA] table.insert(lfmPosition, {1,2,GF_GROUP_FIRST_TWO_SHORT[stringA],true}) if showanyway == true then print(stringA.." lfm "..GF_GROUP_FIRST_TWO_SHORT[stringA]) end end end
 					stringA = "" for i=1,tLen-1 do stringA = stringA..TableA[i] end if (GF_WORD_DUNGEON[stringA] or GF_WORD_RAID[stringA] or GF_WORD_PVP[stringA] or (GF_WORD_QUEST[stringA] and not GF_LFM_BYPASS[stringA])) and GF_GROUP_SHORT_TRIGGER[TableA[tLen]] then foundLFM = 2 if showanyway == true then print("<group> trigger lfm 2") end end
 					stringA = "" for i=2,tLen do stringA = stringA..TableA[i] end if (GF_WORD_DUNGEON[stringA] or GF_WORD_RAID[stringA] or GF_WORD_PVP[stringA] or (GF_WORD_QUEST[stringA] and not GF_LFM_BYPASS[stringA])) and GF_GROUP_SHORT_TRIGGER[TableA[1]] then foundLFM = 2 if showanyway == true then print("<group> trigger lfm 2") end end
 				end
@@ -3625,7 +3645,7 @@ function GF_GetTypes(arg1,arg2,showanyway)
 					if GF_RAID_BEFORE[TableA[i-1]] and (GF_RAID_BEFORE[TableA[i-1]][TableA[i+j+1]] or (TableA[i+j+2] and GF_RAID_BEFORE[TableA[i-1]][TableA[i+j+1]..TableA[i+j+2]])) then foundGuildExclusion = foundGuildExclusion + 1 if foundLFM < 3 then foundLFM = 3 if showanyway == true then print("1 word before/1-2 words after raid") end end end
 					if GF_RAID_AFTER[TableA[i+j+1]] or (TableA[i+j+2] and GF_RAID_AFTER[TableA[i+j+1]..TableA[i+j+2]]) or (TableA[i+j+3] and GF_RAID_AFTER[TableA[i+j+1]..TableA[i+j+2]..TableA[i+j+3]]) then foundGuildExclusion = foundGuildExclusion + 1 if foundLFM < 3 then foundLFM = 3 if showanyway == true then print("1-3 words after raid") end end end
 					numGroupWords = numGroupWords + 1 + j
-				elseif GF_WORD_PVP[stringA] and (not GF_PVP_TRIGGER[stringA] or GF_PVP_TRIGGER_WORD[TableA[i+j+1]] or GF_PVP_TRIGGER_WORD[TableA[i-1]]) then
+				elseif GF_WORD_PVP[stringA] and (not GF_PVP_TRIGGER[stringA] or GF_PVP_TRIGGER_WORD[TableA[i+j+1]] or GF_PVP_TRIGGER_WORD[TableA[i-1]] or (GF_PVP_TRIGGER_WORD[TableA[i-2]] and GF_PVP_TRIGGER_WORD[TableA[i-2]..TableA[i-1]])) then
 					if showanyway == true then print(stringA.." pvp") end
 					if not foundPvP or GF_WORD_PVP[stringA] > foundPvP then foundPvP = GF_WORD_PVP[stringA] table.insert(foundPFlags,1,stringA) else table.insert(foundPFlags, stringA) end
 					if foundPvP == 0 then for num,word in gfind(arg1, "[%p%s](%d+)%s?(%a+)[%p%s]") do if (GF_WORD_PVP[word] or GF_PVP_DETECTION[word]) and tonumber(num) > foundPvP and tonumber(num) > 8 and tonumber(num) < 61 then foundPvP = tonumber(num) break end end end
@@ -3812,7 +3832,9 @@ function GF_GetTypes(arg1,arg2,showanyway)
 
 	if possibleGold then foundTrades = foundTrades + 2 if showanyway == true then print("#g trade 2") end end
 	if tLen >= 10 then foundTradesExclusion = foundTradesExclusion + floor(1.5 ^ (tLen/10)) * .25 if showanyway == true then print((floor(1.5 ^ (tLen/10)) * .25).." tradesex for "..tLen.." words") end if numGroupWords > 0 and tLen/(numGroupWords*1.5) > 1 then foundIgnore = foundIgnore + floor(tLen/(numGroupWords*1.5)) * .25 if showanyway == true then print("subtract "..(floor(tLen/(numGroupWords*1.5)) * .25).." for "..numGroupWords.." group words out of "..tLen) end end end
-	if not firstLFMLFG and foundClass and tLen <= 6 then foundTradesExclusion = foundTradesExclusion + 1 if showanyway == true then print("<class> no group tradesex 1") end end
+-- This is too broad. Need to cancel if found certain keywords like lockbox, enchant, etc. This is for things like LF rogue or any mage because those are too broad.
+-- if E, Q, T, L, P, W
+	if not firstLFMLFG and foundClass and tLen <= 6 then for i=1, tLen do if GF_TRADE_CLASS_EXCLUSION[TableC[i]] then foundClass = nil break end end if foundClass then foundTradesExclusion = foundTradesExclusion + 1 if showanyway == true then print("<class> no group tradesex 1") end end end
 	foundTrades = foundTrades - foundTradesExclusion
 
 	if foundIgnore > 0 then
