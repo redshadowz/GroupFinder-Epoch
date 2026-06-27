@@ -1187,7 +1187,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 			</Button>
 			<Frame name="GF_TranslateDropdownMenu" clampedToScreen="true" enableMouse="true" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true">
 				<Size>
-					<AbsDimension y="85"/>
+					<AbsDimension y="65"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="GF_TranslateDropdownButton" relativePoint="BOTTOMLEFT">
@@ -1234,9 +1234,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								if self:GetChecked() then GF_SavedVariables.showtranslate = true else GF_SavedVariables.showtranslate = false end
-								GF_SavedVariables.showuntranslated = GF_TranslateShowUntranslatedCheckButton:SetChecked(false)
+								if self:GetChecked() then GF_SavedVariables.showtranslate = true else GF_SavedVariables.showtranslate = false GF_SavedVariables.showuntranslated = GF_TranslateShowUntranslatedCheckButton:SetChecked(false) end
 								GF_SavedVariables.blockforeign = GF_TranslateBlockForeignCheckButton:SetChecked(false)
+								GF_ApplyFiltersToGroupList(true)
 							</OnClick>
 							<OnLoad>
 								getglobal(self:GetName().."TextLabel"):SetText(GF_TRANSLATE_CHAT)
@@ -1253,38 +1253,18 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								if self:GetChecked() then GF_SavedVariables.showuntranslated = true else GF_SavedVariables.showuntranslated = false end
-								GF_SavedVariables.showtranslate = GF_TranslateChatCheckButton:SetChecked(false)
+								if self:GetChecked() then GF_SavedVariables.showuntranslated = true GF_SavedVariables.showtranslate = true GF_TranslateChatCheckButton:SetChecked(true) else GF_SavedVariables.showuntranslated = false end
 								GF_SavedVariables.blockforeign = GF_TranslateBlockForeignCheckButton:SetChecked(false)
+								GF_ApplyFiltersToGroupList(true)
 							</OnClick>
 							<OnLoad>
 								getglobal(self:GetName().."TextLabel"):SetText(GF_TRANSLATE_UNTRANSLATED)
 							</OnLoad>
 						</Scripts>
 					</CheckButton>
-					<CheckButton name="GF_TranslateGroupsCheckButton" inherits="GF_DropdownCheckButtonTemplate_Label">
-						<Anchors>
-							<Anchor point="TOP" relativeTo="GF_TranslateShowUntranslatedCheckButton" relativePoint="BOTTOM">
-								<Offset>
-									<AbsDimension x="0" y="6"/>
-								</Offset>
-							</Anchor>
-						</Anchors>
-						<Scripts>
-							<OnClick>
-								if self:GetChecked() then GF_SavedVariables.translategroups = true else GF_SavedVariables.translategroups = false end
-								GF_SavedVariables.blockforeign = GF_TranslateBlockForeignCheckButton:SetChecked(false)
-								GF_GetGroupFilters()
-								GF_ApplyFiltersToGroupList(true)
-							</OnClick>
-							<OnLoad>
-								getglobal(self:GetName().."TextLabel"):SetText(GF_TRANSLATE_INCLUDE_GROUPS)
-							</OnLoad>
-						</Scripts>
-					</CheckButton>
 					<CheckButton name="GF_TranslateBlockForeignCheckButton" inherits="GF_DropdownCheckButtonTemplate_Label">
 						<Anchors>
-							<Anchor point="TOP" relativeTo="GF_TranslateGroupsCheckButton" relativePoint="BOTTOM">
+							<Anchor point="TOP" relativeTo="GF_TranslateShowUntranslatedCheckButton" relativePoint="BOTTOM">
 								<Offset>
 									<AbsDimension x="0" y="6"/>
 								</Offset>
@@ -1295,7 +1275,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 								if self:GetChecked() then GF_SavedVariables.blockforeign = true else GF_SavedVariables.blockforeign = false end
 								GF_SavedVariables.showtranslate = GF_TranslateChatCheckButton:SetChecked(false)
 								GF_SavedVariables.showuntranslated = GF_TranslateShowUntranslatedCheckButton:SetChecked(false)
-								GF_SavedVariables.translategroups = GF_TranslateGroupsCheckButton:SetChecked(false)
 								GF_GetGroupFilters()
 								GF_ApplyFiltersToGroupList(true)
 							</OnClick>
@@ -5842,6 +5821,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 										end
 										if GF_BUTTONS_LIST.LFGHardCore[GF_PerCharVariables.hardcore][4] then GF_WorldAnnounceMessageTextLabel:SetText(GF_HARDCORE_SEND_TEXT) else GF_WorldAnnounceMessageTextLabel:SetText(GF_WORLD_SEND_TEXT.." "..GF_SavedVariables.groupchannelname.." "..GF_LOG_CHANNEL) end
 										GF_LFGHardCoreDropdownTextLabel:SetText(GF_BUTTONS_LIST.LFGHardCore[GF_PerCharVariables.hardcore][1])
+										GF_GetGroupFilters()
 									</OnClick>
 									<OnLoad>
 										getglobal(self:GetName().."TextLabel"):SetText(GF_DISABLE_HARDCORE_SETTINGS)
