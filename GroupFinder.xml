@@ -3743,7 +3743,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 										end
 									</OnLeave>
 									<OnLoad>
-										GF_LogFrameInternalFrameTitle:SetText(GF_LOG_AND_MONITOR)
+										GF_LogFrameInternalFrameTitle:SetText(GF_LOG_HEADER)
 										getglobal(self:GetName().."TextLabel"):SetText(GF_LOG_FILTERS)
 									</OnLoad>
 								</Scripts>
@@ -5819,7 +5819,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 											GF_BUTTONS_LIST.LFGHardCore[3] = {GF_SHOW_NORMAL,1,60,nil,true,nil}
 											if GF_PerCharVariables.hardcore == 3 then DEFAULT_CHAT_FRAME:AddMessage(GF_WORLD_NOW_SENDING, 1, 1, 0.5) else DEFAULT_CHAT_FRAME:AddMessage(GF_HARDCORE_NOW_SENDING, 1, 1, 0.5) end
 										end
-										if GF_BUTTONS_LIST.LFGHardCore[GF_PerCharVariables.hardcore][4] then GF_WorldAnnounceMessageTextLabel:SetText(GF_HARDCORE_SEND_TEXT) else GF_WorldAnnounceMessageTextLabel:SetText(GF_WORLD_SEND_TEXT.." "..GF_SavedVariables.groupchannelname.." "..GF_LOG_CHANNEL) end
+										if GF_BUTTONS_LIST.LFGHardCore[GF_PerCharVariables.hardcore][4] then GF_WorldAnnounceMessageTextLabel:SetText(GF_HARDCORE_SEND_TEXT) else GF_WorldAnnounceMessageTextLabel:SetText(GF_WORLD_SEND_TEXT..GF_SavedVariables.groupchannelname.." "..GF_LOG_CHANNEL) end
 										GF_LFGHardCoreDropdownTextLabel:SetText(GF_BUTTONS_LIST.LFGHardCore[GF_PerCharVariables.hardcore][1])
 										GF_GetGroupFilters()
 									</OnClick>

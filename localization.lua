@@ -5,8 +5,8 @@ GF_TURTLE_SERVERS_LIST = { ["Nordanaar"] = true, ["Tel'Abim"] = true, ["Ambershi
 GF_KNOWN_SERVERS_LIST = { ["Nordanaar"] = true, ["Tel'Abim"] = true, ["Ambershire"] = true }
 GF_HARDCORE_SPELL_NAME = "Hardcore"
 GF_HARDCORE_TURTLE_SUBTEXT = "Challenge"
-GF_CHANNEL_BYPASS_LIST = { ["lft"] = true, }
-GF_CHANNEL_NO_LOG_LIST = { ["lfg"] = true, }
+GF_CHANNEL_BYPASS_LIST = { ["LFT"] = true, }
+GF_CHANNEL_NO_LOG_LIST = { ["LFG"] = true, }
 --GF_LFG_TIMEOUT_TRIGGER = { ["LFG:"] = true,["LFM:"] = true, }
 GF_LFG_PARTY_READY = ":party:ready:"
 GF_LFG_LEFT_QUEUE = "leftQueue"
@@ -28,7 +28,7 @@ GF_HUMAN	= "Human"
 GF_NIGHT_ELF= "Night Elf"
 GF_DWARF	= "Dwarf"
 GF_GNOME	= "Gnome"
-GF_ORC= "Orc"
+GF_ORC		= "Orc"
 GF_UNDEAD	= "Undead"
 GF_TROLL	= "Troll"
 GF_TAUREN	= "Tauren"
@@ -55,7 +55,7 @@ GF_GROUP_LISTINGS = "Group Listings" -- Label for Groupfinder tab
 GF_CHAT_FILTERS = "Chat Filters"
 GF_GROUP_FILTERS = "Group Filters"
 GF_SHOW_GROUPS_IN = "Show groups in"
-GF_WORLD_SEND_TEXT = "Message that gets announced to the"
+GF_WORLD_SEND_TEXT = "Message that gets announced to the "
 GF_HARDCORE_SEND_TEXT = "Message that gets announced to the Hardcore Channel"
 GF_WORLD_NOW_SENDING = "GF: Now sending announcements to the World Channel"
 GF_HARDCORE_NOW_SENDING = "GF: Now sending announcements to the Hardcore Channel"
@@ -72,7 +72,7 @@ GF_GUILDS = "Guild"
 GF_PLAY_SOUND = "Play sound" -- Label for GF_PlaySoundOnResultsCheckButton
 
 -- Log Filters
-GF_LOG_AND_MONITOR = "Chat Log" -- Label at top of Log frame
+GF_LOG_HEADER = "Chat Log" -- Label at top of Log frame
 GF_LOG_FILTERED = "Filtered"
 GF_LOG_SPAM = "Spam"
 GF_LOG_FILTERS = "Log Filters"
@@ -103,9 +103,10 @@ GF_LOG_CONVERT_URL = "Convert to links"
 
 GF_LOG_SAVE_GROUP = "Save Group"
 GF_LOG_RESET_GROUP = "Reset Group"
-
 GF_LOG_GROUP_IS_SAVED = "Group Data is saved"
 GF_LOG_GROUP_IS_RESET = "Group Data is reset"
+GF_ARE_YOU_SURE_SAVE_GROUP = "Are you sure you want to save the current group?" -- Label for Save Group
+GF_ARE_YOU_SURE_RESET_GROUP = "Are you sure you want to reset the current group?" -- Label for Reset Group
 
 -- Group-related buttons and texts
 GF_KEYWORDS_DROPDOWN_DESCR = "Keywords:" -- Label to the left of the GF_GroupsFrameDescriptionEditBox on group frame
@@ -135,7 +136,6 @@ GF_BLACK_LIST = "Blacklist" -- Label for Blacklist tab
 GF_CHAT_SETTINGS = "Chat settings" -- Label for minimap section of Settings tab
 GF_DISPLAY_SETTINGS = "Display settings" -- Label for filter section of Settings tab
 GF_GROUP_SETTINGS = "Group settings" -- Label for minimap section of Settings tab
-GF_MINIMAP_SETTINGS = "Minimap settings" -- Label for minimap section of Settings tab
 GF_OTHER_SETTINGS = "Other settings" -- Label for minimap section of Settings tab
 GF_ADJUST_TRANSPARENCY = "Window transparency" -- Label for adjust transparency on Settings tab
 GF_ADJUST_UISCALE = "Adjust window scale" -- Label for adjust transparency on Settings tab
@@ -151,8 +151,6 @@ GF_ADD_TO_BLOCK_LIST = "Add words to the block list"
 GF_BLOCK_LIST = "Block list"
 GF_ADDING_TO_BLOCK_LIST = "Adding '%s' to block list."
 GF_ADJUST_FILTER_LEVEL = "Group Filtering" -- Label for Filter slider on Settings tab
-GF_ARE_YOU_SURE_SAVE_GROUP = "Are you sure you want to save the current group?" -- Label for Save Group
-GF_ARE_YOU_SURE_RESET_GROUP = "Are you sure you want to reset the current group?" -- Label for Reset Group
 
 GF_FilterLevelNotes = {}
 GF_FilterLevelNotes[1] = "Not Strict"
@@ -191,13 +189,13 @@ GF_RAIDS = "Raid"
 GF_ROLE = "Role"
 GF_TANK = "Tank"
 GF_HEALER = "Healer"
-GF_DPS = "DPS"
 GF_MELEE = "Melee"
 GF_RANGE = "Range"
 GF_CASTER = "Caster"
 GF_MYROLES = "My Roles"
 
 GF_DAMAGE = "Damage"
+GF_DPS = "DPS"
 GF_HEALING = "Healing"
 GF_HPS = "HPS"
 
@@ -281,9 +279,8 @@ GF_PORTAL_LOCALIZED = "portal"
 GF_PLUS_LOCALIZED = "plus"
 GF_ELITE_LOCALIZED = "elite"
 GF_BOSS_LOCALIZED = "boss"
-GF_SERVERTIME_ABBREV_LOCALIZED = "st"
-GF_SERVERTIME_LOCALIZED = "servertime"
 
+GF_MY_LANGUAGE = "en"
 GF_TRANSLATE = "Translate"
 GF_TRANSLATE_CHAT = "Translate Chat"
 GF_TRANSLATE_UNTRANSLATED = "Show Both"
@@ -334,16 +331,16 @@ GF_AutoFilterCheckButton = {
 	tooltip1 = "Auto-Filter",
 	tooltip2 = "When checked, only groups near your level will be shown." },
 GF_GroupFilterShowDungeonCheckButton = { 
-	tooltip1 = "Show dungeon groups",
+	tooltip1 = "Show Dungeon groups",
 	tooltip2 = "When checked, results will include dungeon groups." },
 GF_GroupFilterShowRaidCheckButton = { 
-	tooltip1 = "Show raid groups",
+	tooltip1 = "Show Raid groups",
 	tooltip2 = "When checked, results will include raid groups." },
 GF_GroupFilterShowQuestCheckButton = { 
-	tooltip1 = "Show raid groups",
+	tooltip1 = "Show Quest groups",
 	tooltip2 = "When checked, results will include quest groups." },
 GF_GroupFilterShowOtherCheckButton = { 
-	tooltip1 = "Show other groups",
+	tooltip1 = "Show Other groups",
 	tooltip2 = "When checked, results will include groups other than dungeons/raids/quests." },
 GF_GroupsFrameShowLFMCheckButton = { 
 	tooltip1 = "Show groups looking for more",
@@ -352,10 +349,10 @@ GF_GroupsFrameShowLFGCheckButton = {
 	tooltip1 = "Show players looking for group",
 	tooltip2 = "When checked, results will include all groups flagged with LFG" },
 GF_GroupFilterShowTanksCheckButton = {
-	tooltip1 = "Show tanks only",
+	tooltip1 = "Show Tanks only",
 	tooltip2 = "When checked, results must include tanks." },
 GF_GroupFilterShowHealersCheckButton = {
-	tooltip1 = "Show healers only",
+	tooltip1 = "Show Healers only",
 	tooltip2 = "When checked, results must include healer." },
 GF_GroupFilterShowDPSCheckButton = {
 	tooltip1 = "Show DPS only",
@@ -391,13 +388,13 @@ GF_GetWhoWhisperButton = {
 	tooltip2 = "Whispers the next player on the list made by the 'Get Who' button. If the text input on this line is blank then it will send the World Channel message instead.",  },
 GF_GetWhoSkipButton = { 
 	tooltip1 = "Skip player",
-	tooltip2 = "Skips the next name on the Get Who list for 5 minutes.",  },
+	tooltip2 = "Skips the next name on the 'Get Who' list for 5 minutes.",  },
 
 GF_LFGFrameToggleButton = { 
 	tooltip1 = "Toggle Groupmaker",
 	tooltip2 = "Toggles the Groupmaker to help you create world channel messages.",  },
 GF_GetWhoFrameToggleButton = { 
-	tooltip1 = "Toggle Get Who",
+	tooltip1 = "Toggle 'Get Who'",
 	tooltip2 = "Toggles a menu  to help you find players for dungeons, raids, etc.",  },
 
 GF_AnnounceToLFGButton = {
@@ -522,9 +519,6 @@ GF_TranslateChatCheckButton = {
 GF_TranslateShowUntranslatedCheckButton = {
 	tooltip1 = "Show Both",
 	tooltip2 = "Show both the original and translated messages in chat." },
-GF_TranslateGroupsCheckButton = {
-	tooltip1 = "Show Groups",
-	tooltip2 = "Include Translated groups in group listings." },
 GF_TranslateBlockForeignCheckButton = {
 	tooltip1 = "Block Foreign",
 	tooltip2 = "Block all foreign messages from chat and group listings." },
