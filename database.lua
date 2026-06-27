@@ -4220,16 +4220,12 @@ GF_PUNCTUATION_REMOVE = {
 }
 
 GF_LANGUAGES = { -- Single words that are unique and help to identify the language being spoken
-["en"] = true,
-["cn"] = true,
+["cn"] = true,["es"] = true,["hu"] = true,["ru"] = true,["de"] = true,["pt"] = true,["bg"] = true,["da"] = true,["ro"] = true,["fr"] = true,["sv"] = true,["no"] = true,["pl"] = true,["uk"] = true,["nl"] = true,["sr"] = true,["it"] = true,["sk"] = true,["fi"] = true,["en"] = true,["sl"] = true,["cs"] = true,["tr"] = true,
 }
 GF_LANGUAGE_DETECT = { -- Single words that are unique and help to identify the language being spoken
 }
 GF_LANGUAGE_SINGLE_WORDS={ -- Single words that are unique, and are thus associated with specific languages
-["cn"] = {
-},
-["en"] = {
-},
+["cn"] = {},["es"] = {},["hu"] = {},["ru"] = {},["de"] = {},["pt"] = {},["bg"] = {},["da"] = {},["ro"] = {},["fr"] = {},["sv"] = {},["no"] = {},["pl"] = {},["uk"] = {},["nl"] = {},["sr"] = {},["it"] = {},["sk"] = {},["fi"] = {},["en"] = {},["sl"] = {},["cs"] = {},["tr"] = {},
 }
 
 GF_QUEST_CONVERT = {
@@ -4290,59 +4286,59 @@ local GF_TurtleGroupButtonsListRaids = {
 }
 function GF_AddTurtleWoWDungeonsRaids()
 	if not GF_PlayingOnTurtle then
-for i=1, getn(GF_TurtleSearchList) do table.insert(GF_BUTTONS_LIST.SearchList, 27, GF_TurtleSearchList[i]) end
-for i=1, getn(GF_TurtleGroupButtonsListGetWhoLevel) do table.insert(GF_BUTTONS_LIST.GetWhoLevel, 32, GF_TurtleGroupButtonsListGetWhoLevel[i]) end
-for i=1, getn(GF_TurtleGroupButtonsListDungeons) do table.insert(GF_BUTTONS_LIST.LFGDungeon, GF_TurtleGroupButtonsListDungeons[i]) end
-for i=1, getn(GF_TurtleGroupButtonsListRaids) do table.insert(GF_BUTTONS_LIST.LFGRaid, GF_TurtleGroupButtonsListRaids[i]) end
-table.insert(GF_BUTTONS_LIST.LFGSize, 3, { GF_12_MAN, 1, 60, 12, } )
--- ["arugalsfolly"]={60108,27,209,130},["betrayalfromwithin"]={40560,30,15,15},["herosreward"]={40675,10,14,16},
--- New Hunter level 10 quests ["trainingbeast"]={80755,10,40016,5536},["tamingbeast"]={80342,10,40016,12},["hunterpath"]={80366,10,40016,1537},
--- ["thecollector"]={41296,48,8,8},["serpentbloom"]={60125,18,718,718},["noborucudgel"]={40030,36,8,8},["herosreward"]={40675,20,14,16},["hermit"]={40210,51,0,10},["hammerfall"]={41540,58,17,17},["goodfriend"]={41797,28,0,141},
--- ["betrayalfromwithin"]={40560,35,15,15},["etchedrune"]={80350,1,40016,1},
-if LFTFrame and LFTRoleCheckFrameRole1CheckButton and LFTRoleCheckFrameConfirmButton then
-	GF_LFT_DUNGEONS = {}
-	if LFT_DUNGEON_BFD then GF_LFT_DUNGEONS[LFT_DUNGEON_BFD] = "bfd" end
-	if LFT_DUNGEON_BRD then GF_LFT_DUNGEONS[LFT_DUNGEON_BRD] = "brd" end
-	if LFT_DUNGEON_BRDARENA then GF_LFT_DUNGEONS[LFT_DUNGEON_BRDARENA] = "brdarena" end
-	if LFT_DUNGEON_BRDEMP then GF_LFT_DUNGEONS[LFT_DUNGEON_BRDEMP] = "brdemperor" end
-	if LFT_DUNGEON_COTBM then GF_LFT_DUNGEONS[LFT_DUNGEON_COTBM] = "bm" end
-	if LFT_DUNGEON_DM then GF_LFT_DUNGEONS[LFT_DUNGEON_DM] = "dm" end
-	if LFT_DUNGEON_DME then GF_LFT_DUNGEONS[LFT_DUNGEON_DME] = "dme" end
-	if LFT_DUNGEON_DMN then GF_LFT_DUNGEONS[LFT_DUNGEON_DMN] = "dmn" end
-	if LFT_DUNGEON_DMR then GF_LFT_DUNGEONS[LFT_DUNGEON_DMR] = "dmr" end
-	if LFT_DUNGEON_DMT then GF_LFT_DUNGEONS[LFT_DUNGEON_DMT] = "dmt" end
-	if LFT_DUNGEON_DMW then GF_LFT_DUNGEONS[LFT_DUNGEON_DMW] = "dmw" end
-	if LFT_DUNGEON_FMH then GF_LFT_DUNGEONS[LFT_DUNGEON_FMH] = "fmh" end
-	if LFT_DUNGEON_GILNEAS then GF_LFT_DUNGEONS[LFT_DUNGEON_GILNEAS] = "gc" end
-	if LFT_DUNGEON_GNOMER then GF_LFT_DUNGEONS[LFT_DUNGEON_GNOMER] = "gnomer" end
-	if LFT_DUNGEON_HFQ then GF_LFT_DUNGEONS[LFT_DUNGEON_HFQ] = "hfq" end
-	if LFT_DUNGEON_KC then GF_LFT_DUNGEONS[LFT_DUNGEON_KC] = "crypt" end
-	if LFT_DUNGEON_LBRS then GF_LFT_DUNGEONS[LFT_DUNGEON_LBRS] = "lbrs" end
-	if LFT_DUNGEON_MARAORANGE then GF_LFT_DUNGEONS[LFT_DUNGEON_MARAORANGE] = "maraudonorange" end
-	if LFT_DUNGEON_MARAPRINCESS then GF_LFT_DUNGEONS[LFT_DUNGEON_MARAPRINCESS] = "maraudonprincess" end
-	if LFT_DUNGEON_MARAPURPLE then GF_LFT_DUNGEONS[LFT_DUNGEON_MARAPURPLE] = "maraudonpurple" end
-	if LFT_DUNGEON_RFC then GF_LFT_DUNGEONS[LFT_DUNGEON_RFC] = "rfc" end
-	if LFT_DUNGEON_RFD then GF_LFT_DUNGEONS[LFT_DUNGEON_RFD] = "rfd" end
-	if LFT_DUNGEON_RFK then GF_LFT_DUNGEONS[LFT_DUNGEON_RFK] = "rfk" end
-	if LFT_DUNGEON_SCHOLO then GF_LFT_DUNGEONS[LFT_DUNGEON_SCHOLO] = "scholomance" end
-	if LFT_DUNGEON_SFK then GF_LFT_DUNGEONS[LFT_DUNGEON_SFK] = "sfk" end
-	if LFT_DUNGEON_SMARM then GF_LFT_DUNGEONS[LFT_DUNGEON_SMARM] = "smarm" end
-	if LFT_DUNGEON_SMCATH then GF_LFT_DUNGEONS[LFT_DUNGEON_SMCATH] = "smcath" end
-	if LFT_DUNGEON_SMLIB then GF_LFT_DUNGEONS[LFT_DUNGEON_SMLIB] = "smlib" end
-	if LFT_DUNGEON_SM_GY then GF_LFT_DUNGEONS[LFT_DUNGEON_SM_GY] = "smgy" end
-	if LFT_DUNGEON_ST then GF_LFT_DUNGEONS[LFT_DUNGEON_ST] = "st" end
-	if LFT_DUNGEON_STOCKS then GF_LFT_DUNGEONS[LFT_DUNGEON_STOCKS] = "stockade" end
-	if LFT_DUNGEON_STRATLIVE then GF_LFT_DUNGEONS[LFT_DUNGEON_STRATLIVE] = "livestrat" end
-	if LFT_DUNGEON_STRATUD then GF_LFT_DUNGEONS[LFT_DUNGEON_STRATUD] = "udstrat" end
-	if LFT_DUNGEON_SWC then GF_LFT_DUNGEONS[LFT_DUNGEON_SWC] = "swc" end
-	if LFT_DUNGEON_SWD then GF_LFT_DUNGEONS[LFT_DUNGEON_SWD] = "swd" end
-	if LFT_DUNGEON_SWV then GF_LFT_DUNGEONS[LFT_DUNGEON_SWV] = "swv" end
-	if LFT_DUNGEON_TCG then GF_LFT_DUNGEONS[LFT_DUNGEON_TCG] = "tcg" end
-	if LFT_DUNGEON_ULDA then GF_LFT_DUNGEONS[LFT_DUNGEON_ULDA] = "ulda" end
-	if LFT_DUNGEON_WC then GF_LFT_DUNGEONS[LFT_DUNGEON_WC] = "wc" end
-	if LFT_DUNGEON_WINDHORN then GF_LFT_DUNGEONS[LFT_DUNGEON_WINDHORN] = "windhorn" end
-	if LFT_DUNGEON_ZF then GF_LFT_DUNGEONS[LFT_DUNGEON_ZF] = "zf" end
-end
+		for i=1, getn(GF_TurtleSearchList) do table.insert(GF_BUTTONS_LIST.SearchList, 27, GF_TurtleSearchList[i]) end
+		for i=1, getn(GF_TurtleGroupButtonsListGetWhoLevel) do table.insert(GF_BUTTONS_LIST.GetWhoLevel, 32, GF_TurtleGroupButtonsListGetWhoLevel[i]) end
+		for i=1, getn(GF_TurtleGroupButtonsListDungeons) do table.insert(GF_BUTTONS_LIST.LFGDungeon, GF_TurtleGroupButtonsListDungeons[i]) end
+		for i=1, getn(GF_TurtleGroupButtonsListRaids) do table.insert(GF_BUTTONS_LIST.LFGRaid, GF_TurtleGroupButtonsListRaids[i]) end
+		table.insert(GF_BUTTONS_LIST.LFGSize, 3, { GF_12_MAN, 1, 60, 12, } )
+		-- ["arugalsfolly"]={60108,27,209,130},["betrayalfromwithin"]={40560,30,15,15},["herosreward"]={40675,10,14,16},
+		-- New Hunter level 10 quests ["trainingbeast"]={80755,10,40016,5536},["tamingbeast"]={80342,10,40016,12},["hunterpath"]={80366,10,40016,1537},
+		-- ["thecollector"]={41296,48,8,8},["serpentbloom"]={60125,18,718,718},["noborucudgel"]={40030,36,8,8},["herosreward"]={40675,20,14,16},["hermit"]={40210,51,0,10},["hammerfall"]={41540,58,17,17},["goodfriend"]={41797,28,0,141},
+		-- ["betrayalfromwithin"]={40560,35,15,15},["etchedrune"]={80350,1,40016,1},
+		if LFTFrame and LFTRoleCheckFrameRole1CheckButton and LFTRoleCheckFrameConfirmButton then
+			GF_LFT_DUNGEONS = {}
+			if LFT_DUNGEON_BFD then GF_LFT_DUNGEONS[LFT_DUNGEON_BFD] = "bfd" end
+			if LFT_DUNGEON_BRD then GF_LFT_DUNGEONS[LFT_DUNGEON_BRD] = "brd" end
+			if LFT_DUNGEON_BRDARENA then GF_LFT_DUNGEONS[LFT_DUNGEON_BRDARENA] = "brdarena" end
+			if LFT_DUNGEON_BRDEMP then GF_LFT_DUNGEONS[LFT_DUNGEON_BRDEMP] = "brdemperor" end
+			if LFT_DUNGEON_COTBM then GF_LFT_DUNGEONS[LFT_DUNGEON_COTBM] = "bm" end
+			if LFT_DUNGEON_DM then GF_LFT_DUNGEONS[LFT_DUNGEON_DM] = "dm" end
+			if LFT_DUNGEON_DME then GF_LFT_DUNGEONS[LFT_DUNGEON_DME] = "dme" end
+			if LFT_DUNGEON_DMN then GF_LFT_DUNGEONS[LFT_DUNGEON_DMN] = "dmn" end
+			if LFT_DUNGEON_DMR then GF_LFT_DUNGEONS[LFT_DUNGEON_DMR] = "dmr" end
+			if LFT_DUNGEON_DMT then GF_LFT_DUNGEONS[LFT_DUNGEON_DMT] = "dmt" end
+			if LFT_DUNGEON_DMW then GF_LFT_DUNGEONS[LFT_DUNGEON_DMW] = "dmw" end
+			if LFT_DUNGEON_FMH then GF_LFT_DUNGEONS[LFT_DUNGEON_FMH] = "fmh" end
+			if LFT_DUNGEON_GILNEAS then GF_LFT_DUNGEONS[LFT_DUNGEON_GILNEAS] = "gc" end
+			if LFT_DUNGEON_GNOMER then GF_LFT_DUNGEONS[LFT_DUNGEON_GNOMER] = "gnomer" end
+			if LFT_DUNGEON_HFQ then GF_LFT_DUNGEONS[LFT_DUNGEON_HFQ] = "hfq" end
+			if LFT_DUNGEON_KC then GF_LFT_DUNGEONS[LFT_DUNGEON_KC] = "crypt" end
+			if LFT_DUNGEON_LBRS then GF_LFT_DUNGEONS[LFT_DUNGEON_LBRS] = "lbrs" end
+			if LFT_DUNGEON_MARAORANGE then GF_LFT_DUNGEONS[LFT_DUNGEON_MARAORANGE] = "maraudonorange" end
+			if LFT_DUNGEON_MARAPRINCESS then GF_LFT_DUNGEONS[LFT_DUNGEON_MARAPRINCESS] = "maraudonprincess" end
+			if LFT_DUNGEON_MARAPURPLE then GF_LFT_DUNGEONS[LFT_DUNGEON_MARAPURPLE] = "maraudonpurple" end
+			if LFT_DUNGEON_RFC then GF_LFT_DUNGEONS[LFT_DUNGEON_RFC] = "rfc" end
+			if LFT_DUNGEON_RFD then GF_LFT_DUNGEONS[LFT_DUNGEON_RFD] = "rfd" end
+			if LFT_DUNGEON_RFK then GF_LFT_DUNGEONS[LFT_DUNGEON_RFK] = "rfk" end
+			if LFT_DUNGEON_SCHOLO then GF_LFT_DUNGEONS[LFT_DUNGEON_SCHOLO] = "scholomance" end
+			if LFT_DUNGEON_SFK then GF_LFT_DUNGEONS[LFT_DUNGEON_SFK] = "sfk" end
+			if LFT_DUNGEON_SMARM then GF_LFT_DUNGEONS[LFT_DUNGEON_SMARM] = "smarm" end
+			if LFT_DUNGEON_SMCATH then GF_LFT_DUNGEONS[LFT_DUNGEON_SMCATH] = "smcath" end
+			if LFT_DUNGEON_SMLIB then GF_LFT_DUNGEONS[LFT_DUNGEON_SMLIB] = "smlib" end
+			if LFT_DUNGEON_SM_GY then GF_LFT_DUNGEONS[LFT_DUNGEON_SM_GY] = "smgy" end
+			if LFT_DUNGEON_ST then GF_LFT_DUNGEONS[LFT_DUNGEON_ST] = "st" end
+			if LFT_DUNGEON_STOCKS then GF_LFT_DUNGEONS[LFT_DUNGEON_STOCKS] = "stockade" end
+			if LFT_DUNGEON_STRATLIVE then GF_LFT_DUNGEONS[LFT_DUNGEON_STRATLIVE] = "livestrat" end
+			if LFT_DUNGEON_STRATUD then GF_LFT_DUNGEONS[LFT_DUNGEON_STRATUD] = "udstrat" end
+			if LFT_DUNGEON_SWC then GF_LFT_DUNGEONS[LFT_DUNGEON_SWC] = "swc" end
+			if LFT_DUNGEON_SWD then GF_LFT_DUNGEONS[LFT_DUNGEON_SWD] = "swd" end
+			if LFT_DUNGEON_SWV then GF_LFT_DUNGEONS[LFT_DUNGEON_SWV] = "swv" end
+			if LFT_DUNGEON_TCG then GF_LFT_DUNGEONS[LFT_DUNGEON_TCG] = "tcg" end
+			if LFT_DUNGEON_ULDA then GF_LFT_DUNGEONS[LFT_DUNGEON_ULDA] = "ulda" end
+			if LFT_DUNGEON_WC then GF_LFT_DUNGEONS[LFT_DUNGEON_WC] = "wc" end
+			if LFT_DUNGEON_WINDHORN then GF_LFT_DUNGEONS[LFT_DUNGEON_WINDHORN] = "windhorn" end
+			if LFT_DUNGEON_ZF then GF_LFT_DUNGEONS[LFT_DUNGEON_ZF] = "zf" end
+		end
 	end
 end
 
@@ -4360,15 +4356,15 @@ local GF_EpochGroupButtonsListDungeons = { -- header, min to show, max to show, 
 }
 function GF_AddEpochWoWDungeonsRaids()
 	if not GF_PlayingOnEpoch then
-for i=1, getn(GF_EpochSearchList) do table.insert(GF_BUTTONS_LIST.SearchList, 27, GF_EpochSearchList[i]) end
-for i=1, getn(GF_EpochGroupButtonsListGetWhoLevel) do table.insert(GF_BUTTONS_LIST.GetWhoLevel, 32, GF_EpochGroupButtonsListGetWhoLevel[i]) end
-for i=1, getn(GF_EpochGroupButtonsListDungeons) do table.insert(GF_BUTTONS_LIST.LFGDungeon, GF_EpochGroupButtonsListDungeons[i]) end
-if IsAddOnLoaded("LFG") and LFGMain and LFGRoleCheckRoleTank and LFGRoleCheckAcceptRole then
-	GF_LFT_DUNGEONS = { ["Baradin Hold"] = "bh",["Blackfathom Deeps"] = "bfd",["Blackrock Depths"] = "brd",["Blackrock Depths Arena"] = "brdarena",["Blackrock Depths Emperor"] = "brdemp",["The Deadmines"] = "dm",
-	["Glittermurk Mines"] = "ggm",["Gnomeregan"] = "gnomer",["Lower Blackrock Spire"] = "lbrs",["Maraudon Orange"] = "maraorange",["Maraudon Princess"] = "maraprincess",["Maraudon Purple"] = "marapurple",
-	["Ragefire Chasm"] = "rfc",["Razorfen Downs"] = "rfd",["Razorfen Kraul"] = "rfk",["Scholomance"] = "scholo",["Shadowfang Keep"] = "sfk",["Scarlet Monastery Armory"] = "smarmory",["Scarlet Monastery Cathedral"] = "smcath",
-	["Scarlet Monastery Library"] = "smlib",["Scarlet Monastery Graveyard"] = "smgy",["Temple of Atal'Hakkar"] = "st",["The Stockade"] = "stocks",["Stratholme: Scarlet Bastion"] = "stratlive",["Stratholme: Undead District"] = "stratud",
-	["Uldaman"] = "ulda",["Upper Blackrock Spire"] = "ubrs",["Wailing Caverns"] = "wc",["Zul'Farrak"] = "zf", }
-end
+		for i=1, getn(GF_EpochSearchList) do table.insert(GF_BUTTONS_LIST.SearchList, 27, GF_EpochSearchList[i]) end
+		for i=1, getn(GF_EpochGroupButtonsListGetWhoLevel) do table.insert(GF_BUTTONS_LIST.GetWhoLevel, 32, GF_EpochGroupButtonsListGetWhoLevel[i]) end
+		for i=1, getn(GF_EpochGroupButtonsListDungeons) do table.insert(GF_BUTTONS_LIST.LFGDungeon, GF_EpochGroupButtonsListDungeons[i]) end
+		if IsAddOnLoaded("LFG") and LFGMain and LFGRoleCheckRoleTank and LFGRoleCheckAcceptRole then
+			GF_LFT_DUNGEONS = { ["Baradin Hold"] = "bh",["Blackfathom Deeps"] = "bfd",["Blackrock Depths"] = "brd",["Blackrock Depths Arena"] = "brdarena",["Blackrock Depths Emperor"] = "brdemp",["The Deadmines"] = "dm",
+			["Glittermurk Mines"] = "ggm",["Gnomeregan"] = "gnomer",["Lower Blackrock Spire"] = "lbrs",["Maraudon Orange"] = "maraorange",["Maraudon Princess"] = "maraprincess",["Maraudon Purple"] = "marapurple",
+			["Ragefire Chasm"] = "rfc",["Razorfen Downs"] = "rfd",["Razorfen Kraul"] = "rfk",["Scholomance"] = "scholo",["Shadowfang Keep"] = "sfk",["Scarlet Monastery Armory"] = "smarmory",["Scarlet Monastery Cathedral"] = "smcath",
+			["Scarlet Monastery Library"] = "smlib",["Scarlet Monastery Graveyard"] = "smgy",["Temple of Atal'Hakkar"] = "st",["The Stockade"] = "stocks",["Stratholme: Scarlet Bastion"] = "stratlive",["Stratholme: Undead District"] = "stratud",
+			["Uldaman"] = "ulda",["Upper Blackrock Spire"] = "ubrs",["Wailing Caverns"] = "wc",["Zul'Farrak"] = "zf", }
+		end
 	end
 end
