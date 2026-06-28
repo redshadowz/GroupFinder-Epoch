@@ -1,6 +1,5 @@
 ﻿local GF_CurrentVersion						= 7150 -- New revisions cause a reset of basic settings
 
-GF_TranslationLoaded						= nil
 GF_SavedVariables 							= {}
 GF_PerCharVariables							= {}
 GF_RealmName								= GetRealmName()
@@ -27,6 +26,7 @@ local GF_GetWhoResetTimer					= 900
 local GF_ClassWhoRequest					= nil -- The Who Update function will search for GetWho classes. Turns off when done, or when button is clicked again, or if clicking whisper/skip button.
 local GF_LFGInviteTime						= {}
 local GF_RequestInviteTime					= {}
+GF_LFGDescriptionEditBoxHasFocus			= { nil,0 }
 GF_ButtonIDAliases 							= {}
 
 GF_MessageList								= {}
@@ -99,7 +99,7 @@ local GF_TextColors = { ["SYSTEM"] = {1,1,0},["SAY"] = {1,1,1},["YELL"] = {1,0.2
 ["EMOTE"] = {1,0.502,0.251},["TEXT_EMOTE"] = {1,0.502,0.251},["COMBAT_FACTION_CHANGE"] = {0.502,0.502,1},["COMBAT_XP_GAIN"] = {0.4353,0.4353,1},["COMBAT_HONOR_GAIN"] = {0.8784,0.792,0.0392},["MONSTER_SAY"] = {1,1,1},
 ["MONSTER_EMOTE"] = {1,0.502,0.251},["MONSTER_YELL"] = {1,0.251,0.251},["HARDCORE"] = {0.902,0.8,0.502}, } --["HARDCORE"] = {0.651,0.6,0.451} }
 local EventIDAlias = { ["SAY"] = "[S] ",["YELL"] = "[Y] ",["GUILD"] = "[G] ",["OFFICER"] = "[O] ",["WHISPER"] = "",["WHISPER_INFORM"] = "[To] ",["PARTY"] = "[P] ",["RAID"] = "[R] ",["RAID_LEADER"] = "[RL] ",["RAID_WARNING"] = "[RW] ",
-["BATTLEGROUND"] = "[BG] ",["BATTLEGROUND_LEADER"] = "[BL] ",["SYSTEM"] = "",["FRIEND"] = "[F] ",[strupper(TRADE)] = "[2] ",[strupper(GENERAL)] = "[1] ",}
+["BATTLEGROUND"] = "[BG] ",["BATTLEGROUND_LEADER"] = "[BL] ",["SYSTEM"] = "",["FRIENDS"] = "[F] ",[strupper(TRADE)] = "[2] ",[strupper(GENERAL)] = "[1] ",}
 
 local GF_ChatNameAlias = { ["OFFICER"] = "GUILD",["RAID"] = "PARTY",["RAID_LEADER"] = "PARTY",["RAID_WARNING"] = "PARTY",["BATTLEGROUND"] = "PARTY",["BATTLEGROUND_LEADER"] = "PARTY",["WHISPER_INFORM"] = "WHISPER",}
 local GF_ChatBypass = { ["SYSTEM"] = true,["MONEY"] = true,["LOOT"] = true,["COMBAT_FACTION_CHANGE"] = true,["COMBAT_XP_GAIN"] = true,["COMBAT_HONOR_GAIN"] = true,["EMOTE"] = true,["TEXT_EMOTE"] = true,["MONSTER_SAY"] = true,["MONSTER_EMOTE"] = true,["MONSTER_YELL"] = true,}
@@ -111,7 +111,6 @@ local ThingsToHide = { "GF_LogBottomButton","GF_LogDownButton","GF_LogUpButton",
 "GF_SettingsFrameButton","GF_ShowBlacklistButton","GF_ShowGroupsButton","GF_LogFrameButton", -- 4 other(17 to this point)
 "GF_ConvertLogMessagesToURL","GF_SaveCurrentGroupButton","GF_ResetCurrentGroupButton","GF_TranslateDropdownButton", -- Turn on/off independently
 "GF_QueuetoLFTButton","GF_GetWhoFrame","GF_LFGFrame","GF_MessageFrame","GF_LogFilterDropdownMenu","GF_GroupFilterDropdownMenu","GF_TranslateDropdownMenu","GF_ChatFilterDropdownMenu","GF_LFGHardCore","GF_FontName","GF_AlwaysShow","GF_GroupChannelName","GF_BlockList","GF_AutoBlacklistDropdownMenu","GF_LogChannelName" }
-
 GF_MenusToHide								= {}
 local GF_DifficultyColors = { ["RED"] = "ff0000",["ORANGE"] = "ff8040",["YELLOW"] = "ffff00",["GREEN"] = "1eff00",["GREY"] = "808080", }
 local GF_TankClasses = { ["DRUID"]=true,["WARRIOR"]=true,["PALADIN"]=true,["SHAMAN"]=true }
@@ -299,7 +298,7 @@ function GF_LoadVariables()
 		if GF_PerCharVariables.dpsmetersendhealing == nil then GF_PerCharVariables.dpsmetersendhealing = false end
 	end
 	if not GF_PerCharVariables.friendUnknown then GF_PerCharVariables.friendUnknown = {} end
-	if not GF_PerCharVariables.alwaysShown then GF_PerCharVariables.alwaysShown = {["GUILD"]=true,["FRIEND"]=true,["PARTY"]=true,["SAY"]=true,[strupper(GENERAL)]=true} end
+	if not GF_PerCharVariables.alwaysShown then GF_PerCharVariables.alwaysShown = {["GUILD"]=true,["FRIENDS"]=true,["PARTY"]=true,["SAY"]=true,[strupper(GENERAL)]=true} end
 	if GF_WhoTable[GF_RealmName]["LOADED"][4] < time() then -- Prune the WhoTable once per day
 		GF_WhoTable[GF_RealmName]["LOADED"] = { UnitLevel("player"),({UnitClass("player")})[2],"",time() + 86400 }
 		GF_PruneDataTables()
@@ -347,7 +346,7 @@ function GF_LoadVariables()
 	GF_FrameQuestModCheckButton:Hide()
 	GF_SavedVariables.purgepfdb = false
 	GF_PurgePFDBCheckButton:Hide() -- Also hide in vanilla if no PFUI
-	if not GF_TranslationLoaded then GF_SavedVariables.showtranslate = false GF_SavedVariables.showuntranslated = false GF_SavedVariables.translategroups = false GF_SavedVariables.blockforeign = false end
+	if not GF_TranslationLoaded then GF_SavedVariables.showtranslate = false GF_SavedVariables.showuntranslated = false GF_SavedVariables.blockforeign = false end
 end
 function GF_LoadSettings()
 	if GF_EPOCH_SERVERS_LIST[GF_RealmName] then GF_AddEpochWoWDungeonsRaids() GF_PlayingOnEpoch = true end -- See if I'm not Epoch servers.
@@ -545,7 +544,7 @@ function GF_OnLoad() -- Onload, Tooltips, and Frame/Minimap Functions
 			GF_BlackList[GF_RealmName][name] = true
 			GF_UpdateBlackListItems()
 		end
-		GF_AddChatMessage(name..GF_NOW_BEING_IGNORED,"SYSTEM","SYSTEM")
+		DEFAULT_CHAT_FRAME:AddMessage(name..GF_NOW_BEING_IGNORED,1,1,0.5)
 		--old_AddIgnore(name)
 	end
 	local old_SendWho = SendWho
@@ -739,8 +738,8 @@ function GF_HandleItemRefLinks(link,text,button,chatFrame)
 				GF_ShowGroupLogEntryFrame.offset = 0
 				GF_ShowGroupLogEntryFrame:Hide()
 				GF_ShowGroupLogEntryFrame:Show()
-				return true
 			end
+			return true
 		end
 	elseif strsub(link,1,4) == "gfcg" then
 		if strsub(link,6) == GF_CurrentZone then GroupHistoryLogTable = GF_PerCharVariables.CurrentGroup["TempData"] else GroupHistoryLogTable = GF_PerCharVariables.CurrentGroup[strsub(link,6)] end
@@ -2000,13 +1999,6 @@ function GF_Frame:PARTY_LEADER_CHANGED()
 	GF_OnUpdateFunctions["UpdateGroup"] = GF_UpdateGroup
 	GF_UpdateTicker = GetTime() + .1
 end
-function GF_Frame:PLAYER_LOGIN()
-	for i=1,NUM_CHAT_WINDOWS do
-		getglobal("ChatFrame"..i):SetScript('OnEvent', ChatFrame_OnEvent)
-		getglobal("ChatFrame"..i).oldAddMessage = getglobal("ChatFrame"..i).AddMessage
-		getglobal("ChatFrame"..i).AddMessage = function(self,msg,...) if msg then self:oldAddMessage(msg,...) end end
-	end
-end
 function GF_Frame:PLAYER_ENTERING_WORLD() -- When logging in in a group, PLAYER_ENTERING_WORLD > PARTY_MEMBERS_CHANGED > PARTY_MEMBERS_CHANGED again > ZONE_CHANGED_NEW_AREA... When party member goes offline, PARTY_MEMBERS_CHANGED... online, PARTY_MEMBERS_CHANGED
 -- When switching to raid, PARTY_MEMBERS_CHANGED > RAID_ROSTER_UPDATE... when raid member goes offline PARTY_MEMBERS_CHANGED > RAID_ROSTER_UPDATE... online PARTY_MEMBERS_CHANGED > RAID_ROSTER_UPDATE... reloading UI does nothing
 	for _,event in pairs({'PLAYER_LEAVING_WORLD','PARTY_MEMBERS_CHANGED','PARTY_LEADER_CHANGED','RAID_ROSTER_UPDATE','PARTY_INVITE_REQUEST','FRIENDLIST_UPDATE','GUILD_ROSTER_UPDATE','WHO_LIST_UPDATE','UNIT_NAME_UPDATE',
@@ -2046,6 +2038,13 @@ function GF_Frame:PLAYER_LEVEL_UP()
 	GF_FixLFGStrings()
 	if GF_PerCharVariables.getwhowhisperlevel == 0 then GF_GetWhoLevelDropdownTextLabel:SetText(LEVEL.." "..UnitLevel("player").."±") end
 	GF_UpdateQueueLFTButton()
+end
+function GF_Frame:PLAYER_LOGIN()
+	for i=1,NUM_CHAT_WINDOWS do
+		getglobal("ChatFrame"..i):SetScript('OnEvent', ChatFrame_OnEvent)
+		getglobal("ChatFrame"..i).oldAddMessage = getglobal("ChatFrame"..i).AddMessage
+		getglobal("ChatFrame"..i).AddMessage = function(self,msg,...) if msg then self:oldAddMessage(msg,...) end end
+	end
 end
 function GF_Frame:RAID_ROSTER_UPDATE()
 	GF_OnUpdateFunctions["UpdateGroup"] = GF_UpdateGroup
@@ -2313,13 +2312,25 @@ end
 
 function GF_BATTLEGROUND(event,arg1,arg2,arg8,arg9,arg12)
 	if not GF_WhoTable[GF_RealmName][arg2] or GF_WhoTable[GF_RealmName][arg2][1] == 0 then GF_GetPlayersCurrentlyInGroup() end
-	GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event,arg12)
 	GF_PreviousMessage[arg2] = {true}
+	if GF_TranslationLoaded and GF_SavedVariables.showtranslate then
+		local StringA = GF_TranslateString(arg1)
+		if languageName ~= GF_MY_LANGUAGE then GF_PreviousMessage[arg2][2] = StringA if GF_SavedVariables.showuntranslated then GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event) GF_PreviousMessage[arg2][3] = true end end
+		GF_AddLogMessage(StringA,4,true,arg2,arg8,arg9,event)
+	else
+		GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
+	end
 end
 function GF_BATTLEGROUND_LEADER(event,arg1,arg2,arg8,arg9,arg12)
 	if not GF_WhoTable[GF_RealmName][arg2] or GF_WhoTable[GF_RealmName][arg2][1] == 0 then GF_GetPlayersCurrentlyInGroup() end
-	GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
 	GF_PreviousMessage[arg2] = {true}
+	if GF_TranslationLoaded and GF_SavedVariables.showtranslate then
+		local StringA = GF_TranslateString(arg1)
+		if languageName ~= GF_MY_LANGUAGE then GF_PreviousMessage[arg2][2] = StringA if GF_SavedVariables.showuntranslated then GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event) GF_PreviousMessage[arg2][3] = true end end
+		GF_AddLogMessage(StringA,4,true,arg2,arg8,arg9,event)
+	else
+		GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
+	end
 end
 function GF_CHANNEL(event,arg1,arg2,arg8,arg9,arg12)
 	GF_ProcessChatMessages(event,arg1,arg2,arg8,arg9,arg12)
@@ -2340,8 +2351,14 @@ function GF_EMOTE(event,arg1,arg2,arg8,arg9,arg12)
 	GF_CheckForEmotes(arg1,arg2)
 end
 function GF_GUILD(event,arg1,arg2,arg8,arg9,arg12)
-	GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event)
 	GF_PreviousMessage[arg2] = {true}
+	if GF_TranslationLoaded and GF_SavedVariables.showtranslate then
+		local StringA = GF_TranslateString(arg1)
+		if languageName ~= GF_MY_LANGUAGE then GF_PreviousMessage[arg2][2] = StringA if GF_SavedVariables.showuntranslated then GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event) GF_PreviousMessage[arg2][3] = true end end
+		GF_WhisperReceivedAddToWhisperHistoryList(StringA,arg2,event)
+	else
+		GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event)
+	end
 end
 function GF_HARDCORE(event,arg1,arg2,arg8,arg9,arg12)
 	GF_ProcessChatMessages(event,arg1,arg2,arg8,arg9,arg12)
@@ -2364,28 +2381,58 @@ function GF_MONSTER_YELL(event,arg1,arg2,arg8,arg9,arg12)
 	GF_CheckForMonsterEmote(arg1,arg2)
 end
 function GF_OFFICER(event,arg1,arg2,arg8,arg9,arg12)
-	GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event)
 	GF_PreviousMessage[arg2] = {true}
+	if GF_TranslationLoaded and GF_SavedVariables.showtranslate then
+		local StringA = GF_TranslateString(arg1)
+		if languageName ~= GF_MY_LANGUAGE then GF_PreviousMessage[arg2][2] = StringA if GF_SavedVariables.showuntranslated then GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event) GF_PreviousMessage[arg2][3] = true end end
+		GF_WhisperReceivedAddToWhisperHistoryList(StringA,arg2,event)
+	else
+		GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event)
+	end
 end
 function GF_PARTY(event,arg1,arg2,arg8,arg9,arg12)
 	if not GF_WhoTable[GF_RealmName][arg2] or GF_WhoTable[GF_RealmName][arg2][1] == 0 then GF_GetPlayersCurrentlyInGroup() end
-	GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
 	GF_PreviousMessage[arg2] = {true}
+	if GF_TranslationLoaded and GF_SavedVariables.showtranslate then
+		local StringA = GF_TranslateString(arg1)
+		if languageName ~= GF_MY_LANGUAGE then GF_PreviousMessage[arg2][2] = StringA if GF_SavedVariables.showuntranslated then GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event) GF_PreviousMessage[arg2][3] = true end end
+		GF_AddLogMessage(StringA,4,true,arg2,arg8,arg9,event)
+	else
+		GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
+	end
 end
 function GF_RAID(event,arg1,arg2,arg8,arg9,arg12)
 	if not GF_WhoTable[GF_RealmName][arg2] or GF_WhoTable[GF_RealmName][arg2][1] == 0 then GF_GetPlayersCurrentlyInGroup() end
-	GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
 	GF_PreviousMessage[arg2] = {true}
+	if GF_TranslationLoaded and GF_SavedVariables.showtranslate then
+		local StringA = GF_TranslateString(arg1)
+		if languageName ~= GF_MY_LANGUAGE then GF_PreviousMessage[arg2][2] = StringA if GF_SavedVariables.showuntranslated then GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event) GF_PreviousMessage[arg2][3] = true end end
+		GF_AddLogMessage(StringA,4,true,arg2,arg8,arg9,event)
+	else
+		GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
+	end
 end
 function GF_RAID_LEADER(event,arg1,arg2,arg8,arg9,arg12)
 	if not GF_WhoTable[GF_RealmName][arg2] or GF_WhoTable[GF_RealmName][arg2][1] == 0 then GF_GetPlayersCurrentlyInGroup() end
-	GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
 	GF_PreviousMessage[arg2] = {true}
+	if GF_TranslationLoaded and GF_SavedVariables.showtranslate then
+		local StringA = GF_TranslateString(arg1)
+		if languageName ~= GF_MY_LANGUAGE then GF_PreviousMessage[arg2][2] = StringA if GF_SavedVariables.showuntranslated then GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event) GF_PreviousMessage[arg2][3] = true end end
+		GF_AddLogMessage(StringA,4,true,arg2,arg8,arg9,event)
+	else
+		GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
+	end
 end
 function GF_RAID_WARNING(event,arg1,arg2,arg8,arg9,arg12)
 	if not GF_WhoTable[GF_RealmName][arg2] or GF_WhoTable[GF_RealmName][arg2][1] == 0 then GF_GetPlayersCurrentlyInGroup() end
-	GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
 	GF_PreviousMessage[arg2] = {true}
+	if GF_TranslationLoaded and GF_SavedVariables.showtranslate then
+		local StringA = GF_TranslateString(arg1)
+		if languageName ~= GF_MY_LANGUAGE then GF_PreviousMessage[arg2][2] = StringA if GF_SavedVariables.showuntranslated then GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event) GF_PreviousMessage[arg2][3] = true end end
+		GF_AddLogMessage(StringA,4,true,arg2,arg8,arg9,event)
+	else
+		GF_AddLogMessage(arg1,4,true,arg2,arg8,arg9,event)
+	end
 end
 function GF_SAY(event,arg1,arg2,arg8,arg9,arg12)
 	GF_ProcessChatMessages(event,arg1,arg2,arg8,arg9,arg12)
@@ -2399,10 +2446,16 @@ function GF_TEXT_EMOTE(event,arg1,arg2,arg8,arg9,arg12)
 end
 function GF_WHISPER(event,arg1,arg2,arg8,arg9,arg12)
 	if GF_BlackList[GF_RealmName][arg2] and not GF_ExcludeNames[arg2] then GF_PreviousMessage[arg2] = {} return end
-	if not GF_WhoTable[GF_RealmName][arg2] and GF_PlayingOnTurtle and GF_SavedVariables.usewhoongroups and GF_SavedVariables.usefriendslist then GF_GetWhoData(arg2,arg12) end
-	GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event)
-	ChatEdit_SetLastTellTarget(arg2)
+	if not GF_WhoTable[GF_RealmName][arg2] and GF_PlayingOnTurtle and GF_SavedVariables.usewhoongroups and GF_SavedVariables.usefriendslist then GF_GetWhoData(arg2) end
 	GF_PreviousMessage[arg2] = {true}
+	if GF_TranslationLoaded and GF_SavedVariables.showtranslate then
+		local StringA = GF_TranslateString(arg1)
+		if languageName ~= GF_MY_LANGUAGE then GF_PreviousMessage[arg2][2] = StringA if GF_SavedVariables.showuntranslated then GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event) GF_PreviousMessage[arg2][3] = true end end
+		GF_WhisperReceivedAddToWhisperHistoryList(StringA,arg2,event)
+	else
+		GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event)
+		table.insert(DEFAULT_CHAT_FRAME.editBox.lastTell,1,arg2)
+	end
 end
 function GF_WHISPER_INFORM(event,arg1,arg2,arg8,arg9,arg12)
 	if not GF_WhoTable[GF_RealmName][arg2] and GF_PlayingOnTurtle and GF_SavedVariables.usewhoongroups and GF_SavedVariables.usefriendslist then GF_GetWhoData(arg2,arg12) end
@@ -2425,7 +2478,7 @@ function GF_ProcessChatMessages(event,arg1,arg2,arg8,arg9,arg12,delayed) -- Chat
 	if logType > 7 and GF_PlayerMessages[arg2] and GF_PlayerMessages[arg2][1] and GF_PlayerMessages[arg2][1][1] then GF_PlayerMessages[arg2][1][1] = time() + 1 end -- To block multiple messages in series(Guild,Trade,Blacklist,Level)
 	if not GF_CHANNEL_NO_LOG_LIST[arg9Fixed] then if GF_PreviousMessage[arg2][3] then GF_AddLogMessage(arg1,logType,true,arg2,arg8,arg9,event) end GF_AddLogMessage(GF_PreviousMessage[arg2][2] or arg1,logType,true,arg2,arg8,arg9,event) end
 	if (logType ~= 10 and (languageName == GF_MY_LANGUAGE or not GF_SavedVariables.blockforeign) and (GF_ChatCheckFilters(logType,arg1,arg2,event) or arg2 == "SYSTEM" or GF_PerCharVariables.alwaysShown[event] or GF_PerCharVariables.alwaysShown[arg9Fixed]))
-	or (GF_Guildies[arg2] and GF_PerCharVariables.alwaysShown["GUILD"]) or (GF_Friends[arg2] and GF_PerCharVariables.alwaysShown["FRIEND"]) or (GF_PlayersCurrentlyInGroup[arg2] and GF_PerCharVariables.alwaysShown["PARTY"]) then
+	or (GF_Guildies[arg2] and GF_PerCharVariables.alwaysShown["GUILD"]) or (GF_Friends[arg2] and GF_PerCharVariables.alwaysShown["FRIENDS"]) or (GF_PlayersCurrentlyInGroup[arg2] and GF_PerCharVariables.alwaysShown["PARTY"]) then
 		if delayed then
 			if event == "CHANNEL" then GF_AddChannelMessage(arg1,arg2,arg8,arg9) else GF_AddChatMessage(arg1,arg2,event) end
 		else
@@ -2491,7 +2544,7 @@ function GF_CheckForSystem(arg1)
 		GF_PreviousMessage["SYSTEM"] = {}
 		return
 	elseif strfind(arg1, WHO_NUM_RESULTS) then -- Changed elseif strfind(arg1, WHO_NUM_RESULTS) or strfind(arg1, WHO_NUM_RESULTS_P1) then
-		for i=1,GetNumWhoResults() do
+		for i=1, GetNumWhoResults() do
 			local name,guild,level,_,class = GetWhoInfo(i)
 			if GF_Classes[class] then
 				GF_WhoTable[GF_RealmName][name] = { level, GF_Classes[class], guild, time() }
@@ -2640,7 +2693,7 @@ function GF_GetTypes(arg1,arg2,showInfo)
 	end
 	local tLen,pos = getn(TableA),1
 	while pos <= tLen do
-		if TableA[pos][1] then
+		if type(TableA[pos]) == "table" then
 			stringA = TableA[pos][1]
 			TableA[pos][1] = nil
 			strPos,tPos,pVal,tVal,charType,TableB = 1,1,nil,nil,nil,{}
@@ -2805,14 +2858,14 @@ function GF_GetTypes(arg1,arg2,showInfo)
 		pos = pos + 1
 	end
 	if GF_TranslationLoaded then
-		for i=1, tLen do if TableA[i][1] then for j=1, getn(TableA[i]),2 do if GF_LANGUAGE_DETECT[TableA[i][j][2]] then for lang,_ in pairs(GF_LANGUAGE_DETECT[TableA[i][j][2]]) do if not languageID[lang] then languageID[lang] = 1 else languageID[lang] = languageID[lang] + 1 end end end end end end
+		for i=1, tLen do if type(TableA[i]) == "table" then for j=1, getn(TableA[i]),2 do if GF_LANGUAGE_DETECT[TableA[i][j][2]] then for lang,_ in pairs(GF_LANGUAGE_DETECT[TableA[i][j][2]]) do if not languageID[lang] then languageID[lang] = 1 else languageID[lang] = languageID[lang] + 1 end end end end end end
 		tVal = languageID[GF_MY_LANGUAGE] or 0
 		for langID,totalLang in pairs(languageID) do if totalLang > tVal then tVal = totalLang languageName = langID end if showInfo == true then print(langID.." - "..totalLang) end end
 		if languageName ~= GF_MY_LANGUAGE then
 			stringC = strupper(languageName)..": "
 			if languageName == "cn" then pVal = 18 else pVal = 6 end
 			for i=1, tLen do
-				if TableA[i][1] then
+				if type(TableA[i]) == "table" then
 					tVal = getn(TableA[i])
 					for j = 1+pVal < tVal and pVal or tVal-2, 2, -2 do
 						tPos = 1
@@ -2822,7 +2875,7 @@ function GF_GetTypes(arg1,arg2,showInfo)
 								for k=2, j, 2 do stringA = stringA..TableA[i][tPos+k][2] end
 								if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA] then
 									for k=1, j do table.remove(TableA[i],tPos+1) tVal=tVal-1 end -- Subtract the additional words/spaces
-									if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1] then
+									if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]) == "table" then
 										TableA[i][tPos] = {GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1],"Z"}
 										for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]),2 do -- Have 3 words.. Already added word #1... Now I need to add 2/3/4/5
 											table.insert(TableA[i], tPos+1, {GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][k+1],"Z"}) -- Add word #3 into position 2... On second rotation, will put word #5 into position 4
@@ -2846,7 +2899,7 @@ function GF_GetTypes(arg1,arg2,showInfo)
 							stringA = TableA[i][tPos][2]
 							if stringA then
 								if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA] then
-									if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1] then
+									if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]) == "table" then
 										TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1]
 										for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]),2 do -- Have 3 words.. Already added word #1... Now I need to add 2/3/4/5
 											table.insert(TableA[i], tPos+1, GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][k+1]) -- Add word #3 into position 2... On second rotation, will put word #5 into position 4
@@ -2871,10 +2924,10 @@ function GF_GetTypes(arg1,arg2,showInfo)
 							stringA = TableA[i][tPos][2]
 							if stringA then
 								if GF_PUNCTUATION_NO_SPACE[strbyte(stringA)] then
-									if GF_PUNCTUATION_CONNECTING[stringA] and TableA[i][tPos-2][2] and tVal > tPos+2 then
+									if GF_PUNCTUATION_CONNECTING[stringA] and type(TableA[i][tPos-2]) == "table" and TableA[i][tPos-2][2] and tVal > tPos+2 then
 										stringA = TableA[i][tPos-2][2]..TableA[i][tPos+2][2]
 										if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA] then
-											if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1] then
+											if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]) == "table" then
 												TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1]
 												for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]),2 do -- Have 3 words.. Already added word #1... Now I need to add 2/3/4/5
 													table.insert(TableA[i], tPos+1, GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][k+1]) -- Add word #3 into position 2... On second rotation, will put word #5 into position 4
@@ -2894,7 +2947,7 @@ function GF_GetTypes(arg1,arg2,showInfo)
 								else
 									stringB = strlower(TableA[i][tPos][1])
 									if GF_LANGUAGE_SINGLE_WORDS[languageName][stringB] then
-										if GF_LANGUAGE_SINGLE_WORDS[languageName][stringB][1] then
+										if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringB]) == "table" then
 											TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringB][1]
 											for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringB]),2 do
 												table.insert(TableA[i], tPos+1, GF_LANGUAGE_SINGLE_WORDS[languageName][stringB][k+1])
@@ -2906,7 +2959,7 @@ function GF_GetTypes(arg1,arg2,showInfo)
 											TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringB]
 										end
 									elseif GF_LANGUAGE_SINGLE_WORDS[languageName][stringA] then
-										if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1] then
+										if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]) == "table" then
 											TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1]
 											for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]),2 do
 												table.insert(TableA[i], tPos+1, GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][k+1])
@@ -2934,15 +2987,15 @@ function GF_GetTypes(arg1,arg2,showInfo)
 			end
 			if GF_SavedVariables.showtranslate then GF_PreviousMessage[arg2][2] = stringC if GF_SavedVariables.showuntranslated then GF_PreviousMessage[arg2][3] = true end end
 		else
-			for i=1, tLen do if TableA[i][1] then for j=1, getn(TableA[i]), 2 do TableA[i][j] = TableA[i][j][2] end end end
+			for i=1, tLen do if type(TableA[i]) == "table" then for j=1, getn(TableA[i]), 2 do TableA[i][j] = TableA[i][j][2] end end end
 		end
 	else
-		for i=1, tLen do if TableA[i][1] then for j=1, getn(TableA[i]), 2 do TableA[i][j] = TableA[i][j][2] end end end
+		for i=1, tLen do if type(TableA[i]) == "table" then for j=1, getn(TableA[i]), 2 do TableA[i][j] = TableA[i][j][2] end end end
 	end
 
 	tPos = 1
 	while tPos <= tLen do
-		if TableA[tPos][1] then
+		if type(TableA[tPos]) == "table" then
 			tVal = getn(TableA[tPos])
 			pos = 1 -- To detect word/word with no space(eg "lfgscholo" = lfg scholo) and fix single words
 			while pos <= tVal do
@@ -2961,7 +3014,7 @@ function GF_GetTypes(arg1,arg2,showInfo)
 						else
 							table.remove(TableA[tPos],pos+1)
 						end
-						tVal = tVal - 2	
+						tVal = tVal - 2
 					elseif TableA[tPos][pos+2] then
 						if GF_WORD_FIX_SINGLE_WORD[TableA[tPos][pos+2]] then TableA[tPos][pos+2] = GF_WORD_FIX_SINGLE_WORD[TableA[tPos][pos+2]] end
 						stringC = GF_WORD_FIX[TableA[tPos][pos-2]] and GF_WORD_FIX[TableA[tPos][pos-2]] or TableA[tPos][pos-2] -- stringC is previous word and already "fixed"
@@ -3053,7 +3106,7 @@ function GF_GetTypes(arg1,arg2,showInfo)
 								end
 							elseif stringA == "+-" or stringA == "-+" then -- This is for hardcore trade detection which is restricted to level ranges.
 								if tonumber(stringD) then foundTrades = foundTrades + 1 if showInfo == true then print("+-d% trade 1") end end
-							end							
+							end
 						end
 					elseif TableA[tPos][pos-2] then -- Nothing after, so only check before.
 						stringC = GF_WORD_FIX[TableA[tPos][pos-2]] and GF_WORD_FIX[TableA[tPos][pos-2]] or TableA[tPos][pos-2]
@@ -3964,7 +4017,7 @@ function GF_ProcessStringToTable(arg1,getLanguage,noLinks)
 	end
 	local tLen,pos = getn(TableA),1
 	while pos <= tLen do
-		if TableA[pos][1] then
+		if type(TableA[pos]) == "table" then
 			stringA = TableA[pos][1]
 			TableA[pos][1] = nil
 			strPos,tPos,pVal,tVal,charType,TableB = 1,1,nil,nil,nil,{}
@@ -4129,13 +4182,13 @@ function GF_ProcessStringToTable(arg1,getLanguage,noLinks)
 		pos = pos + 1
 	end
 	if getLanguage then
-		for i=1, tLen do if TableA[i][1] then for j=1, getn(TableA[i]),2 do if GF_LANGUAGE_DETECT[TableA[i][j][2]] then for lang,_ in pairs(GF_LANGUAGE_DETECT[TableA[i][j][2]]) do if not languageID[lang] then languageID[lang] = 1 else languageID[lang] = languageID[lang] + 1 end end end end end end
+		for i=1, tLen do if type(TableA[i]) == "table" then for j=1, getn(TableA[i]),2 do if GF_LANGUAGE_DETECT[TableA[i][j][2]] then for lang,_ in pairs(GF_LANGUAGE_DETECT[TableA[i][j][2]]) do if not languageID[lang] then languageID[lang] = 1 else languageID[lang] = languageID[lang] + 1 end end end end end end
 		tVal,languageName = languageID[GF_MY_LANGUAGE] or 0,GF_MY_LANGUAGE
 		for langID,totalLang in pairs(languageID) do if totalLang > tVal then tVal = totalLang languageName = langID end end
 		return TableA, tLen,languageName
 	elseif not noLinks then
 		for i=1, tLen do
-			if TableA[i][1] then for j=1, getn(TableA[i]), 2 do TableA[i][j] = TableA[i][j][2] end end
+			if type(TableA[i]) == "table" then for j=1, getn(TableA[i]), 2 do TableA[i][j] = TableA[i][j][2] end end
 		end
 		return TableA, tLen
 	else
@@ -4149,7 +4202,7 @@ function GF_TranslateString(arg1) -- /script print(GF_TranslateString("ALGUIEN D
 		stringC = strupper(languageName)..": "
 		if languageName == "cn" then pVal = 18 else pVal = 6 end
 		for i=1, tLen do
-			if TableA[i][1] then
+			if type(TableA[i]) == "table" then
 				tVal = getn(TableA[i])
 				for j = 1+pVal < tVal and pVal or tVal-2, 2, -2 do
 					tPos = 1
@@ -4159,7 +4212,7 @@ function GF_TranslateString(arg1) -- /script print(GF_TranslateString("ALGUIEN D
 							for k=2, j, 2 do stringA = stringA..TableA[i][tPos+k][2] end
 							if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA] then
 								for k=1, j do table.remove(TableA[i],tPos+1) tVal=tVal-1 end -- Subtract the additional words/spaces
-								if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1] then
+								if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]) == "table" then
 									TableA[i][tPos] = {GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1],"Z"}
 									for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]),2 do -- Have 3 words.. Already added word #1... Now I need to add 2/3/4/5
 										table.insert(TableA[i], tPos+1, {GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][k+1],"Z"}) -- Add word #3 into position 2... On second rotation, will put word #5 into position 4
@@ -4183,7 +4236,7 @@ function GF_TranslateString(arg1) -- /script print(GF_TranslateString("ALGUIEN D
 						stringA = TableA[i][tPos][2]
 						if stringA then
 							if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA] then
-								if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1] then
+								if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]) == "table" then
 									TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1]
 									for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]),2 do -- Have 3 words.. Already added word #1... Now I need to add 2/3/4/5
 										table.insert(TableA[i], tPos+1, GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][k+1]) -- Add word #3 into position 2... On second rotation, will put word #5 into position 4
@@ -4208,10 +4261,10 @@ function GF_TranslateString(arg1) -- /script print(GF_TranslateString("ALGUIEN D
 						stringA = TableA[i][tPos][2]
 						if stringA then
 							if GF_PUNCTUATION_NO_SPACE[strbyte(stringA)] then
-								if GF_PUNCTUATION_CONNECTING[stringA] and TableA[i][tPos-2][2] and tVal > tPos+2 then
+								if GF_PUNCTUATION_CONNECTING[stringA] and type(TableA[i][tPos-2]) == "table" and TableA[i][tPos-2][2] and tVal > tPos+2 then
 									stringA = TableA[i][tPos-2][2]..TableA[i][tPos+2][2]
 									if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA] then
-										if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1] then
+										if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]) == "table" then
 											TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1]
 											for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]),2 do -- Have 3 words.. Already added word #1... Now I need to add 2/3/4/5
 												table.insert(TableA[i], tPos+1, GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][k+1]) -- Add word #3 into position 2... On second rotation, will put word #5 into position 4
@@ -4231,7 +4284,7 @@ function GF_TranslateString(arg1) -- /script print(GF_TranslateString("ALGUIEN D
 							else
 								stringB = strlower(TableA[i][tPos][1])
 								if GF_LANGUAGE_SINGLE_WORDS[languageName][stringB] then
-									if GF_LANGUAGE_SINGLE_WORDS[languageName][stringB][1] then
+									if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringB]) == "table" then
 										TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringB][1]
 										for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringB]),2 do
 											table.insert(TableA[i], tPos+1, GF_LANGUAGE_SINGLE_WORDS[languageName][stringB][k+1])
@@ -4243,7 +4296,7 @@ function GF_TranslateString(arg1) -- /script print(GF_TranslateString("ALGUIEN D
 										TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringB]
 									end
 								elseif GF_LANGUAGE_SINGLE_WORDS[languageName][stringA] then
-									if GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1] then
+									if type(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]) == "table" then
 										TableA[i][tPos] = GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][1]
 										for k=2,getn(GF_LANGUAGE_SINGLE_WORDS[languageName][stringA]),2 do
 											table.insert(TableA[i], tPos+1, GF_LANGUAGE_SINGLE_WORDS[languageName][stringA][k+1])
@@ -4269,8 +4322,10 @@ function GF_TranslateString(arg1) -- /script print(GF_TranslateString("ALGUIEN D
 				stringC = stringC..TableA[i]
 			end
 		end
+		if GF_SavedVariables.showtranslate then GF_PreviousMessage[arg2][2] = stringC if GF_SavedVariables.showuntranslated then GF_PreviousMessage[arg2][3] = true end end
 	else
-		for i=1, tLen do if TableA[i][1] then for j=1, getn(TableA[i]), 2 do TableA[i][j] = TableA[i][j][2] end end end
+		stringC = ""
+		for i=1, tLen do if type(TableA[i]) == "table" then for j=1, getn(TableA[i]), 2 do TableA[i][j] = TableA[i][j][2] end stringC = stringC..table.concat(TableA[i]) else stringC = stringC..TableA[i] end end
 	end
 	return stringC, languageName, TableA, tLen
 end
@@ -4313,7 +4368,7 @@ function GF_GetGroupInformation(arg1,arg2,sentTime,event) -- Searches messages f
 				entry.message = GF_GetRolesFromLFGText(arg1)
 				if not GF_PlayerMessages[arg2] then GF_PlayerMessages[arg2] = { { time(),entry.message }, { time(), "ZZZzzz123654" }, { time(), "ZZZzzz123654" } } else table.insert(GF_PlayerMessages[arg2],1,{ time(), entry.message }) table.remove(GF_PlayerMessages[arg2],4) end
 				return 1,entry,true
-			end			
+			end
 		end
 		entry.message = GF_GetRolesFromLFGText(arg1)
 		if not GF_PlayerMessages[arg2] then GF_PlayerMessages[arg2] = { { time(),entry.message }, { time(), "ZZZzzz123654" }, { time(), "ZZZzzz123654" } } else table.insert(GF_PlayerMessages[arg2],1,{ time(), entry.message }) table.remove(GF_PlayerMessages[arg2],4) end
@@ -4665,7 +4720,7 @@ function GF_GetPlayersCurrentlyInGroup()
 			end
 		end
 	end
-	GF_CreateExcludeNamesList()	
+	GF_CreateExcludeNamesList()
 end
 function GF_GetNumGroupMembers()
 	if GetNumRaidMembers() > 0 then return GetNumRaidMembers() else return GetNumPartyMembers() + 1 end
@@ -4908,12 +4963,14 @@ function GF_TogglePlayerDropDownMenu(link,text,button,frame)
 	if GF_HandleItemRefLinks(link,text,button,frame) then return end
 	if button == "RightButton" and strsub(link,1,6) == "player" then
 		HideDropDownMenu(1)
-		GameTooltip:Hide()
-		GF_DropDownMenu = CreateFrame("Frame", "GF_DropDownMenu", frame, "UIDropDownMenuTemplate")
-		GF_DropDownMenu.name = strsub(link,8)
-		GF_DropDownMenu.message = GF_PlayerMessages[GF_DropDownMenu.name] and GF_PlayerMessages[GF_DropDownMenu.name][1][2] or GF_DEFAULT_PLAYER_NOTE
-		UIDropDownMenu_Initialize(GF_DropDownMenu, GF_CreateDropDownMenu, "MENU")
-		ToggleDropDownMenu(1, nil, GF_DropDownMenu, "cursor")
+		if strsub(link,8) ~= UnitName("player") then
+			GameTooltip:Hide()
+			GF_DropDownMenu = CreateFrame("Frame", "GF_DropDownMenu", frame, "UIDropDownMenuTemplate")
+			GF_DropDownMenu.name = strsub(link,8)
+			GF_DropDownMenu.message = GF_PlayerMessages[GF_DropDownMenu.name] and GF_PlayerMessages[GF_DropDownMenu.name][1][2] or GF_DEFAULT_PLAYER_NOTE
+			UIDropDownMenu_Initialize(GF_DropDownMenu, GF_CreateDropDownMenu, "MENU")
+			ToggleDropDownMenu(1, nil, GF_DropDownMenu, "cursor")
+		end
 	else
 		SetItemRef(link,text,button,frame)
 	end
@@ -4923,12 +4980,14 @@ function GF_ToggleGroupHistoryPlayerDropDownMenu(frame,text,button)
 	if not link or GF_HandleItemRefLinks(link,text,button,frame) then return end
 	if button == "RightButton" then
 		HideDropDownMenu(1)
-		GameTooltip:Hide()
-		GF_DropDownMenu = CreateFrame("Frame", "GF_DropDownMenu", frame, "UIDropDownMenuTemplate")
-		GF_DropDownMenu.name = strsub(link,8)
-		GF_DropDownMenu.message = GF_DEFAULT_PLAYER_NOTE
-		UIDropDownMenu_Initialize(GF_DropDownMenu, GF_CreateDropDownMenu, "MENU")
-		ToggleDropDownMenu(1, nil, GF_DropDownMenu, "cursor")
+		if strsub(link,8) ~= UnitName("player") then
+			GameTooltip:Hide()
+			GF_DropDownMenu = CreateFrame("Frame", "GF_DropDownMenu", frame, "UIDropDownMenuTemplate")
+			GF_DropDownMenu.name = strsub(link,8)
+			GF_DropDownMenu.message = GF_DEFAULT_PLAYER_NOTE
+			UIDropDownMenu_Initialize(GF_DropDownMenu, GF_CreateDropDownMenu, "MENU")
+			ToggleDropDownMenu(1, nil, GF_DropDownMenu, "cursor")
+		end
 	else
 		SetItemRef(link,text,button,frame)
 		CloseDropDownMenus(1)
@@ -5024,6 +5083,7 @@ function GF_CreateDropDownMenu()
 					table.remove(GF_GroupHistory[GF_RealmName],GF_DropDownMenu.id)
 					GF_GroupHistoryUpdateFrame()
 				end
+				if GF_DropDownMenu.name == GF_WhisperLogCurrentButtonName then GF_WhisperHistoryButtonPressed(1) end
 			end
 		end
 		info.value = nil
@@ -5035,7 +5095,7 @@ function GF_CreateDropDownMenu()
 		info.hasArrow = false
 		info.disabled = nil
 		info.text = GF_BLACK_LIST
-		info.func = function() table.insert(GF_BlackList[GF_RealmName], 1, { GF_DropDownMenu.name, GF_DropDownMenu.message }) GF_BlackList[GF_RealmName][GF_DropDownMenu.name] = true GF_UpdateBlackListItems() GF_ApplyFiltersToGroupList(true) end
+		info.func = function() if not GF_BlackList[GF_RealmName][GF_DropDownMenu.name] then table.insert(GF_BlackList[GF_RealmName], 1, { GF_DropDownMenu.name, GF_DropDownMenu.message }) GF_BlackList[GF_RealmName][GF_DropDownMenu.name] = true end DEFAULT_CHAT_FRAME:AddMessage(GF_DropDownMenu.name..GF_NOW_BEING_IGNORED,1,1,0.5) GF_UpdateBlackListItems() GF_ApplyFiltersToGroupList(true) end
 		info.value = nil
 		UIDropDownMenu_AddButton(info, 1)
 	end
@@ -5167,7 +5227,7 @@ function GF_WhisperHistoryButtonPressed(id,override,nolog) -- Whisper/Guild Hist
 	getglobal("GF_WhisperHistoryButton"..GF_WhisperLogCurrentButtonID):UnlockHighlight()
 	getglobal("GF_WhisperHistoryButton"..id):LockHighlight()
 	if GF_WhisperLogCurrentButtonID > 1 then getglobal("GF_WhisperHistoryButtonCheckButton"..GF_WhisperLogCurrentButtonID):Hide() end
-	if id > 1 then getglobal("GF_WhisperHistoryButtonCheckButton"..id):Show() end
+	if id > 1 and GF_SavedVariables.showwhisperlogs == 1 then getglobal("GF_WhisperHistoryButtonCheckButton"..id):Show() end
 
 	GF_WhisperLogCurrentButtonID = id
 	GF_WhisperLogLastWhisperLog = GF_SavedVariables.showwhisperlogs
@@ -5197,7 +5257,7 @@ function GF_WhisperReceivedAddToWhisperHistoryList(arg1,arg2,event,delayed)
 	end
 	table.insert(GF_LogHistory[GF_RealmName],1,{arg1,4,event})
 	if getn(GF_LogHistory[GF_RealmName]) > 500 then table.remove(GF_LogHistory[GF_RealmName],501) end
-	if GF_WhisperLogCurrentButtonID == 0 or GF_WhisperLogLastWhisperLog == 1 and (GF_WhisperLogCurrentButtonID == 1 or arg2 == getglobal("GF_WhisperHistoryButton"..GF_WhisperLogCurrentButtonID):GetText()) then
+	if GF_WhisperLogCurrentButtonID == 0 or (GF_WhisperLogLastWhisperLog == 1 and (GF_WhisperLogCurrentButtonID == 1 or arg2 == GF_WhisperLogCurrentButtonName)) then
 		local info = ChatTypeInfo[event]
 		if GF_ConvertMessagesToLinks then
 			local _,_,startString,endString = strfind(arg1, "(.-%].-|Hplayer.-|h|r:? )(.*)")
@@ -5319,7 +5379,7 @@ function GF_GroupHistoryUpdateFrame(name,insertonly)
 	if insertonly then return end
 	for i=2, 19 do
 		if GF_GroupHistory[GF_RealmName][i+GF_WhisperLogOffset] then
-			if GF_GroupHistory[GF_RealmName][GF_GroupHistory[GF_RealmName][i+GF_WhisperLogOffset]].priority then getglobal("GF_WhisperHistoryButtonCheckButton"..i):SetChecked(true) getglobal("GF_WhisperHistoryButton"..i.."TextureGold"):Show() else getglobal("GF_WhisperHistoryButtonCheckButton"..i):SetChecked(false) getglobal("GF_WhisperHistoryButton"..i.."TextureGold"):Hide() end
+			if GF_GroupHistory[GF_RealmName][GF_GroupHistory[GF_RealmName][i+GF_WhisperLogOffset]].priority then getglobal("GF_WhisperHistoryButtonCheckButton"..i):SetChecked(true) getglobal("GF_WhisperHistoryButton"..i.."TextureGold"):Show() getglobal("GF_WhisperHistoryButton"..i.."TextureGreen"):Show() else getglobal("GF_WhisperHistoryButtonCheckButton"..i):SetChecked(false) getglobal("GF_WhisperHistoryButton"..i.."TextureGold"):Hide() getglobal("GF_WhisperHistoryButton"..i.."TextureGreen"):Hide() end
 			getglobal("GF_WhisperHistoryButton"..i):SetText(GF_GroupHistory[GF_RealmName][i+GF_WhisperLogOffset])
 			getglobal("GF_WhisperHistoryButton"..i):Show()
 		else
@@ -5510,7 +5570,7 @@ function GF_UpdateBlackListItems() -- Blacklist functions
 	while GF_BlackListOffset > (getn(GF_BlackList[GF_RealmName]) + .1) do GF_BlackListOffset = GF_BlackListOffset - 20 end
 	GF_BlackListFramePageLabel:SetText(GF_PAGE.." "..ceil((GF_BlackListOffset + .1) / 20).." / "..math.max(ceil(getn(GF_BlackList[GF_RealmName]) / 20),1))
 	GF_BlackListFramePageLabel:Show()
-	for i=1,20 do
+	for i=1, 20 do
 		if getglobal("GF_BlackListItem"..i) then
 			if i+GF_BlackListOffset <= getn(GF_BlackList[GF_RealmName]) then
 				getglobal("GF_BlackListItem"..i.."NameLabel"):SetText(GF_BlackList[GF_RealmName][GF_BlackListOffset+i][1])
@@ -5542,6 +5602,7 @@ function GF_BlacklistAddPlayerDialogOKButton_OnCLick()
 		if not GF_BlackList[GF_RealmName][name] and not strfind(name, "[%d%p%c%s]") then
 			table.insert(GF_BlackList[GF_RealmName],1,{ name, GF_DEFAULT_PLAYER_NOTE })
 			GF_BlackList[GF_RealmName][name] = true
+			DEFAULT_CHAT_FRAME:AddMessage(name..GF_NOW_BEING_IGNORED,1,1,0.5)
 		else
 			DEFAULT_CHAT_FRAME:AddMessage(name..GF_INVALID_PLAYER_NAME,1,1,0.5)
 		end
@@ -5916,7 +5977,7 @@ function GF_GetWhoLevelDropdownShow()
 	if GF_PerCharVariables.getwhowhisperlevel == 0 then GF_GetWhoLevel1:SetChecked(true) end
 end
 function GF_AlwaysShowDropdownShow()
-	GF_BUTTONS_LIST["AlwaysShow"] = {{CHAT_MSG_GUILD},{FRIEND},{CHAT_MSG_PARTY},{CHAT_MSG_SAY},{CHAT_MSG_YELL},{GF_WORLD_CHANNEL_NAME},{GF_LFG_CHANNEL_NAME},{TRADE},{GENERAL},[strlower(GF_WORLD_CHANNEL_NAME)] = true,[strlower(GF_LFG_CHANNEL_NAME)] = true,[strlower(TRADE)] = true,[strlower(GENERAL)] = true,}
+	GF_BUTTONS_LIST["AlwaysShow"] = {{CHAT_MSG_GUILD},{FRIENDS},{CHAT_MSG_PARTY},{CHAT_MSG_SAY},{CHAT_MSG_YELL},{GF_WORLD_CHANNEL_NAME},{GF_LFG_CHANNEL_NAME},{TRADE},{GENERAL},[strlower(GF_WORLD_CHANNEL_NAME)] = true,[strlower(GF_LFG_CHANNEL_NAME)] = true,[strlower(TRADE)] = true,[strlower(GENERAL)] = true,}
 	local chanList = { GetChannelList() }
 	for i=1, getn(chanList) do if not tonumber(chanList[i]) and not GF_BUTTONS_LIST["AlwaysShow"][strlower(chanList[i])] then table.insert(GF_BUTTONS_LIST["AlwaysShow"],{chanList[i]}) end end
 	GF_GetDropDownButtons("AlwaysShow",6,true)
@@ -6356,6 +6417,24 @@ function GF_leaveQueueButton_OnClick()
 	leaveQueue()
 	GF_UpdateQueueLFTButton()
 end
+function GF_ReportDamageMeter()
+	if not GroupHistoryLogTable then return end
+	if ChatEdit_GetActiveWindow() then
+		local playerTable = {}
+		for pname,data in pairs(GroupHistoryLogTable[3]) do
+			table.insert(playerTable, {data[3],ceil(data[3]/data[5]),data[4],ceil(data[4]/data[5]),pname,data[1],data[2],strlen(pname)+strlen(data[1])})
+		end
+		if GF_PerCharVariables.dpsmetersenddamage then table.sort(playerTable, function(a,b) return a[1]>b[1] end) else table.sort(playerTable, function(a,b) return a[3]>b[3] end) end
+		for i=1, getn(playerTable) do
+			if GF_PerCharVariables.dpsmetersenddamage then
+				SendChatMessage("|cff"..(GF_ClassColors[playerTable[i][7]] or "9d9d9d").."|Hplayer:"..playerTable[i][5].."|h["..playerTable[i][5]..", "..playerTable[i][6].."]|h|r"..strsub("-------------------------",1,-(strlen(playerTable[i][1]) + playerTable[i][8])).." "..playerTable[i][1].." "..GF_DAMAGE.." ... "..playerTable[i][2].." "..GF_DPS,ChatEdit_GetActiveWindow():GetAttribute("chatType"),nil,ChatEdit_GetActiveWindow():GetAttribute("chatType") == "WHISPER" and ChatEdit_GetActiveWindow():GetAttribute("tellTarget") or ChatEdit_GetActiveWindow():GetAttribute("channelTarget"))
+			else
+				SendChatMessage("|cff"..(GF_ClassColors[playerTable[i][7]] or "9d9d9d").."|Hplayer:"..playerTable[i][5].."|h["..playerTable[i][5]..", "..playerTable[i][6].."]|h|r"..strsub("-------------------------",1,-(strlen(playerTable[i][3]) + playerTable[i][8])).." "..playerTable[i][3].." "..GF_HEALING.." ... "..playerTable[i][4].." "..GF_HPS,ChatEdit_GetActiveWindow():GetAttribute("chatType"),nil,ChatEdit_GetActiveWindow():GetAttribute("chatType") == "WHISPER" and ChatEdit_GetActiveWindow():GetAttribute("tellTarget") or ChatEdit_GetActiveWindow():GetAttribute("channelTarget"))
+			end
+			if i == 5 then break end
+		end
+	end
+end
 
 function GF_GetPlayerInfoByGUID(guid)
 	local success,_,class,_,race,_,name,realm = pcall(GetPlayerInfoByGUID,guid)
@@ -6389,7 +6468,7 @@ function GetModifiedQuestName(arg1,renamedungeon)
 
 	tPos = 1
 	while tPos <= tLen do
-		if TableA[tPos][1] then
+		if type(TableA[tPos]) == "table" then
 			tVal = getn(TableA[tPos])
 			pos = 1 -- To detect word/word with no space(eg "lfgscholo" = lfg scholo) and fix single words
 			while pos <= tVal do
@@ -6408,7 +6487,7 @@ function GetModifiedQuestName(arg1,renamedungeon)
 						else
 							table.remove(TableA[tPos],pos+1)
 						end
-						tVal = tVal - 2	
+						tVal = tVal - 2
 					elseif TableA[tPos][pos+2] then
 						if GF_WORD_FIX_SINGLE_WORD[TableA[tPos][pos+2]] then TableA[tPos][pos+2] = GF_WORD_FIX_SINGLE_WORD[TableA[tPos][pos+2]] end
 						stringC = GF_WORD_FIX[TableA[tPos][pos-2]] and GF_WORD_FIX[TableA[tPos][pos-2]] or TableA[tPos][pos-2] -- stringC is previous word and already "fixed"
@@ -6494,7 +6573,7 @@ function GetModifiedQuestName(arg1,renamedungeon)
 										if TableA[tPos][pos+1] == "" then TableA[tPos][pos+1] = " " end
 									end
 								end
-							end							
+							end
 						end
 					elseif TableA[tPos][pos-2] then -- Nothing after, so only check before.
 						stringC = GF_WORD_FIX[TableA[tPos][pos-2]] and GF_WORD_FIX[TableA[tPos][pos-2]] or TableA[tPos][pos-2]
@@ -6874,24 +6953,6 @@ function CompileQuestTemp() -- /script CompileQuestTemp()
 	GF_SavedVariables.questconversion = {}
 	for entryname,wtable in pairs(GF_QUEST_CONVERT) do
 		GF_SavedVariables.questconversion[entryname] = wtable
-	end
-end
-function GF_ReportDamageMeter()
-	if not GroupHistoryLogTable then return end
-	if ChatEdit_GetActiveWindow() then
-		local playerTable = {}
-		for pname,data in pairs(GroupHistoryLogTable[3]) do
-			table.insert(playerTable, {data[3],ceil(data[3]/data[5]),data[4],ceil(data[4]/data[5]),pname,data[1],data[2],strlen(pname)+strlen(data[1])})
-		end
-		if GF_PerCharVariables.dpsmetersenddamage then table.sort(playerTable, function(a,b) return a[1]>b[1] end) else table.sort(playerTable, function(a,b) return a[3]>b[3] end) end
-		for i=1, getn(playerTable) do
-			if GF_PerCharVariables.dpsmetersenddamage then
-				SendChatMessage("|cff"..(GF_ClassColors[playerTable[i][7]] or "9d9d9d").."|Hplayer:"..playerTable[i][5].."|h["..playerTable[i][5]..", "..playerTable[i][6].."]|h|r"..strsub("-------------------------",1,-(strlen(playerTable[i][1]) + playerTable[i][8])).." "..playerTable[i][1].." "..GF_DAMAGE.." ... "..playerTable[i][2].." "..GF_DPS,ChatEdit_GetActiveWindow():GetAttribute("chatType"),nil,ChatEdit_GetActiveWindow():GetAttribute("chatType") == "WHISPER" and ChatEdit_GetActiveWindow():GetAttribute("tellTarget") or ChatEdit_GetActiveWindow():GetAttribute("channelTarget"))
-			else
-				SendChatMessage("|cff"..(GF_ClassColors[playerTable[i][7]] or "9d9d9d").."|Hplayer:"..playerTable[i][5].."|h["..playerTable[i][5]..", "..playerTable[i][6].."]|h|r"..strsub("-------------------------",1,-(strlen(playerTable[i][3]) + playerTable[i][8])).." "..playerTable[i][3].." "..GF_HEALING.." ... "..playerTable[i][4].." "..GF_HPS,ChatEdit_GetActiveWindow():GetAttribute("chatType"),nil,ChatEdit_GetActiveWindow():GetAttribute("chatType") == "WHISPER" and ChatEdit_GetActiveWindow():GetAttribute("tellTarget") or ChatEdit_GetActiveWindow():GetAttribute("channelTarget"))
-			end
-			if i == 5 then break end
-		end
 	end
 end
 
